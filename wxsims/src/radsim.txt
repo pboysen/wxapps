@@ -1,0 +1,299 @@
+Case 1 Title:
+Energy Sources  
+Case Instructions/Overview:
+[: https://youtu.be/WOEty4wIs8U]
+The video from space shows our atmosphere in constant motion. What causes this behavior? You will learn to investigate some of the reasons for this by doing what scientist do - make educated guesses and collect data to see if your ideas are correct. If not, use what you have learned and try again.
+
+In studying the constant motions of the atmosphere you will be confronted with several familiar circumstances associated with the air near the surface and the effects of different surfaces that most of us take for granted. As is often the case, things may be different than we have always assumed. You will be challenged to think about what may be happening and to express your best ideas in the form of hypotheses. An hypothesis is an idea not yet proven but is a step that will lead to refined understanding. After you record your hypothesis a simulation is provided to enable you to collect data to evaluate the validity of your ideas.
+Phase 1 title:
+Atmospheric warming
+Phase 1 Introduction
+Several years ago snow was dropped in a band from northwest to southeast across the state of Iowa. It was snow free in the other 2/3rds of the state. Data from this event have been used to construct realistic events that are used to challenge your thinking about how energy from the sun warms the atmosphere (the air that surrounds the earth) and the earth below.You will look at data from 4 different regions of the state.
+Insert Figure 3barns.png in Rex stuff
+
+Phase 1 hypothesis:
+How do you think the ATMOSPHERE is warmed? Make a guess concerning the energy sources. This best guess is your hypothesis.
+[atmoshyp]
+Phase 2 Expert answer
+Our experiences suggest that the sun warms everything. Let’s find some data to help us make our hypothesis.
+
+Data Collection:
+Use RadSim to collect the temperature profile data for the atmosphere above the grass surface. To do this move the balloon vertically a distance and click plot. The data will be plotted on a graph. Repeat until you have plotted a complete line. You may redo your data collection until you are satisfied with your results. Collect data for only day time when the sun is shining. 
+[radsim]
+Phase 2 analysis:
+How does the data relate to your hypothesis. Do they confirm what you predicted or do you need to modify your original idea?
+[confirmhyp]
+
+Phase 3 expert comments:
+[grass_day.png]
+If the sun’s energy directly warms the atmosphere we would expect to have the atmosphere get warmer as we go up closer to the sun. But during the day the atmosphere cools, not gets warmer, as we get closer to the sun.   What is happening?  Since the atmosphere gets warmer closer to the earth, this suggests that the surface of the earth might be the energy source for warming the atmosphere.
+
+Surface heating
+
+Phase 3 hypothesis:
+How does the GRASS SURFACE warm? Make an hypothesis concerning the sources of the energy responsible for warming it.  Does it warm the same at day as at night?
+[warmgrass]
+
+Phase 4 expert answer
+We’re pretty sure the sun warms the surface but we should collect data to confirm our ideas.
+
+Data Collection:
+Use the balloon to collect temperature data for the atmosphere above the grass surface, but this time do it for both day and night. 
+
+Phase 4 analysis
+Do the data fit with what you originally thought ? What would be a better hypothesis now that you have more information?
+[grassnightday]
+
+Phase 5 expert comments:
+[grass_day_night.png]
+During the day the grass surface is warmer than the atmospheric air that overlies it because the grass surface absorbs energy from the sun. Because the grass surface is warmer it can transfer energy to the cooler air, but the atmosphere doesn’t seem to absorb solar energy well. However, at night, the grass surface cools to the point where the atmospheric air is warmer than the grass surface.   A warmer essence is an energy source for a cooler one.  Does this mean that the grass surface is the energy source for the atmosphere during the day and the atmospheric air is the energy source for the grass surface during the night?  How this could happen is yet to be discussed.
+
+
+Phase 6 Summary
+
+Some conclusions that relate to our observations are:
+Solar radiation (sunlight) apparently passes through the atmosphere without giving up energy to heat it.
+Some radiation must be invisible to us. For example, the earth cools at night (loses energy) but we don't see that process.    
+
+
+Case 2 title:
+Radiation Principles
+Case 2 overview
+
+Our earth/atmosphere system is energized by radiation emitted by the sun.  Eventually radiation is lost back to space to balance energy input and output. To find the amount of this lost radiation we use the Stefan-Boltzmann Law. There is more energy radiated at some wavelengths than others, and it is important to know which wavelengths are associated with the greatest radiation emitted. Wien’s Law tells us where that is. You will investigate how this works in this case. 
+
+Phase 1 title
+Radiation  Better version in TS
+Phase 1 Stefan-Boltzmann Law
+Every object has a temperature and emits (gives off) energy in the form of radiation. 
+The amount of this energy is described by the Stefan-Boltzmann Law.
+The emitted energy is related to the temperature, in degrees Kelvin, of the object to the fourth power. This means hot objects radiate a lot more energy than cool ones. Remember that the value of T in the equation is T^4, which will significantly increase the value of E. 
+Phase 1 calculation
+To appreciate this effect ignore the two constants and just consider energy emitted “E” for (about the temperature of the sun). Calculate E (6000) / E (300).various T’s. Calculate E for T = 100, 200, 300 (about the temperature of the earth), and T = 6000 
+[calcte]
+Phase 2 expert comments
+Use your table and E (6000)/ E(300)= 160,000.This result demonstrates how much greater the sun emits compared with the earth.
+
+
+
+
+
+
+
+The temperature of the earth is about 300 K and that of the sun, 6000 K, so the sun’s radiant energy output is huge compared with the earth. 
+
+The Stefan-Boltzmann law only calculates the total energy emitted at any temperature. There is no wavelength dependence. But a complex blackbody equation (not shown here) has been used to construct the graph below for the energy radiated by a blackbody (at any wavelength) for the two temperatures, 6000 K and 300 K. A blackbody is an idealized physical body that absorbs all incident electromagnetic radiation. Using the blackbody equation allows us to find two pieces of information: The amount of energy that an object radiates, and the wavelength of the energy radiated the most.
+
+Radiation  Better version in TS
+Wien’s Law
+Although we now know about the relative amounts of energy radiated by the sun and the earth, there are a few more important facts to understand. For example, the maximum energy the sun radiates is at wavelengths in the visible region. None of the energy emitted by the earth in the visible region is strong enough to be noticeable. In fact it is extremely small. The blackbody curve for the sun (T = 6000 K) is the yellow curve shown in the left panel.
+
+
+
+em_spec_sm.gif
+We still need more information before we can make sense of all of this. Wien’s Law shows us the wavelength, in microns, 
+where an object has the greatest radiant energy emission (one micron is 1 meter divided by 1 million). (Add Wien’s equation) If we slightly change the constant from 2980 to 3000 we can easily calculate the wavelength at which the sun and earth have maximum radiant energy emission.
+
+
+
+
+Phase 2 calculation
+Use the approximate value of the constant, 3000, and calculate the wavelengths of maximum emission for the sun (T = 6000 K) and for the earth (T = 300 K).
+[wavelength]
+Phase 3 Expert answer
+
+Wien’s law was used to determine the wavelength where the emitted radiation is the strongest. The sun’s temperature is about 6000 K so from this relationship (3000/6000 = 0.5) the predominant radiation is 0.5 . This is in the middle of the visible wavelength region 0.4 - 0.7 . The average temperature of the earth is about 300 K so Wien’s law determines that the wavelength region of maximum emission is centered on 10  which is in the infrared region.
+
+
+
+Phase 3 significance
+[em_spec_sm.gif]
+To understand the significance of this, look at the blackbody curve for the sun. Notice that the curve is essentially zero where the right side of the figure is terminated at 10 microns. The red curve on the right represents the blackbody curve for the earth. The 300 K curve for the earth is actually always under the 6000 K curve for the sun but it has been amplified to show the maximum at 10 microns. The earth’s emission is completely swamped by that of the sun!
+As you might expect there is more to the story. The sun radiates in all directions but only a small part is received by the earth. When we compare the energy of the sun available at the 
+
+[sun_earth.png]
+earth with the earth’s blackbody radiation a different picture emerges. The next Figure [two_bb.png] 
+shows  that the two blackbody curves are now about the same. What this means is that the energy from the sun incident on the earth is about the same as the energy emitted by the earth.
+The next figure ([two_bb.png] ) has two parts. Begin with the top part which shows the blackbody curves for both the sun and earth,. The left hand curve is that part of the energy emitted by the sun that reaches the earth’s atmosphere and the right hand curve is the energy emitted by the earth  which eventually is lost to space.The vertical wiggly lines represent wavelength. On the left side the wiggles are very close together, or short waves. On the right the wiggles are almost smooth to show long waves. The vertical colored “rainbow” band indicates the visible region of the sun’s radiant output. 
+
+Phase 3 question 
+What would happen if the energy the earth received from the sun differed from the energy emitted back to space by the earth?
+This is a very important conclusion. Why?
+[tempdiffdiff]
+
+Phase 4 expert answer
+If the energy from the sun differed from the energy emitted by the earth the earth system would  either warm or cool until a balance is achieved and our climate would be different. Remember, the emitted energy is proportional to the 4th power of the temperature.
+
+Phase 5 Summary
+We now know how bodies with different temperatures emit radiant energy (radiation). But our earth is surrounded by an atmosphere composed of a variety of gases. The abundance of the most important of these gases is given in the table. We need oxygen to support life, and nitrogen plays many important roles as well, but it is the minor or trace gases that are more interesting. You will see why in the next phase.
+
+Permanent: nitrogen, oxygen, argon
+Variable (minor or trace): ozone, carbon dioxide, water vapor, cfcs, ??
+  
+
+Phase 4 title:
+Short Wave Absorption
+Phase 4 content:
+[previous figure]
+Now let us look at the bottom part of the graph we just looked at; it shows the absorption of radiation by the atmosphere.  At the extreme left the curve is at 1, which means 100 % absorption is occurring for energy at those wavelengths (shortwave).  The area under the curve is surrounded by a thin gold line to emphasize the amount of this absorption. Total absorption is 1. Fortunately for us all of the shortwaves just below the visible are absorbed. They would be fatal.Notice that this is the ultraviolet region  (see bottom of graph). This absorption is fortunate since ultraviolet radiation would be lethal for us if it passed to the surface unhindered.  As we progress further to the right there is a section where there is hardly any absorption. This is called the short wave window. Notice how it corresponds to the blackbody curve for the sun which is just above it.
+Phase 4 question 
+Refer to the figure (two_bb.png) with the temperature profile data you collected and discuss how the absorption of shortwave (solar) energy is involved in transferring energy to the atmosphere.
+ [8_profiles.png]
+Discuss how short wave absorption properties relate to the temperature profiles you observed in the balloon activity.
+[shortwave]
+Phase 5 expert answer
+The absence of absorption in the region of significant solar emission means that the sun’s radiation passes through the atmosphere with almost no interaction, thus solar radiation has limited ability to warm the atmosphere.
+Phase 6 Summary
+We have only considered the left, or shortwave, energy curve so far. But an equally large energy source at wavelengths greater than about 5 microns still awaits our consideration and is represented by the righthand curve. You will examine how the energies at these wavelengths interact with our atmosphere in the next phase.
+
+Phase 7 title
+Long Wave Absorption
+
+Phase 7 observations
+[two_bb.png]
+Look at the absorption graph in the extreme long wave region (all the way to the right).There is almost total absorption of longwave energy here. As we look back to shorter wavelengths (to the left), we come to an area where there is a valley. This means that the atmosphere absorbs relatively little at  these wavelengths. Notice that this window region corresponds closely with the wavelengths where the earth emits the most energy. We see that the atmosphere absorbs some of this radiation but also allows some to pass through to outer space.
+Phase 7 analysis 
+Discuss how this absorption region differs from that in the visible section.
+[longwave]
+Phase 8 expert answer
+[two_bb.png]
+Unlike the short wave window which is open to the sun’s maximum radiation wavelengths, the long wave window has some absorption at wavelengths where the earth radiation is still significant. So some energy emitted at long wavelengths is absorbed by atmospheric gases and thus warms the atmosphere. 
+Phase 8 question
+The most important gases in the atmosphere that absorb this radiation emitted by the earth are water vapor and carbon dioxide. What do you think the consequences might be if the abundance of these gases changed?
+[consequence]
+Phase 9 expert answer
+If the abundance of either of these gases increased the absorption of longwave energy would be greater and, in the absence of other factors, the temperature of the atmosphere would increase.
+Phase 10 Summary
+This discussion of the absorption of  short and longwave radiation by gases in the atmosphere is applicable to the region of the atmosphere where weather occurs, the troposphere. There is another absorption participant that plays a major role in weather processes. You will investigate that in the next case.
+Case 3 title
+Surface Temperatures
+Case 3 introduction
+Different surface types warm differently. For example, a sidewalk is too hot for barefeet on a sunny summer day but the grass alongside is comfortable. You will be challenged to explain why these differences happen in this case.
+Phase 1 title: 
+Surface Characteristics
+Phase 1 Overview:
+There are three other regions in addition to the grass field: a plowed field (bare soil), a sand expanse and a snow covered landscape. These surface types may be expected to have surface temperatures different from a grass surface. The following table contains some physical characteristics of various substances that provide a basis for understanding surface temperature differences.
+Definitions: 
+Thermal conductivity is a material property describing the ability to conduct heat.
+Specific heat of a substance is the amount of heat required to increase the temperature of one gram of the substance 1 degree C.
+Albedo is the fraction of incident solar radiation reflected (per cent)
+
+
+    Substance        specific heat    thermal conductivity @25C        albedo
+            cal/g xC        w/(mxK)        per cent reflectivity
+    water            1.00            0.58
+    ice (0C)        0.50            2.18
+    fresh snow        0.50            0.05 – 0.25            80-90
+    sandy clay        0.33            0.15 – 1.8
+    moist soil        0.25            1.4                10
+    dry air            0.24            0.024
+    sand(beach/desert)    0.19            0.15 – 0.25            20-40
+    grass                                        5 -25
+
+
+Phase 1 hypotheses:
+Based on your experience and the table data, hypothesize about what the relative surface temperatures will be for the bare soil, sand and snow surfaces. The conditions are all the same except for the surface type. Use your experience with the grass surface as a basis for your hypotheses.
+[surfhyp]
+
+Phase 2 expert answer
+Our experience based on walking on beaches and through snow suggest that sand will be the hottest surface and snow the coldest. We might also expect black to be warmer than green so a best first guess might be from cold to hot, snow, grass, plowed field and sand.
+Data collection:
+[radsim]
+Use the simulation and the balloon to collect surface temperature data for each surface type for both day and night. 
+Phase 2 analysis
+Discuss how your data supports your hypotheses. What results agreed with your expectations and what remains to be explained?
+[hyp2]
+Phase 3 expert comments:
+From the warmest to coldest surface temperatures it is sand, soil, grass and snow. The table shows that snow reflects almost all of the solar radiation (80 – 90 %) incident on its surface so there is little energy available to warm it. Further, the snow and the other surfaces all cool at night. This suggests that they are all good emitters and effectively lose energy by infrared radiation.
+
+During the day sand is the warmest. It reflects only 20 – 40% of the incident solar radiation and its ability to conduct heat away from the top surface is poor (about 10% that of soil). Further, it has the lowest specific heat of all the substances in the table. This means it takes the least amount of energy to raise the temperature of one gram of sand 1C compared with the others.
+There is only albedo data for grass but if we compare it with the other surfaces we see that it reflects less than all of the others, except for moist soil. Thus it has energy to warm its surface but not as much as the moist soil. The moist soil has the highest conductivity of any of the surfaces so it can conduct some energy away. No surface can quickly conduct significant energy to the air beyond small distances since the conductivity for air is extremely small.
+Phase 4 Summary
+We know the atmosphere is warmed by longwave radiation from the earth’s surface and you just determined that surfaces heat differently. You also have seen that the temperature profiles above these surfaces are different but similar in some ways also. In the next case you will investigate these profiles more closely.
+
+Case 4 title
+Atmospheric Temperature Profiles
+Case 4 introduction
+Our atmosphere is heated by various methods. One process is related to the nature of the underlying surface. How this happens is the topic for this section.
+Phase 1 title
+Atmosphere temperature profile differences
+Phase 1 hypotheses:
+Use your experiences with the temperature profile above the grass surface and make hypotheses concerning how the temperature profiles above the other three surfaces will differ from that for grass. Do this for both day and night.
+
+Phase 2 expert answer
+If we assume that the sand and plowed field profiles will be similar to the grass profile we might expect that during the day these 
+profiles have the same slope for the lower portions. The sand will begin warmer and so will the plowed field but its profile 
+will be between sand and grass. Snow is much colder and is probably different but how? 
+We’ll need data to get a better understanding. Nighttime profiles for sand and plowed fields might be similar to that for grass 
+but again will start warmer. Snow is hard to guess and data seems to be needed to even get started.
+
+Data collection:
+Use the simulation and the balloon to collect atmospheric profile temperature data above each surface type for both day and night. 
+[radsim]
+Phase 2 analysis
+Discuss how your data supports your hypotheses. Which results agreed with your expectations and what remains to be explained?
+[allsurf]
+Phase 3 expert comments:
+[8_profiles.png]
+The profiles above all surfaces except for snow have the same slopes for the lower regions. Snow warms with height both day and night, thus the air above is an energy source for this surface all of the time. Snow stays cold because it has a very high albedo (80 - 90 %, it reflects almost all sunlight) so sun can’t warm it. It also emits very well so it loses energy that way. But it is colder than the air above it so it not an energy source for warming the air by radiation.
+
+The data in the table shows that air is a poor conductor so it can't be heated by heat transfer that way by any surface. There is no horizontal wind and no clouds have formed so neither advection nor latent heat transfer are energy transfer methods in play. That leaves only convection as a possible mechanism for warming the air in the lower regions over the surfaces. 
+Summary
+You have already observed that the temperature profiles are somewhat similar to each other in some cases. In the next phase you will look at these similarities more closely and then consider reasons for why this occurs.
+
+Phase 4 title:
+Lapse rates
+
+Phase 4 measurement
+The figure shows the temperature profiles over each of the four surfaces for both day and night. Use this figure to measure and record the lapse rates (temperature change with height) from the surface to 0.5km (500 m) for day and night for each substance.
+[radsim]
+
+Phase 5 expert answer
+[500m_profiles_farm.png]
+The daytime lapse rates:
+Sand  (6.8 C - 11.8 C) / 500m = - 5 C / 500m = - 10 c / km
+Field (4.8 C - 9.8 C) / 500m = - 5 C / 500m = - 10 C / km
+Grass (3.8 C - 7.8 C ) / 400m = - 4 C / 400m = - 10 C / km
+Snow is different and warms with height. All of the night time lapse rates are variable and warm with increasing elevation above the surface for the lowest layer.
+Phase 5 hypotheses:
+Hypothesize about the mechanisms that could cause these similar lapse rates during the day time.
+[lapsehyp]
+Phase 6 expert comments:
+As the sun warms the the ground small parcels next to the surface are warmed and thus act similar to a hot air balloon, they rise.[parcel.png] But as the parcel rises it mixes with the surrounding air so the profile is modified to be warmer. Other warm parcels follow. The complete explanation will be addressed in the MtnSim activity but students should note that when parcels rise, others must descend. This rise and descent of air parcels is known as convection and mixes the atmosphere in the lower layers above the ground.
+
+Phase 7 Summary
+Although there are large temperature differences horizontally, so far your attention has been directed to vertical temperature profiles. In the next section you will investigate the consequences of horizontal temperature differences. 
+Case 5 title
+Horizontal Pressure Gradient
+Case 5 introduction
+Weather is a consequence of energy moving from high energy regions to lower energy regions.
+Radiation is the ultimate source of energy for our system but you are well aware that winds play a major role in our weather. In this section you will be asked to explain the connection between the horizontal temperature variations you have seen and wind.
+Phase 1 title:
+Micro view
+[figure_1.jpg, need to add a label Figure 1]
+Figure 1 shows the atmosphere above sand and soil surfaces on a micro level where molecules and their spacings (density) are shown. We are going to look at a reference level a short distance above the surface, say 400m. This horizontal 400m surface is parallel with the underlying sand, soil, grass and snow surfaces.
+Phase 1 hypotheses:
+Examine the micro view in figure 1 and hypothesize how the molecules will move horizontally between the columns above the 400m surface in the picture.
+[micro]
+
+Phase 2 expert answer
+Molecules will move horizontally from regions of greater to lesser density.This will result in molecules flowing from the sand column to the soil column above the 400m reference surface.
+
+Eventually you will use weather maps to evaluate relationships between horizontal temperature differences, horizontal pressure differences and wind. The next section will show how these are connected.
+
+Phase 3 title:
+Macro view
+ 
+[figure_2.png] shows density changes in terms of the vertical spacing of constant pressure surfaces.The constant pressure surface are spaced further apart vertically when the temperature is warmer than when it is cooler. We will use the same horizontal reference surface at 400m here.
+
+
+
+In this macro view the intersections of constant pressure surfaces on the 400m surface are shown. On the horizontal 400m surface the intersections are constant pressure lines. The constant pressure lines vary left to right from 970 mb to 900 mb. These pressure contours correspond to the underlying sand, soil, grass and snow surfaces as one goes from warmest to coldest.
+Phase 3 questions
+Why will mass (molecules) will move on the 400mb surface? How are the two views related?
+[macro]
+
+Phase 4 expert comments:
+Mass (molecules) will move from high to low pressure. On this horizontal surface mass movement (wind) occurs because of horizontal pressure differences (a horizontal pressure gradient). A fundamental law of physics is that acceleration, a change in speed or direction, is a result of a force. You have seen that the horizontal pressure gradient force in this example is a consequence of horizontal temperature differences. So a horizontal pressure gradient causes wind to blow. The larger the gradient (the closer the spacing of the constant pressure lines), the faster the wind.
+Phase 5 Summary
+
