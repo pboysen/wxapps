@@ -1,78 +1,117 @@
-<!doctype html>
- 
-<meta charset="utf-8"/>
-<title>Meteorology Simulations</title>
-<style>
-body {
-	margin: 100px;
-	font-size: 16px;
-	font-family: arial;
-}
-</style>
-<h2>Meteorology Simulations</h2>
-<p>You can use the educational tools to explore conditions relating to such challenging concepts as solar and terrestrial radiation, 
-humidity variables, temperature lags and adiabatic processes.
-Each tool is written in HTML5 and Javascript and will run in most modern browsers including mobile.</p>
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<!-- Styles -->
+<link rel="stylesheet" href="docs/index.css">
+</head>
+<body>
 
-<h3>Mountain Simulation</h3>
-<p><strong>Concept:</strong>This activity allows the user to adjust the initial temperature and vapor pressure of a parcel, 
+<div class="main-page"> 
+  <div class="flex-item"><span>WXAPPS</span></div>
+  <div class="flex-item">Active Learning in Meteorology</div>
+</div>
+<div class="main-content">
+<div class="appbox">
+	<div class="app">
+		<div class="title">Overview</div>
+		<p>Engage your students in active learning about meteorology by using one or more of the WXAPPS listed below.
+		Each app is either a simulation or tool designed to let students explore conditions relating to such challenging concepts as solar and terrestrial radiation, 
+		humidity variables, temperature lags and adiabatic processes. Tools are also provided to sort clouds and draw weather maps.</p>
+		<div class="title">Usage</div>
+		<p>
+		Use the embed code listed for each app to place in your webpage.  The apps are designed to run in both desktop browsers or on mobile. 
+		The source code is available on <a href="https://github.com/pboysen/wxapps">GitHub</a> if you want to make enhancements.  
+		The apps are freely available and released under the MIT License.</p>
+	</div>
+	<div class="app">
+		<div class="title">Mtnsim</div>
+		<img src="docs/img/mtnsim.png" alt="Image of Mountain Simulation"/>
+		<p>This app lets the student adjust the initial temperature and vapor pressure of a parcel, 
 denoted by a leaf, to observe how saturation occurs as the parcel travels over the mountain. 
-The challenge for the user is hypothesize how these parameters affect when (where) saturation occurs to identify the 
+The challenge for the student is hypothesize how these parameters affect when (where) saturation occurs to identify the 
 variety of paths to saturation. 
-</p>
-<img src="demo/assets/mtnsim.png" title="Mointain Simulation"/>
-<p><a href="demo/sims/mtnsim/index.html" title="Mountain Simulation">Demo</a></p>
-
-<h3>Radiation Simulation</h3>
-<p><strong>Concept:</strong>Users collect temperature profile data for day and night in an environment 
-that differs only by surface conditions. This activity is intended to be a puzzle since users are not 
-expected to have yet been exposed to course materials that explain the profile differences. 
-The challenge for the users is to list both what makes sense and what doesn't.</p>
-<img src="demo/assets/radsim.png" title="Radiation Simulation"/>
-<p><a href="demo/sims/radsim/index.html" title="Radiation Simulation">Demo</a></p>
-<h3>Budget Simulation</h3>
-<p><strong>Concept:</strong>This activity challenges the users to hypothesize how input and output flows 
+		</p>
+		<div class="links">
+		<a href="">Try it!</a> EMBED: <input type="text" size="20" value="<iframe src>"/>
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Budgetsim</div>
+		<img src="docs/img/budgetsim.png" alt="Image of Budget Simulation"/>
+		<p>This app challenges the student to hypothesize how input and output flows 
 affect the water level in the tank over time. The input flow can be changed during predetermined time periods. 
 The output flow is constant during the entire activity. 
-The goal is for the user to construct rules that govern tank water level and are generally applicable to parameters 
-other than water.</p>
-<img src="demo/assets/budgetsim.png" title="Budget Simulation"/>
-<p><a href="demo/sims/budgetsim/index.html" title="Budget Simulation">Demo</a></p>
-
-<h3>Advection Simulation</h3>
-<p><strong>Concept:</strong>This activity allows the user to modify the wind speed, direction, duration, isotherm spacing to observe the 
-impact of these variables on advection and the temperature gradient moves.</p>
-<img src="demo/assets/advectionsim.jpg" title="Advection Simulation"/>
-<p><a href="demo/sims/advectionsim/index.html" title="Advection Simulation">Demo</a></p>
-
-<h3>Vapor Simulation</h3>
-<p><strong>Concept:</strong>This activity introduces the user to the process of condensation and evaporation in a beaker.  
-Users can apply heat to watch the system reach equilibrium.</p>
-<img src="demo/assets/vaporsim.png" title="Vapor Simulation"/>
-<p><a href="demo/sims/vaporsim/index.html" title="Vapor Simulation">Demo</a></p>
-
-<h3>Bubble Simulation</h3>
-<p><strong>Concept:</strong>This activity introduces the user to parcels of air that rise and fall in the atmosphere as the result of heating and cooling.</p>
-<img src="demo/assets/bubblesim.png" title="Bubble Simulation"/>
-<p><a href="demo/sims/bubblesim/index.html" title="Bubble Simulation">Demo</a></p>
-
-<h3>Draw Simulation</h3>
-<p><strong>Concept:</strong>DrawSim lets students draw a variety of symbols on weather maps.  It is divided into three basic tools to let the student:
+The goal is for the student to construct rules that govern tank water level and are generally applicable to parameters 
+other than water.
+		</p>
+		<div class="links">
+		<a href="">Try it!</a> EMBED:
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Radiation Simulation</div>
+		<img src="docs/img/radsim.png" alt="Image of Radiation Simulation"/>
+		<p>The student collect temperature profile data for day and night in an environment 
+that differs only by surface conditions. This activity is intended to be a puzzle since students are not 
+expected to have yet been exposed to course materials that explain the profile differences. 
+The challenge for the student is to list both what makes sense and what doesn't.</p>
+		<div class="links">
+		<a href="">Try it!</a> EMBED:
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Advectionsim</div>
+		<img src="docs/img/advectionsim.png" alt="Image of Advection Simulation"/>
+		<p>This app lets the student modify the wind speed, direction, duration, isotherm spacing to observe the 
+		impact of these variables on advection and the temperature gradient moves.</p>
+		<div class="links">
+		<a href="">Try it!</a> EMBED:
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Vapor Simulation</div>
+		<img src="docs/img/vaporsim.png" alt="Image of Vapor Simulation"/>
+		<p>This app introduces the student to the process of condensation and evaporation in a beaker.  
+A student can apply heat for a few seconds and watch the system reach equilibrium.</p></p>
+		<div class="links">
+		<a href="">Try it!</a> EMBED:
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Bubble Simulation</div>
+		<img src="docs/img/bubblesim.png" alt="Image of Bubble Simulation"/>
+		<p>This app lets the student a parcel of air rise and fall in the atmosphere as the result of 
+		heating and cooling.</p>
+		<div class="links">
+		<a href="">Try it!</a> EMBED:
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Draw Tool</div>
+		<img src="docs/img/drawsim.png" alt="Image of Draw Tool"/>
+		<p>DrawSim lets students draw a variety of symbols on weather maps.  It is divided into three basic tools to let the student:
 <ul>
 <li>Pressure: wind vectors and pressure regions</li>
 <li>Air Mass: place one of eight air mass symbols</li>
 <li>IsoPath: draw lines connecting equal values</li>
 </ul>
-<p>An example pressure map is shown below.</p>
+		<div class="links">
+		<a href="">Try Pressure!</a> <a href="">Try Air Mass!</a> <a href="">Try Isopath!</a> URL: EMBED:
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Cloud Simulation</div>
+		<img src="docs/img/cloudsim.png" alt="Image of Cloud Simulation"/>
+		<p>A student moves cloud images to correct locations either by level (1,2,3) and form (streaks,heaps and) or by stability.
+		</p>
+		<div class="links">
+		 <a href="">Try it!</a>  <a href="">Try it!</a> EMBED:
+		</div>
+	</div>
+</div>
+</div>
 
-<img src="demo/assets/drawsim.png" title="Pressure Drawing"/>
-<p>
-<a href="demo/sims/drawsim/index.html?img=assets/sfc_slp_map.gif&mode=edit&tool=isopath" title="Isolines">Draw isolines on a map</a><br/>
-<a href="demo/sims/drawsim/index.html?img=assets/sfc_slp_map.gif&mode=edit&tool=pressure" title="Pressure Symbols">Place pressure symbols on a map</a><br/>
-<a href="demo/sims/drawsim/index.html?img=assets/multisat.jpg&mode=edit&tool=airmass" title="Airmass Symbols">Place airmass symbols on a map</a><br/>
-</p>
-<h3>Cloud Simulation</h3>
-<p><strong>Concept:</strong>students are asked to move cloud images to correct locations either by level/form or by stability.
-<img src="demo/assets/cloudsim.png" title="Cloud Simulation"/>
-<p><a href="demo/sims/cloudsim/index.html?tool=grid" title="Cloud Simulation">Demo of sorting by level/form</a></p>
-<p><a href="demo/sims/cloudsim/index.html?tool=stability" title="Cloud Simulation">Demo of sorting by stability</a></p>
+</body>
+</html>

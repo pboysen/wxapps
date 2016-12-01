@@ -1,4 +1,2 @@
-# wxsims
-You can use the educational tools to explore conditions relating to such challenging concepts as solar and terrestrial radiation, 
-humidity variables, temperature lags and adiabatic processes.
-Each tool is written in HTML5 and Javascript and will run in most modern browsers including mobile.
+# wxapps
+Engage your students in active learning about meteorology by using one or more of the WXAPPS listed below. Each app is either a simulation or tool designed to let students explore conditions relating to such challenging concepts as solar and terrestrial radiation, humidity variables, temperature lags and adiabatic processes. Tools are also provided to sort clouds and draw weather maps.

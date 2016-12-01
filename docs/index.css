@@ -1,0 +1,66 @@
+body {
+	padding: 0;
+	margin: 0;
+	background: #eee;
+}
+
+.main-page {
+	position: relative;
+	width: 100%;
+	height: 500px;
+	background: url(img/sunburst.jpg) no-repeat center center;
+	background-size: cover; display : flex;
+	flex-direction: column; align-items : center;
+	justify-content: center;
+	display: -webkit-flex;
+	align-items: center;
+	display: flex;
+}
+
+.flex-item {
+	color: white;
+	font-size: 24px;
+	font-family: Arial, sans-serif;
+}
+
+.flex-item span {
+	font-size: 36px;
+	font-family: Impact, Charcoal, sans-serif;
+}
+
+.main-content {
+	font-size: 14px;
+	font-family: Arial, sans-serif;
+}
+
+.appbox {
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+}
+
+.app {
+	width: 60%;
+	padding: 8px; 
+	background: #FFF;
+	border-radius: 8px;
+	margin: 8px;
+}
+
+.title {
+	font-size: 16px;
+	color: #0080ff;
+	text-align: center;
+	font-weight: bold;
+}
+
+.app img {
+	float: left;
+	margin-right: 16px;
+}
+
+.links {
+	margin-top: 8px;
+	border-top: 1px solid #eee;
+	clear: both;
+}
