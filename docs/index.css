@@ -40,7 +40,8 @@ body {
 }
 
 .app {
-	width: 60%;
+	width: 70%;
+	min-height: 250px;
 	padding: 8px; 
 	background: #FFF;
 	border-radius: 8px;
@@ -60,7 +61,10 @@ body {
 }
 
 .links {
-	margin-top: 8px;
-	border-top: 1px solid #eee;
-	clear: both;
+}
+
+.links input {
+	width: 50%;
+	border: 1px solid #0080ff;
+	border-radius: 4px;
 }
