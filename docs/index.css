@@ -41,7 +41,6 @@ body {
 
 .app {
 	width: 70%;
-	min-height: 250px;
 	padding: 8px; 
 	background: #FFF;
 	border-radius: 8px;
@@ -58,13 +57,18 @@ body {
 .app img {
 	float: left;
 	margin-right: 16px;
+	width: 30%;
 }
 
 .links {
+	clear: both;
+	border-top: 1px solid #eee;
+	margin: 4px;
 }
 
 .links input {
 	width: 50%;
 	border: 1px solid #0080ff;
 	border-radius: 4px;
+	margin: 2px;
 }
