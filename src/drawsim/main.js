@@ -56,8 +56,8 @@ function removeSymbol(symbol) {
 				return
 			}
 			break
-		case "isopath":
-			if (IsoPath.isSame(symbol,symbols[i])) {
+		case "isopleth":
+			if (IsoPleth.isSame(symbol,symbols[i])) {
 				symbols.splice(i,1)
 				store.set(image,symbols)
 				return
@@ -195,7 +195,7 @@ class Pressures extends createjs.Container {
 	getLength() { return 10*30+2 }
 
 	getInst() {
-		return "<p>Click location and select a vector or region to add. Click vector or region to delete.</p>"
+		return "<p>Click location and select a vector or pressure region to add. Click vector or pressure region to delete.</p>"
 	}
 }
 
@@ -276,7 +276,7 @@ class Airmasses extends createjs.Container {
 	}
 }
 
-class IsoPath {
+class IsoPleth {
 	static showSymbol(stage,json) {
 		let pts = json.pts
 		let path = new createjs.Container()
@@ -297,14 +297,16 @@ class IsoPath {
 	    })
 		path.addChild(shape)
 		let first = pts[0], last = pts[pts.length-1]
-		let label = IsoPath.getLabel(json.value,first.x - 10,first.y + (first.y < last.y? -24: 0))
+		let label = IsoPleth.getLabel(json.value,first.x - 10,first.y + (first.y < last.y? -24: 0))
+    	label.cursor = "not-allowed"
 		label.addEventListener("click", e => {
 			removeSymbol(json)
 			stage.removeChild(path)
 		})
 		path.addChild(label)
 		if (dist(first,last) > 10) {
-			let label = IsoPath.getLabel(json.value,last.x - 10,last.y + (first.y < last.y? 0 : -24))
+			let label = IsoPleth.getLabel(json.value,last.x - 10,last.y + (first.y < last.y? 0 : -24))
+			label.cursor = "not-allowed"
 			label.addEventListener("click", e => {
 				removeSymbol(json)
 				stage.removeChild(path)
@@ -365,8 +367,8 @@ class IsoPath {
 			if (this.pts.length < 3) return
 			let value = prompt("Enter value:",1)
 			if (value) {
-				let symbol = {type:"isopath",value: value, pts: this.pts}
-				IsoPath.showSymbol(drawsim.mainstage,symbol)
+				let symbol = {type:"isopleth",value: value, pts: this.pts}
+				IsoPleth.showSymbol(drawsim.mainstage,symbol)
 				addSymbol(symbol)
 			}
 		})
@@ -459,10 +461,13 @@ class DrawSim {
 				back.addEventListener("mousedown", e => this.toolbar.show(e))
 				this.mainstage.addChild(this.toolbar)
 				break
-			case "isopath":
-				this.isopath = new IsoPath(back,this)
-				inst.innerHTML = this.isopath.getInst()
+			case "isopleth":
+				this.isopleth = new IsoPleth(back,this)
+				inst.innerHTML = this.isopleth.getInst()
 				break
+			default: {
+					alert(tool +" should be pressure, airmass or isopleth")
+				}
 			}
 		}
 		// handle download
@@ -490,8 +495,8 @@ class DrawSim {
 			case "airmass":
 				Airmass.showSymbol(this.mainstage,json)
 				break
-			case "isopath":
-				IsoPath.showSymbol(this.mainstage,json)
+			case "isopleth":
+				IsoPleth.showSymbol(this.mainstage,json)
 				break;
 			}
 		})
