@@ -10,7 +10,8 @@ export class Graph {
 			scale: spec.xscale,
 			major: spec.majorX,
 			minor: spec.minorX,
-			precision: spec.precisionX
+			precision: spec.precisionX,
+			invert: spec.xinvert
 		})
 		this.yaxis = new Axis({
 			stage: this.stage,
@@ -20,7 +21,8 @@ export class Graph {
 			scale: spec.yscale,
 			major: spec.majorY,
 			minor: spec.minorY,
-			precision: spec.precisionY
+			precision: spec.precisionY,
+			invert: spec.yinvert
 		})
 		this.width = 1
 		this.last = null
@@ -77,6 +79,7 @@ export class Graph {
 		else
 			line.graphics.setStrokeStyle(this.width).beginStroke(this.color).moveTo(x1, y1).lineTo(x2, y2).endStroke()
 		this.stage.addChild(line)
+		return line
 	}
 	
     plot(xv,yv) {

@@ -16,6 +16,7 @@ export class Axis {
 		this.precision = spec.precision || 0
 		this.vertical = spec.orient && spec.orient == "vertical" || false
 		this.linear = spec.scale && spec.scale == "linear" || false
+		this.invert = spec.invert || false
 		if (spec.dim.x) {
 			this.originX = spec.dim.x
 			this.endX = this.originX + this.w
@@ -58,20 +59,23 @@ export class Axis {
     	let label_bnds = label.getBounds()
         if (this.vertical) {
             this.drawLine(this.originX,this.originY,this.originX,this.endY)
-            if (this.spec.label) {
-	            let y = this.originY - (this.originY - label_bnds.width)/2
-	            this.drawText(label, 4, y)
-            }
+            let minXLabel = this.originX
             for (let val = this.min; val <= this.max; val += this.major) {
                 let v = this.getLoc(val)
                 this.drawLine(this.originX-4,v,this.originX+4,v)                
                 let text = this.getText(val.toFixed(this.precision))
                 let bnds = text.getBounds()
-                this.drawText(text,this.originX-5-bnds.width,v+bnds.height/2-10)
+                let x = this.originX-5-bnds.width
+                this.drawText(text,x,v+bnds.height/2-10)
+                if (x < minXLabel) minXLabel = x
             }
             for (let val = this.min; val <= this.max; val += this.minor) {
                 let v = this.getLoc(val)
                 this.drawLine(this.originX-2,v,this.originX+2,v)                
+            }
+            if (this.spec.label) {
+	            let y = this.originY - (this.originY - label_bnds.width)/2
+	            this.drawText(label, minXLabel - label_bnds.height, y)
             }
         } else {
             this.drawLine(this.originX,this.originY, this.endX,this.originY)            

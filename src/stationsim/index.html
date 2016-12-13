@@ -1,21 +1,46 @@
 <!doctype html>
 
 <meta charset="utf-8"/>
-<title>DrawSim</title>
+<title>StationSim</title>
 <link rel=stylesheet href="index.css">
 <script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
 
-<div class="drawsim">
+<div class="stationsim">
 	<h3>Instructions</h3>
 	<div id="instruct"></div>
-	</p>
+	<table>
+		<tr>
+			<th>Pressure</th>
+			<th>Temperature</th>
+			<th>Dew Point Depression</th>
+			<th>Wind Speed</th>
+		</tr>
+		<tr>
+			<td>850 mb</td>
+			<td><input type="text" name="850t"/></td>
+			<td><input type="text" name="850d"/></td>
+			<td><input type="text" name="850w"/></td>
+		</tr>
+		<tr>
+			<td>700 mb</td>
+			<td><input type="text" name="800t"/></td>
+			<td><input type="text" name="800d"/></td>
+			<td><input type="text" name="800w"/></td>
+		</tr>
+		<tr>
+			<td>500 mb</td>
+			<td><input type="text" name="800t"/></td>
+			<td><input type="text" name="800d"/></td>
+			<td><input type="text" name="800w"/></td>
+		</tr>
+	</table>
+	<div id="panel">
+		<input type="button" value="plot" title="Plot"/></a>
+	</div>
 	<div class="display">
 		<canvas id="maincanvas" width="800" height="600"></canvas>
 	</div>
 	<br/>
-	<div id="panel">
-		<a id="download" download="map.png"><input type="button" value="Download" title="Download"/></a>
-	</div>
 </div>
 
 <script src="main-built.js"></script>
