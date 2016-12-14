@@ -1,21 +1,103 @@
 <!doctype html>
 
 <meta charset="utf-8"/>
-<title>DrawSim</title>
+<title>StationSim</title>
 <link rel=stylesheet href="index.css">
 <script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
 
-<div class="drawsim">
+<div class="stationsim">
 	<h3>Instructions</h3>
 	<div id="instruct"></div>
-	</p>
+	<table id="wxtable">
+		<tr>
+			<th>Pressure(mb)</th>
+			<th>Temperature(C)</th>
+			<th>Dew Point Depression(C)</th>
+			<th>Wind Direction</th>
+			<th>Wind Speed(kn)</th>
+		</tr>
+		<tr>
+			<td>500</td>
+			<td><input type="text" id="500t" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
+			<td><input type="text" id="500dpd" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
+			<td>
+				<select id="500d">
+					<option value="0" selected="selected">N</option>
+					<option value="1">NE</option>
+					<option value="2">E</option>
+					<option value="3">SE</option>
+					<option value="4">S</option>
+					<option value="5">SW</option>
+					<option value="6">W</option>
+					<option value="7">NW</option>
+				</select>
+			</td>
+			<td><input type="text" id="500s" size="2" maxlength="2" value="0" pattern="\d{1,2}$"/></td>
+		</tr>
+		<tr>
+			<td>700</td>
+			<td><input type="text" id="700t" size="3" maxlength="3"  value="0" pattern="-?\d{1,2}$"/></td>
+			<td><input type="text" id="700dpd" size="3" maxlength="3"  value="0" pattern="-?\d{1,2}$"/></td>
+			<td>
+				<select id="700d" selected="selected">
+					<option value="0" selected="selected">N</option>
+					<option value="1">NE</option>
+					<option value="2">E</option>
+					<option value="3">SE</option>
+					<option value="4">S</option>
+					<option value="5">SW</option>
+					<option value="6">W</option>
+					<option value="7">NW</option>
+				</select>
+			</td>
+			<td><input type="text" id="700s" size="2" maxlength="2" value="0"pattern="\d{1,2}$"/></td>
+		</tr>
+		<tr>
+			<td>850</td>
+			<td><input type="text" id="850t" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
+			<td><input type="text" id="850dpd" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
+			<td>
+				<select id="850d">
+					<option value="0" selected="selected">N</option>
+					<option value="1">NE</option>
+					<option value="2">E</option>
+					<option value="3">SE</option>
+					<option value="4">S</option>
+					<option value="5">SW</option>
+					<option value="6">W</option>
+					<option value="7">NW</option>
+				</select>
+			</td>
+			<td><input type="text" id="850s" size="2" maxlength="2"  value="0" pattern="\d{1,2}$"/></td>
+		</tr>
+		<tr>
+			<td>surface</td>
+			<td><input type="text" id="surfacet" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
+			<td><input type="text" id="surfacedpd" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
+			<td>
+				<select id="surfaced">
+					<option value="0" selected="selected">N</option>
+					<option value="1">NE</option>
+					<option value="2">E</option>
+					<option value="3">SE</option>
+					<option value="4">S</option>
+					<option value="5">SW</option>
+					<option value="6">W</option>
+					<option value="7">NW</option>
+				</select>
+			</td>
+			<td><input type="text" id="surfaces" size="2" maxlength="2"  value="0" pattern="\d{1,2}$"/></td>
+		</tr>
+	</table>
+	<div class="panel">
+		<input type="button" id="plot" value="Plot" title="Plot"/></a>
+	</div>
 	<div class="display">
 		<canvas id="maincanvas" width="800" height="600"></canvas>
 	</div>
-	<br/>
-	<div id="panel">
-		<a id="download" download="map.png"><input type="button" value="Download" title="Download"/></a>
+	<div class="panel">
+		<a id="download" download="station.png"><input type="button" value="Download" title="Download"/></a>
 	</div>
 </div>
 
-<script src="main-built-min.js"></script>
+<script src="main-built.js"></script>

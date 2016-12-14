@@ -1,9 +1,43 @@
-.drawsim {
+.stationsim {
+	width: 800px;
 	font-family: Arial, Helvetica, sans-serif;
 	display: block;
 	margin: 0 auto;
 	margin-top: 10px;
 	padding: 4px;
+}
+
+.stationsim table {
+	width: 100%;
+	font-family: Arial, Helvetica, sans-serif;
+	border: 1px solid #AAA;
+	margin: 10px; 
+}
+
+.stationsim th {
+	width: 20%;
+	border-right: 1px solid #AAA;
+	font-weight: normal;
+	background: skyblue;
+	color: white;
+	padding: 0px;
+}
+
+.stationsim td {
+	border-right: 1px solid #AAA;
+	border-top: 1px solid #AAA;
+	background: white;
+	text-align: center;	
+}
+
+.stationsim input[type="text"] {
+	border-radius: 4px;
+	border: 1px solid #AAA;
+	text-align: right;
+}
+
+#instruct {
+	padding: 8px;
 }
 
 .display {
@@ -12,21 +46,13 @@
 	margin: 10px;
 }
 
-#download {
-	cursor: pointer;
-}
-
-#panel {
+.panel {
 	width: 800px;
 	display: inline-block;
 	text-align: center;
 }
 
-#panel a:link {
-    text-decoration: none;
-}
-
-#panel input[type=button]{
+.panel input[type=button]{
 	width: 90px;
 	border: 1px solid #AAA;
 	border-radius: 4px;
@@ -35,7 +61,7 @@
 	padding: 1px;
 }
 
-#panel input[type=button]:hover:enabled{
+.panel input[type=button]:hover:enabled{
 	background: skyblue;
 	color: white;
 }
