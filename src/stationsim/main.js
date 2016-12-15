@@ -3,10 +3,12 @@ import {Url} from "url"
 
 let store = getStore(), searchParams = new URLSearchParams(window.location.search.substring(1))
 
-let edit = searchParams.get('mode') == "edit", pressures = ["500","700","850","1000"]
+let edit = searchParams.get('mode') == "edit"
+let hcode = {12:"200", 9.3:"930", 5.5:"550", 3: "000", 1.5: "500", 0: "000"}
+
 let stations = {}
-stations["200"] = {h:12, t:0, dpd:0, d:0, s: 0}
-stations["300"] = {h:9.3, t:0, dpd:0, d:0, s: 0}
+stations["200"] = {h:12, t:0, dpd:"N/A", d:0, s: 0}
+stations["300"] = {h:9.3, t:0, dpd:"N/A", d:0, s: 0}
 stations["500"] = {h:5.5, t:0, dpd:0, d:0, s: 0}
 stations["700"] = {h:3, t:0, dpd:0, d:0, s: 0}
 stations["850"] = {h:1.5, t:0, dpd:0, d:0, s: 0}
@@ -22,19 +24,18 @@ class StationValues {
 	get() {
 		let s = store.get("stations")
 		if (s) stations = s
-		pressures.forEach(p => {
+		for(let p in stations) {
 			["t","dpd","d","s"].forEach(v => {
 				let id = p+v
 				let elem = document.getElementById(id)
-				if (!elem) console.log(id,elem)
 				elem.value = stations[p][v]
 			})
-		})
+		}
 	}
 	
 	update() {
 		let valid = true
-		pressures.forEach(p => {
+		for(let p in stations) {
 			["t","dpd","d","s"].forEach(v => {
 				let id = p+v
 				let elem = document.getElementById(id)
@@ -43,7 +44,7 @@ class StationValues {
 				} else
 					valid = false
 			})
-		})
+		}
 		if (valid)
 			store.set("stations",stations)
 		return valid
@@ -84,7 +85,7 @@ class WindVector {
 }
 
 class Station {
-	constructor(stage, x, y, p, s) {
+	constructor(stage, x, y, s) {
 		let border = new createjs.Shape()
 		border.graphics.beginStroke("#87cefa").drawRect(x-45,y-35,85,70).endStroke()
 		let circle = new createjs.Shape()
@@ -92,10 +93,10 @@ class Station {
 		let temp = new createjs.Text(s.t,"11px Arial","#000")
 		temp.x = x - 40
 		temp.y = y - 30
-		let press = new createjs.Text(p,"11px Arial","#000")
+		let press = new createjs.Text(hcode[s.h],"11px Arial","#000")
 		press.x = x + 20
 		press.y = y - 30
-		let ttd = new createjs.Text(s.dpd-s.t,"11px Arial","#000")
+		let ttd = new createjs.Text(s.dpd,"11px Arial","#000")
 		ttd.x = x - 40
 		ttd.y = y + 10
 		let wind = new WindVector(x,y,s.d,s.s)
@@ -108,9 +109,9 @@ class StationGraph extends Graph {
 		super({
 			stage: stage,
 			x: 200,
-			y: 550,
+			y: 650,
 			w: 580,
-			h: 540,
+			h: 640,
 			xlabel: "Temperature(C)",
 			ylabel: "Height(km)",
 			xscale: "linear",
@@ -118,7 +119,7 @@ class StationGraph extends Graph {
 			minX: -30,
 			maxX: 30,
 			minY: 0,
-			maxY: 12,
+			maxY: 13,
 			majorX: 10,
 			minorX: 5,
 			majorY: 1,
@@ -138,18 +139,18 @@ class StationGraph extends Graph {
 			t.x = 205
 			t.y = y - 10
 			this.stage.addChild(t)
-			if (p > 300 || p == "1000") new Station(this.stage,80,y,p,s)
+			new Station(this.stage,80,y,s)
 		}
 		let sfc = new createjs.Text("Surface","11px Arial","#000")
 		sfc.x = 140
-		sfc.y = 545
+		sfc.y = 645
 		this.stage.addChild(sfc)
 		this.setColor("#0F0")
-		this.drawLine(300,590,350,590)
+		this.drawLine(300,690,350,690)
 		// plots of T and T - Td
 		let tmp = new createjs.Text("T","11px Arial","#000")
 		tmp.x = 360
-		tmp.y = 585
+		tmp.y = 685
 		this.stage.addChild(tmp)
 		this.dotted = false
 		this.plot(stations["500"].t,stations["500"].h)
@@ -158,23 +159,23 @@ class StationGraph extends Graph {
 		this.plot(stations["1000"].t,stations["1000"].h)
 		this.endPlot()
 		this.setColor("#00F")
-		this.drawLine(400,590,450,590)
+		this.drawLine(400,690,450,690)
 		tmp = new createjs.Text("T - Td","11px Arial","#000")
 		tmp.x = 460
-		tmp.y = 585
+		tmp.y = 685
 		this.stage.addChild(tmp)
 		this.plot(stations["500"].dpd,stations["500"].h)
 		this.plot(stations["700"].dpd,stations["700"].h)
 		this.plot(stations["850"].dpd,stations["850"].h)
-		this.plot(stations["1000"].t,stations["1000"].h)
+		this.plot(stations["1000"].dpd,stations["1000"].h)
 		this.endPlot()
 		// adiabats
 		this.setColor("#888")
 		this.dotted = true
-		this.drawLine(520,590,570,590)
+		this.drawLine(520,690,570,690)
 		tmp = new createjs.Text("Dry Adiabat","11px Arial","#000")
 		tmp.x = 580
-		tmp.y = 585
+		tmp.y = 685
 		this.stage.addChild(tmp)
 		for (let t = -20; t <= 30; t+= 10) {
 			this.plot(t,0)
