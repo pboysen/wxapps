@@ -50,7 +50,7 @@
 					<option value="7">NW</option>
 				</select>
 			</td>
-			<td><input type="text" id="700s" size="2" maxlength="2" value="0"pattern="\d{1,2}$"/></td>
+			<td><input type="text" id="700s" size="2" maxlength="2" value="0" pattern="\d{1,2}$"/></td>
 		</tr>
 		<tr>
 			<td>850</td>
@@ -71,11 +71,11 @@
 			<td><input type="text" id="850s" size="2" maxlength="2"  value="0" pattern="\d{1,2}$"/></td>
 		</tr>
 		<tr>
-			<td>surface</td>
-			<td><input type="text" id="surfacet" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
-			<td><input type="text" id="surfacedpd" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
+			<td>1000</td>
+			<td><input type="text" id="1000t" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
+			<td><input type="text" id="1000dpd" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
 			<td>
-				<select id="surfaced">
+				<select id="1000d">
 					<option value="0" selected="selected">N</option>
 					<option value="1">NE</option>
 					<option value="2">E</option>
@@ -86,11 +86,11 @@
 					<option value="7">NW</option>
 				</select>
 			</td>
-			<td><input type="text" id="surfaces" size="2" maxlength="2"  value="0" pattern="\d{1,2}$"/></td>
+			<td><input type="text" id="1000s" size="2" maxlength="2"  value="0" pattern="\d{1,2}$"/></td>
 		</tr>
 	</table>
 	<div class="panel">
-		<input type="button" id="plot" value="Plot" title="Plot"/></a>
+		<input type="button" id="plot" value="Plot" title="Plot"/>
 	</div>
 	<div class="display">
 		<canvas id="maincanvas" width="800" height="600"></canvas>
@@ -100,4 +100,4 @@
 	</div>
 </div>
 
-<script src="main-built-min.js"></script>
+<script src="main-built.js"></script>

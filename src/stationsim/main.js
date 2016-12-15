@@ -3,14 +3,14 @@ import {Url} from "url"
 
 let store = getStore(), searchParams = new URLSearchParams(window.location.search.substring(1))
 
-let edit = searchParams.get('mode') == "edit", pressures = ["500","700","850","surface"]
+let edit = searchParams.get('mode') == "edit", pressures = ["500","700","850","1000"]
 let stations = {}
 stations["200"] = {h:12, t:0, dpd:0, d:0, s: 0}
 stations["300"] = {h:9.3, t:0, dpd:0, d:0, s: 0}
 stations["500"] = {h:5.5, t:0, dpd:0, d:0, s: 0}
 stations["700"] = {h:3, t:0, dpd:0, d:0, s: 0}
 stations["850"] = {h:1.5, t:0, dpd:0, d:0, s: 0}
-stations["surface"] = {h:0, t:0, dpd:0, d:0, s: 0}
+stations["1000"] = {h:0, t:0, dpd:0, d:0, s: 0}
 
 createjs.MotionGuidePlugin.install()
 createjs.Ticker.frameRate = 1
@@ -26,6 +26,7 @@ class StationValues {
 			["t","dpd","d","s"].forEach(v => {
 				let id = p+v
 				let elem = document.getElementById(id)
+				if (!elem) console.log(id,elem)
 				elem.value = stations[p][v]
 			})
 		})
@@ -58,7 +59,7 @@ class WindVector {
 		let w = new createjs.Shape()
 		w.graphics.beginStroke("#000").moveTo(0,0).lineTo(0,tip).endStroke()
 		cont.addChild(w)
-		if (speed > 50) {
+		if (speed >= 50) {
 			w = new createjs.Shape()
 			w.graphics.beginStroke("#000").beginFill("#000").moveTo(0,tip).lineTo(8,tip+4).lineTo(0,tip+8).lineTo(0,tip).endStroke()
 			cont.addChild(w)
@@ -133,12 +134,11 @@ class StationGraph extends Graph {
 			let s = stations[p]
 			let y = this.yaxis.getLoc(s.h)
 			this.drawLine(200,y,780,y)
-			let txt = p == "surface"?"1 atm": p + " mb"
-			let t = new createjs.Text(txt,"11px Arial","#000")
+			let t = new createjs.Text(p + " mb","11px Arial","#000")
 			t.x = 205
 			t.y = y - 10
 			this.stage.addChild(t)
-			if (p > 300) new Station(this.stage,80,y,p,s)
+			if (p > 300 || p == "1000") new Station(this.stage,80,y,p,s)
 		}
 		let sfc = new createjs.Text("Surface","11px Arial","#000")
 		sfc.x = 140
@@ -151,10 +151,11 @@ class StationGraph extends Graph {
 		tmp.x = 360
 		tmp.y = 585
 		this.stage.addChild(tmp)
+		this.dotted = false
 		this.plot(stations["500"].t,stations["500"].h)
 		this.plot(stations["700"].t,stations["700"].h)
 		this.plot(stations["850"].t,stations["850"].h)
-		this.plot(stations["surface"].t,stations["surface"].h)
+		this.plot(stations["1000"].t,stations["1000"].h)
 		this.endPlot()
 		this.setColor("#00F")
 		this.drawLine(400,590,450,590)
@@ -165,7 +166,7 @@ class StationGraph extends Graph {
 		this.plot(stations["500"].dpd,stations["500"].h)
 		this.plot(stations["700"].dpd,stations["700"].h)
 		this.plot(stations["850"].dpd,stations["850"].h)
-		this.plot(stations["surface"].t,stations["surface"].h)
+		this.plot(stations["1000"].t,stations["1000"].h)
 		this.endPlot()
 		// adiabats
 		this.setColor("#888")
