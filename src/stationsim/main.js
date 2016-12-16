@@ -93,14 +93,14 @@ class Station {
 		let temp = new createjs.Text(s.t,"11px Arial","#000")
 		temp.x = x - 40
 		temp.y = y - 30
-		let press = new createjs.Text(hcode[s.h],"11px Arial","#000")
-		press.x = x + 20
-		press.y = y - 30
+		//let press = new createjs.Text(hcode[s.h],"11px Arial","#000")
+		//press.x = x + 20
+		//press.y = y - 30
 		let ttd = new createjs.Text(s.dpd,"11px Arial","#000")
 		ttd.x = x - 40
 		ttd.y = y + 10
 		let wind = new WindVector(x,y,s.d,s.s)
-		stage.addChild(border,circle,temp,press,ttd,wind)
+		stage.addChild(border,circle,temp,ttd,wind)
 	}
 }
 
