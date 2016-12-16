@@ -17,6 +17,42 @@
 			<th>Wind Speed(kn)</th>
 		</tr>
 		<tr>
+			<td>200</td>
+			<td><input type="text" id="200t" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
+			<td><input type="text" id="200dpd" size="3" maxlength="3" value="N/A" readonly="readonly"/></td>
+			<td>
+				<select id="200d">
+					<option value="0" selected="selected">N</option>
+					<option value="1">NE</option>
+					<option value="2">E</option>
+					<option value="3">SE</option>
+					<option value="4">S</option>
+					<option value="5">SW</option>
+					<option value="6">W</option>
+					<option value="7">NW</option>
+				</select>
+			</td>
+			<td><input type="text" id="200s" size="2" maxlength="2" value="0" pattern="\d{1,2}$"/></td>
+		</tr>
+		<tr>
+			<td>300</td>
+			<td><input type="text" id="300t" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
+			<td><input type="text" id="300dpd" size="3" maxlength="3" value="N/A" readonly="readonly"/></td>
+			<td>
+				<select id="300d">
+					<option value="0" selected="selected">N</option>
+					<option value="1">NE</option>
+					<option value="2">E</option>
+					<option value="3">SE</option>
+					<option value="4">S</option>
+					<option value="5">SW</option>
+					<option value="6">W</option>
+					<option value="7">NW</option>
+				</select>
+			</td>
+			<td><input type="text" id="300s" size="2" maxlength="2" value="0" pattern="\d{1,2}$"/></td>
+		</tr>
+		<tr>
 			<td>500</td>
 			<td><input type="text" id="500t" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
 			<td><input type="text" id="500dpd" size="3" maxlength="3" value="0" pattern="-?\d{1,2}$"/></td>
@@ -93,7 +129,7 @@
 		<input type="button" id="plot" value="Plot" title="Plot"/>
 	</div>
 	<div class="display">
-		<canvas id="maincanvas" width="800" height="600"></canvas>
+		<canvas id="maincanvas" width="800" height="700"></canvas>
 	</div>
 	<div class="panel">
 		<a id="download" download="station.png"><input type="button" value="Download" title="Download"/></a>
