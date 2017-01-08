@@ -11,6 +11,8 @@ let tool = searchParams.get('tool') || "vectors"
 
 createjs.MotionGuidePlugin.install()
 
+//Lines with symbols for a dry line, moisture axis, thermal ridge, low level jet and upper level jet 
+
 function dist(p1,p2) { 
 	let dx = p1.x - p2.x, dy = p1.y - p2.y
 	return Math.sqrt(dx*dx + dy*dy)

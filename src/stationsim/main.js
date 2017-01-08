@@ -5,6 +5,15 @@ let store = getStore(), searchParams = new URLSearchParams(window.location.searc
 
 let edit = searchParams.get('mode') == "edit"
 let hcode = {12:"200", 9.3:"930", 5.5:"550", 3: "000", 1.5: "500", 0: "000"}
+let wet = [
+	[10,1000, 0,800, -10,660, -20,550, -30,460],
+	[20,1000, 10,770, 0,650, -10,480, -20,400],
+	[30,1000, 20,730, 10,540, 0,410, -10,325]
+]
+//Ln (P1/P2) = g(Z1-Z2)/(RdT) where Rd = 287, g = 9.8, T is an average temp for the layer. 
+//There might be a minus sign missing and some multiples of 10 to get the units correct. 
+//You have to work up from the surface where P1 = 1000 and Z1 = 0.
+function height(t,p) { return (Math.log(1000/p)*287*((t+273+10+273)/2)/9.8)/1000 }
 
 let stations = {}
 stations["200"] = {h:12, t:0, dpd:"N/A", d:0, s: 0}
@@ -13,7 +22,7 @@ stations["500"] = {h:5.5, t:0, dpd:0, d:0, s: 0}
 stations["700"] = {h:3, t:0, dpd:0, d:0, s: 0}
 stations["850"] = {h:1.5, t:0, dpd:0, d:0, s: 0}
 stations["1000"] = {h:0, t:0, dpd:0, d:0, s: 0}
-
+	
 createjs.MotionGuidePlugin.install()
 createjs.Ticker.frameRate = 1
 
@@ -146,10 +155,10 @@ class StationGraph extends Graph {
 		sfc.y = 645
 		this.stage.addChild(sfc)
 		this.setColor("#0F0")
-		this.drawLine(300,690,350,690)
+		this.drawLine(200,690,250,690)
 		// plots of T and T - Td
 		let tmp = new createjs.Text("T","11px Arial","#000")
-		tmp.x = 360
+		tmp.x = 260
 		tmp.y = 685
 		this.stage.addChild(tmp)
 		this.dotted = false
@@ -159,9 +168,9 @@ class StationGraph extends Graph {
 		this.plot(stations["1000"].t,stations["1000"].h)
 		this.endPlot()
 		this.setColor("#00F")
-		this.drawLine(400,690,450,690)
+		this.drawLine(300,690,350,690)
 		tmp = new createjs.Text("T - Td","11px Arial","#000")
-		tmp.x = 460
+		tmp.x = 360
 		tmp.y = 685
 		this.stage.addChild(tmp)
 		this.plot(stations["500"].dpd,stations["500"].h)
@@ -172,14 +181,27 @@ class StationGraph extends Graph {
 		// adiabats
 		this.setColor("#888")
 		this.dotted = true
-		this.drawLine(520,690,570,690)
+		this.drawLine(420,690,470,690)
 		tmp = new createjs.Text("Dry Adiabat","11px Arial","#000")
-		tmp.x = 580
+		tmp.x = 480
 		tmp.y = 685
 		this.stage.addChild(tmp)
-		for (let t = -20; t <= 30; t+= 10) {
+		for (let t = -20; t <= 0; t+= 10) {
 			this.plot(t,0)
 			this.plot(-30,(t+30)/10)
+			this.endPlot()
+		}
+		this.setColor("#00F")
+		this.dotted = true
+		this.drawLine(570,690,620,690)
+		tmp = new createjs.Text("Wet Adiabat","11px Arial","#000")
+		tmp.x = 630
+		tmp.y = 685
+		this.stage.addChild(tmp)
+		for (let i = 0; i < wet.length; i++) {
+			for (let p = 0; p < wet[i].length; p += 2) {
+				this.plot(wet[i][p],height(wet[i][p],wet[i][p+1]))
+			}
 			this.endPlot()
 		}
 		this.dotted.false
