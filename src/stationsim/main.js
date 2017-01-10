@@ -186,7 +186,7 @@ class StationGraph extends Graph {
 		tmp.x = 480
 		tmp.y = 685
 		this.stage.addChild(tmp)
-		for (let t = -20; t <= 0; t+= 10) {
+		for (let t = 0; t <= 30; t+= 10) {
 			this.plot(t,0)
 			this.plot(-30,(t+30)/10)
 			this.endPlot()
@@ -227,7 +227,7 @@ class StationSim {
 		let table = document.getElementById("wxtable")
 		if (edit) {
 			this.mainstage.enableMouseOver()
-			inst.innerHTML = "Enter requested map values. Click <strong>Plot</strong> to view station models on graph."
+			inst.innerHTML = "Complete the table below from the weather maps. Click <strong>Plot</strong> to view station models on graph."
 			plot.addEventListener("click", e => this.stationgraph.update())
 			table.style.display = "block"
 		} else {
