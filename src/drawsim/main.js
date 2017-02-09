@@ -8,6 +8,18 @@ if (!image) image = prompt("Enter image url:","")
 let edit = searchParams.get('mode') == "edit"
 let scale = searchParams.get('scale') || 1.0
 let tool = searchParams.get('tool') || "vectors"
+let ex = searchParams.get('ex') || ""
+let radius = searchParams.get('r') || 10
+
+let linetypes = {
+	dry:{w:2,c:"#00F",pat:[2,2]},
+	highT:{w:2,c:"#F00",pat:[1,1,2,2]},
+	highTd:{w:2,c:"#0F0",pat:[1,1,2,2]},
+	jet850:{w:3,c:"#000",pat:[1,0]},
+	jet300:{w:1,c:"#808",pat:[2,0]}
+}
+
+let linetype = "highT"
 
 createjs.MotionGuidePlugin.install()
 
@@ -19,17 +31,17 @@ function dist(p1,p2) {
 }
 
 function getSymbols() {
-	let symbols = store.get(image)
+	let symbols = store.get(image+ex)
 	if (!symbols) {
 		symbols = []
-		store.set(image,symbols)
+		store.set(image+ex,symbols)
 	}
 	return symbols
 }
 
 function addSymbol(symbol) {
 	let symbols = getSymbols()
-	store.set(image,symbols.concat(symbol))
+	store.set(image+ex,symbols.concat(symbol))
 }
 
 function removeSymbol(symbol) {
@@ -40,28 +52,42 @@ function removeSymbol(symbol) {
 		case "vector":
 			if (Vector.isSame(symbol,symbols[i])) {
 				symbols.splice(i,1)
-				store.set(image,symbols)
+				store.set(image+ex,symbols)
 				return
 			}
 			break
 		case "region":
 			if (PressureRegion.isSame(symbol,symbols[i])) {
 				symbols.splice(i,1)
-				store.set(image,symbols)
+				store.set(image+ex,symbols)
 				return
 			}
 			break
 		case "airmass":
 			if (Airmass.isSame(symbol,symbols[i])) {
 				symbols.splice(i,1)
-				store.set(image,symbols)
+				store.set(image+ex,symbols)
 				return
 			}
 			break
 		case "isopleth":
 			if (IsoPleth.isSame(symbol,symbols[i])) {
 				symbols.splice(i,1)
-				store.set(image,symbols)
+				store.set(image+ex,symbols)
+				return
+			}
+			break
+		case "line":
+			if (Line.isSame(symbol,symbols[i])) {
+				symbols.splice(i,1)
+				store.set(image+ex,symbols)
+				return
+			}
+			break;
+		case "circle":
+			if (Circle.isSame(symbol,symbols[i])) {
+				symbols.splice(i,1)
+				store.set(image+ex,symbols)
 				return
 			}
 			break;
@@ -70,7 +96,7 @@ function removeSymbol(symbol) {
 }
 
 function deleteSymbols() {
-	store.set(image,[])
+	store.set(image+ex,[])
 }
 
 
@@ -381,6 +407,123 @@ class IsoPleth {
 	}
 }
 
+class Line {
+	static getLineShape(lt) {
+		console.log(lt)
+		let shape = new createjs.Shape()
+	    shape.graphics.setStrokeStyle(lt.w).setStrokeDash(lt.pat).beginStroke(lt.c)
+	    return shape
+	}
+	
+	static showSymbol(stage,json) {
+		let pts = json.pts
+		let path = new createjs.Container()
+		let shape = Line.getLineShape(linetypes[json.ltype])
+		let oldX = pts[0].x
+		let oldY = pts[0].y
+		let oldMidX = oldX
+		let oldMidY = oldY
+	    json.pts.forEach(pt => {
+			let midPoint = new createjs.Point(oldX + pt.x >> 1, oldY+pt.y >> 1)
+	        shape.graphics.moveTo(midPoint.x, midPoint.y)
+	        shape.graphics.curveTo(oldX, oldY, oldMidX, oldMidY)
+	        oldX = pt.x
+	        oldY = pt.y
+	        oldMidX = midPoint.x
+	        oldMidY = midPoint.y
+	    })
+	    path.addChild(shape)
+	    stage.addChild(path)
+	}
+	
+	static isSame(json1,json2) {
+		if (json1.type != json2.type) return false
+		if (json1.ltype != json2.ltype) return false
+		if (json1.pts[0].x != json2.pts[0].x) return false
+		if (json1.pts[0].y != json2.pts[0].y) return false
+		return true
+	}
+	
+	constructor(back,drawsim) {
+		createjs.Ticker.framerate = 10
+		this.back = back
+		this.mouseDown = false
+		drawsim.mainstage.addEventListener("stagemousedown", e => {
+			this.currentShape = Line.getLineShape(linetypes[linetype])
+			drawsim.mainstage.addChild(this.currentShape)
+		    this.oldX = this.oldMidX = e.stageX
+		    this.oldY = this.oldMidY = e.stageY
+			this.mouseDown = true
+			this.pts = []
+		})
+		drawsim.mainstage.addEventListener("stagemousemove", e => {
+			if (this.mouseDown == false) return
+	        this.pt = new createjs.Point(e.stageX, e.stageY)
+			this.pts = this.pts.concat({x:e.stageX,y:e.stageY})
+			let midPoint = new createjs.Point(this.oldX + this.pt.x >> 1, this.oldY+this.pt.y >> 1)
+	        this.currentShape.graphics.moveTo(midPoint.x, midPoint.y)
+	        this.currentShape.graphics.curveTo(this.oldX, this.oldY, this.oldMidX, this.oldMidY)
+	        this.oldX = this.pt.x
+	        this.oldY = this.pt.y
+	        this.oldMidX = midPoint.x
+	        this.oldMidY = midPoint.y
+		})
+		drawsim.mainstage.addEventListener("stagemouseup", e => {
+			this.mouseDown = false
+			drawsim.mainstage.removeChild(this.currentShape)
+			if (this.pts.length < 3) return
+			let symbol = {type:"line",ltype: linetype, pts: this.pts}
+			Line.showSymbol(drawsim.mainstage,symbol)
+			addSymbol(symbol)
+		})
+	}
+	
+	getInst() {
+		return "<p>Click and drag to draw line. Supply value when prompted.  Click value to delete.</p>"
+	}
+}
+
+class Circle extends createjs.Container {
+	static showSymbol(stage,json) {
+		let circle = new createjs.Shape()
+		circle.graphics.setStrokeStyle(2).beginFill("#FFF").beginStroke("#F00").drawCircle(json.pt.x,json.pt.y,json.r).endStroke()
+		circle.alpha = 0.5
+    	circle.cursor = "not-allowed"
+		circle.addEventListener("click", e => {
+			removeSymbol(json)
+			stage.removeChild(circle)
+		})
+    	stage.addChild(circle)
+	}
+	
+	static isSame(json1,json2) {
+		if (json1.type != json2.type) return false
+		if (json1.ex != json2.ex) return false
+		if (json1.r != json2.r) return false
+		if (json1.pt.x != json2.pt.x) return false
+		if (json1.pt.y != json2.pt.y) return false
+		return true
+	}
+	
+	constructor(back,drawsim) {
+		super()
+    	back.cursor = "pointer"
+		back.addEventListener("click", e => {
+			let symbol = this.toJSON(e.stageX,e.stageY)
+			addSymbol(symbol)
+			Circle.showSymbol(drawsim.mainstage,symbol)
+		})
+	}
+	
+	toJSON(x,y) {
+		return {type:"circle", ex: ex, r:radius, pt:{x:x,y:y}}
+	}
+	
+	getInst() {
+		return "<p>Click to add a circle. Click circle to delete.</p>"
+	}
+}
+
 class Toolbar extends createjs.Container {
 	constructor(tool,drawsim) {
 		super()
@@ -434,16 +577,10 @@ class DrawSim {
 		this.mainstage = new createjs.Stage("maincanvas")
 		createjs.Touch.enable(this.mainstage)
 		let back = new createjs.Bitmap(image)
-		back.x = 40
-		back.y = 40
-		this.mainstage.addChild(back)
-		back.onload = function() {
-			let bnd = back.getBounds()
-			this.mainstage.canvas.width = bnd.width + 40
-			this.mainstage.canvas.height = bnd.height + 40
-			let panel = document.getElementById("panel")
-			panel.width = bnd.width + 40
+		back.image.onload = function() {
+			drawsim.resize(back)
 		}
+		this.mainstage.addChild(back)
 		this.showSymbols()
 		if (edit) {
 			this.mainstage.enableMouseOver()
@@ -467,8 +604,16 @@ class DrawSim {
 				this.isopleth = new IsoPleth(back,this)
 				inst.innerHTML = this.isopleth.getInst()
 				break
+			case "line":
+				this.line = new Line(back,this)
+				inst.innerHTML = this.line.getInst()
+				break
+			case "circle":
+				this.circle = new Circle(back,this)
+				inst.innerHTML = this.circle.getInst()
+				break
 			default: {
-					alert(tool +" should be pressure, airmass or isopleth")
+					alert("Parameter tool should be pressure, airmass, isopleth or line")
 				}
 			}
 		}
@@ -482,6 +627,16 @@ class DrawSim {
 			dt = dt.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=map.png');
 			dl.href = dt;
 		})
+	}
+	
+	resize(img) {
+		let bnd = img.getBounds()
+		this.mainstage.canvas.width = bnd.width + 40
+		this.mainstage.canvas.height = bnd.height + 40
+		let panel = document.getElementById("panel")
+		panel.width = bnd.width + 40
+		img.x = 20
+		img.y = 20
 	}
 	
 	showSymbols() {
@@ -499,6 +654,12 @@ class DrawSim {
 				break
 			case "isopleth":
 				IsoPleth.showSymbol(this.mainstage,json)
+				break;
+			case "line":
+				Line.showSymbol(this.mainstage,json)
+				break;
+			case "circle":
+				Circle.showSymbol(this.mainstage,json)
 				break;
 			}
 		})
