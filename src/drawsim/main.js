@@ -12,14 +12,15 @@ let ex = searchParams.get('ex') || ""
 let radius = searchParams.get('r') || 10
 
 let linetypes = {
-	dry:{w:2,c:"#00F",pat:[2,2]},
-	highT:{w:2,c:"#F00",pat:[1,1,2,2]},
-	highTd:{w:2,c:"#0F0",pat:[1,1,2,2]},
-	jet850:{w:3,c:"#000",pat:[1,0]},
-	jet300:{w:1,c:"#808",pat:[2,0]}
+	dry:{w:1,c:"#000"},
+	highT:{w:1,c:"#F00"},
+	highTd:{w:1,c:"#0F0"},
+	jet850:{w:5,c:"#F00"},
+	jet300:{w:1,c:"#800080"}
 }
 
-let linetype = "highT"
+let linetype = "dry"
+let linetypeButton = null
 
 createjs.MotionGuidePlugin.install()
 
@@ -409,15 +410,49 @@ class IsoPleth {
 
 class Line {
 	static getLineShape(lt) {
-		console.log(lt)
 		let shape = new createjs.Shape()
-	    shape.graphics.setStrokeStyle(lt.w).setStrokeDash(lt.pat).beginStroke(lt.c)
+	    shape.graphics.setStrokeStyle(lt.w).beginStroke(lt.c)
 	    return shape
+	}
+	
+	static setButton(button,color) {
+		let b = button.getChildAt(0)
+		let border = new createjs.Shape()
+		border.x = b.x
+		border.graphics.setStrokeStyle(1).beginFill(color).beginStroke("#AAA").drawRoundRect(0,2,62,18,2,2,2,2).endStroke()
+		button.removeChildAt(0)
+		button.addChildAt(border,0)
+	}
+	
+	static getButton(x,name) {
+		let lt = linetypes[name]
+		let button = new createjs.Container()
+		button.cursor = "pointer"
+		button.addEventListener("click",e => {
+			if (name == linetype) return
+			if (linetypeButton) Line.setButton(linetypeButton,"#FFF")
+			Line.setButton(button,"#EEE")
+			linetype = name
+			linetypeButton = button			
+		})
+		let border = new createjs.Shape()
+		border.graphics.setStrokeStyle(1).beginFill(name == linetype?"#EEE":"#FFF").beginStroke("#AAA").drawRoundRect(0,2,62,18,2,2,2,2).endStroke()
+		if (name == linetype) linetypeButton = button
+		border.x = x
+		let txt = new createjs.Text(name,"bold 12px Arial","#000")
+		txt.x = x+5
+		txt.y = 5
+		let line = Line.getLineShape(lt)
+		let left = x + txt.getBounds().width+10
+		line.graphics.moveTo(left,10).lineTo(left+15,10).endStroke()
+		button.addChild(border,txt,line)
+		return button
 	}
 	
 	static showSymbol(stage,json) {
 		let pts = json.pts
 		let path = new createjs.Container()
+		path.name = json.ltype
 		let shape = Line.getLineShape(linetypes[json.ltype])
 		let oldX = pts[0].x
 		let oldY = pts[0].y
@@ -448,6 +483,12 @@ class Line {
 		createjs.Ticker.framerate = 10
 		this.back = back
 		this.mouseDown = false
+		let x = 5
+		for (let key in linetypes) {
+			let b = Line.getButton(x,key)
+			drawsim.mainstage.addChild(b)
+			x += 65
+		}
 		drawsim.mainstage.addEventListener("stagemousedown", e => {
 			this.currentShape = Line.getLineShape(linetypes[linetype])
 			drawsim.mainstage.addChild(this.currentShape)
@@ -472,14 +513,19 @@ class Line {
 			this.mouseDown = false
 			drawsim.mainstage.removeChild(this.currentShape)
 			if (this.pts.length < 3) return
+			drawsim.mainstage.removeChild(drawsim.mainstage.getChildByName(linetype))
+			getSymbols().forEach(s => {
+				if (s.ltype == linetype) removeSymbol(s)
+			})
 			let symbol = {type:"line",ltype: linetype, pts: this.pts}
 			Line.showSymbol(drawsim.mainstage,symbol)
 			addSymbol(symbol)
+			
 		})
 	}
 	
 	getInst() {
-		return "<p>Click and drag to draw line. Supply value when prompted.  Click value to delete.</p>"
+		return "<p>Select a line type, then click and drag to draw. <br/>Drawing another line of the same type will replace the previous line.</p>"
 	}
 }
 
@@ -613,7 +659,7 @@ class DrawSim {
 				inst.innerHTML = this.circle.getInst()
 				break
 			default: {
-					alert("Parameter tool should be pressure, airmass, isopleth or line")
+					alert("Parameter tool should be pressure, airmass, isopleth, line or circle")
 				}
 			}
 		}
@@ -636,7 +682,7 @@ class DrawSim {
 		let panel = document.getElementById("panel")
 		panel.width = bnd.width + 40
 		img.x = 20
-		img.y = 20
+		img.y = 25
 	}
 	
 	showSymbols() {
