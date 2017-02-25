@@ -1,5 +1,5 @@
 import {getStore} from "../utils"
-import {Url} from "url"
+import {Url} from "url" 
 
 let store = getStore(), searchParams = new URLSearchParams(window.location.search.substring(1))
 
@@ -16,7 +16,7 @@ let linetypes = {
 	highT:{w:1,c:"#F00"},
 	highTd:{w:1,c:"#0F0"},
 	jet850:{w:5,c:"#F00"},
-	jet300:{w:1,c:"#800080"}
+	jet300:{w:5,c:"#800080"}
 }
 
 let linetype = "dry"
@@ -502,7 +502,7 @@ class Line {
 	        this.pt = new createjs.Point(e.stageX, e.stageY)
 			this.pts = this.pts.concat({x:e.stageX,y:e.stageY})
 			let midPoint = new createjs.Point(this.oldX + this.pt.x >> 1, this.oldY+this.pt.y >> 1)
-	        this.currentShape.graphics.moveTo(midPoint.x, midPoint.y)
+	        this.currentShape.graphics.setStrokeStyle(linetypes[linetype].w).moveTo(midPoint.x, midPoint.y)
 	        this.currentShape.graphics.curveTo(this.oldX, this.oldY, this.oldMidX, this.oldMidY)
 	        this.oldX = this.pt.x
 	        this.oldY = this.pt.y
