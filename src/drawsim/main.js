@@ -9,7 +9,8 @@ let edit = searchParams.get('mode') == "edit"
 let scale = searchParams.get('scale') || 1.0
 let tool = searchParams.get('tool') || "vectors"
 let ex = searchParams.get('ex') || ""
-let radius = searchParams.get('r') || 10
+let width = searchParams.get('w') || 20
+let height = searchParams.get('h') || 20
 
 let linetypes = {
 	dry:{w:1,c:"#000"},
@@ -85,8 +86,8 @@ function removeSymbol(symbol) {
 				return
 			}
 			break;
-		case "circle":
-			if (Circle.isSame(symbol,symbols[i])) {
+		case "ellipse":
+			if (Ellipse.isSame(symbol,symbols[i])) {
 				symbols.splice(i,1)
 				store.set(image+ex,symbols)
 				return
@@ -543,23 +544,24 @@ class Line {
 	}
 }
 
-class Circle extends createjs.Container {
+class Ellipse extends createjs.Container {
 	static showSymbol(stage,json) {
-		let circle = new createjs.Shape()
-		circle.graphics.setStrokeStyle(2).beginFill("#FFF").beginStroke("#F00").drawCircle(json.pt.x,json.pt.y,json.r).endStroke()
-		circle.alpha = 0.5
-    	circle.cursor = "not-allowed"
-		circle.addEventListener("click", e => {
+		let ellipse = new createjs.Shape()
+		ellipse.graphics.setStrokeStyle(2).beginFill("#FFF").beginStroke("#F00").drawEllipse(Math.round(json.pt.x-json.w/2),Math.round(json.pt.y-json.h/2),Math.round(json.w),Math.round(json.h)).endStroke()
+		ellipse.alpha = 0.5
+    	ellipse.cursor = "not-allowed"
+		ellipse.addEventListener("click", e => {
 			removeSymbol(json)
-			stage.removeChild(circle)
+			stage.removeChild(ellipse)
 		})
-    	stage.addChild(circle)
+    	stage.addChild(ellipse)
 	}
 	
 	static isSame(json1,json2) {
 		if (json1.type != json2.type) return false
 		if (json1.ex != json2.ex) return false
-		if (json1.r != json2.r) return false
+		if (json1.w != json2.w) return false
+		if (json1.h != json2.h) return false
 		if (json1.pt.x != json2.pt.x) return false
 		if (json1.pt.y != json2.pt.y) return false
 		return true
@@ -571,16 +573,16 @@ class Circle extends createjs.Container {
 		back.addEventListener("click", e => {
 			let symbol = this.toJSON(e.stageX,e.stageY)
 			addSymbol(symbol)
-			Circle.showSymbol(drawsim.mainstage,symbol)
+			Ellipse.showSymbol(drawsim.mainstage,symbol)
 		})
 	}
 	
 	toJSON(x,y) {
-		return {type:"circle", ex: ex, r:radius, pt:{x:x,y:y}}
+		return {type:"ellipse", ex: ex, w:width, h:height, pt:{x:x,y:y}}
 	}
 	
 	getInst() {
-		return "<p>Click to add a circle. Click circle to delete.</p>"
+		return "<p>Click to add an ellipse. Click ellipse to delete.</p>"
 	}
 }
 
@@ -745,16 +747,16 @@ class DrawSim {
 				this.line = new Line(back,this)
 				inst.innerHTML = this.line.getInst()
 				break
-			case "circle":
-				this.circle = new Circle(back,this)
-				inst.innerHTML = this.circle.getInst()
+			case "ellipse":
+				this.ellipse = new Ellipse(back,this)
+				inst.innerHTML = this.ellipse.getInst()
 				break
 			case "field":
 				this.field = new Field(back,this)
 				inst.innerHTML = this.field.getInst()
 				break
 			default: {
-					alert("Parameter tool should be pressure, airmass, isopleth, line, circle or field")
+					alert("Parameter tool should be pressure, airmass, isopleth, line, ellipse or field")
 				}
 			}
 		}
@@ -799,8 +801,8 @@ class DrawSim {
 			case "line":
 				Line.showSymbol(this.mainstage,json)
 				break;
-			case "circle":
-				Circle.showSymbol(this.mainstage,json)
+			case "ellipse":
+				Ellipse.showSymbol(this.mainstage,json)
 				break;
 			case "field":
 				Field.showSymbol(this.mainstage,json)
