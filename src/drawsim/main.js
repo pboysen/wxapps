@@ -92,8 +92,22 @@ function removeSymbol(symbol) {
 				return
 			}
 			break;
+		case "field":
+			if (Field.isSame(symbol,symbols[i])) {
+				symbols.splice(i,1)
+				store.set(image+ex,symbols)
+				return
+			}
+			break;
 		}
 	}
+}
+
+function deleteLastSymbol() {
+	let symbols = getSymbols()
+	if (symbols.length == 0) return
+	symbols.splice(symbols.length-1,1)
+	store.set(image+ex,symbols)
 }
 
 function deleteSymbols() {
@@ -570,6 +584,83 @@ class Circle extends createjs.Container {
 	}
 }
 
+class Field {
+	static showSymbol(stage,json) {
+		let pts = json.pts
+		let path = new createjs.Container()
+		let shape = new createjs.Shape()
+	    shape.graphics.beginStroke("#000")
+		let oldX = pts[0].x
+		let oldY = pts[0].y
+		let oldMidX = oldX
+		let oldMidY = oldY
+	    json.pts.forEach(pt => {
+			let midPoint = new createjs.Point(oldX + pt.x >> 1, oldY+pt.y >> 1)
+	        shape.graphics.setStrokeStyle(1).moveTo(midPoint.x, midPoint.y)
+	        shape.graphics.curveTo(oldX, oldY, oldMidX, oldMidY)
+	        oldX = pt.x
+	        oldY = pt.y
+	        oldMidX = midPoint.x
+	        oldMidY = midPoint.y
+	    })
+		path.addChild(shape)
+		stage.addChild(path)
+	}
+	
+	static isSame(json1,json2) {
+		if (json1.type != json2.type) return false
+		if (json1.pts[0].x != json2.pts[0].x) return false
+		if (json1.pts[0].y != json2.pts[0].y) return false
+		return true
+	}
+	
+	constructor(back,drawsim) {
+		createjs.Ticker.framerate = 10
+		this.back = back
+		this.mouseDown = false
+		document.onkeypress = function(e) { 
+			if (e.key === "Delete") {
+				deleteLastSymbol()
+				drawsim.mainstage.clear()
+				drawsim.mainstage.addChild(back)
+				drawsim.showSymbols()
+			}
+		}
+		drawsim.mainstage.addEventListener("stagemousedown", e => {
+			this.currentShape = new createjs.Shape()
+		    this.currentShape.graphics.beginStroke("#000")
+			drawsim.mainstage.addChild(this.currentShape)
+		    this.oldX = this.oldMidX = e.stageX
+		    this.oldY = this.oldMidY = e.stageY
+			this.mouseDown = true
+			this.pts = []
+		})
+		drawsim.mainstage.addEventListener("stagemousemove", e => {
+			if (this.mouseDown == false) return
+	        this.pt = new createjs.Point(e.stageX, e.stageY)
+			this.pts = this.pts.concat({x:e.stageX,y:e.stageY})
+			let midPoint = new createjs.Point(this.oldX + this.pt.x >> 1, this.oldY+this.pt.y >> 1)
+	        this.currentShape.graphics.setStrokeStyle(1).moveTo(midPoint.x, midPoint.y)
+	        this.currentShape.graphics.curveTo(this.oldX, this.oldY, this.oldMidX, this.oldMidY)
+	        this.oldX = this.pt.x
+	        this.oldY = this.pt.y
+	        this.oldMidX = midPoint.x
+	        this.oldMidY = midPoint.y
+		})
+		drawsim.mainstage.addEventListener("stagemouseup", e => {
+			this.mouseDown = false
+			drawsim.mainstage.removeChild(this.currentShape)
+			let symbol = {type:"field", pts: this.pts}
+			Field.showSymbol(drawsim.mainstage,symbol)
+			addSymbol(symbol)
+		})
+	}
+	
+	getInst() {
+		return "<p>Join horizontal field lines on left and right by drawing over top of image. Lines should not cross.  Press delete to delete last line.</p>"
+	}
+}
+
 class Toolbar extends createjs.Container {
 	constructor(tool,drawsim) {
 		super()
@@ -658,8 +749,12 @@ class DrawSim {
 				this.circle = new Circle(back,this)
 				inst.innerHTML = this.circle.getInst()
 				break
+			case "field":
+				this.field = new Field(back,this)
+				inst.innerHTML = this.field.getInst()
+				break
 			default: {
-					alert("Parameter tool should be pressure, airmass, isopleth, line or circle")
+					alert("Parameter tool should be pressure, airmass, isopleth, line, circle or field")
 				}
 			}
 		}
@@ -667,7 +762,7 @@ class DrawSim {
 		let dl = document.getElementById("download")
 		dl.addEventListener("click", e => {
 			let dt = this.mainstage.canvas.toDataURL('image/png')
-			/* Change MIME type to trick the browser to downlaod the file instead of displaying it */
+			/* Change MIME type to trick the browser to download the file instead of displaying it */
 			dt = dt.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
 			/* In addition to <a>'s "download" attribute, you can define HTTP-style headers */
 			dt = dt.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=map.png');
@@ -706,6 +801,9 @@ class DrawSim {
 				break;
 			case "circle":
 				Circle.showSymbol(this.mainstage,json)
+				break;
+			case "field":
+				Field.showSymbol(this.mainstage,json)
 				break;
 			}
 		})
