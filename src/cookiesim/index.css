@@ -1,0 +1,113 @@
+.cookiesim {
+	font-family: Arial, Helvetica, sans-serif;
+	display: block;
+	margin: 0 auto;
+	margin-top: 10px;
+	padding: 4px;
+}
+
+#instruct {
+	padding: 8px;
+}
+
+#ingr {
+	width: 1000px;
+	display: block;
+	overflow-x: hidden;
+	overflow-y: auto;
+	margin: 0 auto;
+	border: 1px solid #AAA;
+	border-radius: 8px;
+	background:  #EEE;
+}
+
+#ingr table {
+	margin: 0 auto; 
+}
+
+#ingr table caption {
+	font-weight: bold;
+}
+
+#ingr th {
+	font-weight: normal;
+	background: skyblue;
+	color: white;
+	padding: 0px;
+}
+
+#ingr td {
+	background:  #EEE;
+	text-align: center;
+	padding: 4px
+}
+
+#panel {
+	margin: 20px auto;
+	text-align: center;
+}
+
+#panel input[type=button]{
+	width: 90px;
+	border: 1px solid #AAA;
+	border-radius: 4px;
+	margin: 4px;
+	background: white;
+	padding: 1px;
+}
+
+#panel input[type=button]:hover:enabled{
+	background: skyblue;
+	color: white;
+}
+
+#results {
+	width: 1100px;
+	height: 600px;
+	display: block;
+	overflow-x: hidden;
+	overflow-y: auto;
+	margin: 20px auto;
+	border: 1px solid #AAA;
+	border-radius: 8px;
+}
+
+#results table {
+	width: 100%;
+	font-family: Arial, Helvetica, sans-serif;
+	border: 1px solid #AAA;
+}
+
+#results table caption {
+	font-weight: bold;
+}
+
+#results tr th {
+	width: 200px;
+	border-right: 1px solid #AAA;
+	border-bottom: 1px solid #AAA;
+	font-weight: normal;
+	background: #EEE;
+	padding: 2px;
+}
+
+#results tr td {
+	width: 200px;
+	border-right: 1px solid #AAA;
+	border-bottom: 1px solid #AAA;
+	background: white;
+	text-align: center;
+	vertical-align: middle;
+}
+
+#results .delete_col {
+	width: 16px;
+}
+
+.delete_img {
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+	cursor: pointer;
+}
+

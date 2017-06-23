@@ -1,0 +1,80 @@
+<!doctype html>
+
+<meta charset="utf-8"/>
+<title>CookieSim</title>
+<link rel=stylesheet href="index.css">
+
+<div class="cookiesim">
+	<h3>Instructions</h3>
+	<div id="instruct"></div>
+	<div id="ingr">
+		<table>
+			<caption>Ingredients</caption>
+			<tr>
+				<td>Sugar 
+					<select id="ingr1">
+						<option selected="selected">Control</option>
+						<option value="sugar50">50%</option>
+						<option value="sugar150">150%</option>
+					</select>
+				</td>
+				<td>Butter 
+					<select id="ingr2">
+						<option selected="selected">Control</option>
+						<option value="butter50">50%</option>
+						<option value="butter150">150%</option>
+					</select>
+				</td>
+				<td>Flour
+					<select id="ingr3">
+						<option selected="selected">Control</option>
+						<option value="flour50">50%</option>
+						<option value="flour150">150%</option>
+					</select>
+				</td>
+				<td>Leavening 
+					<select id="ingr4">
+						<option selected="selected">Control</option>
+						<option value="leaveningnone">None</option>
+						<option value="leaveningsoda">Baking Soda</option>
+						<option value="leaveningsodapowder">Baking Soda+Powder</option>
+					</select>
+				</td>
+			</tr>
+		</table>
+		<div id="panel">
+			<input type="button" id="bake" value="Bake" title="Bake"/>
+		</div>
+	</div>
+	<div id="results">
+		<table>
+			<caption>Experimental Results</caption>
+			<tr>
+				<th>Dough</th>
+				<th>Chemical/Physical Structure</th>
+				<th>Top View</th>
+				<th>Side View</th>
+		        <th class="delete_col"><img id="delete_all" class="delete_img" alt="Delete all results" title="Delete all results" src="assets/delete.jpg"/></th>
+			</tr>
+			<tr>
+				<td>
+					<img src="assets/case1/control/dough.png"/>
+				</td>
+				<td>
+					<img src="assets/case1/control/sugar.png" id="ctrl_structure"/>
+				</td>
+				<td>
+					<img src="assets/case1/control/top.png"/>
+					<div>Width: 10.5cm</div>
+				</td>
+				<td>
+					<img src="assets/case1/control/side.png"/>
+					<div>Height: 0.87cm</div>
+				</td>
+				<td class="delete_col">&nbsp;</td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<script src="main-built.js"></script>
