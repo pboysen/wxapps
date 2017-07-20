@@ -10,8 +10,8 @@
 	padding: 8px;
 }
 
-#ingr {
-	width: 1000px;
+#level {
+	width: 350px;
 	display: block;
 	overflow-x: hidden;
 	overflow-y: auto;
@@ -19,27 +19,6 @@
 	border: 1px solid #AAA;
 	border-radius: 8px;
 	background:  #EEE;
-}
-
-#ingr table {
-	margin: 0 auto; 
-}
-
-#ingr table caption {
-	font-weight: bold;
-}
-
-#ingr th {
-	font-weight: normal;
-	background: skyblue;
-	color: white;
-	padding: 0px;
-}
-
-#ingr td {
-	background:  #EEE;
-	text-align: center;
-	padding: 4px
 }
 
 #panel {
@@ -61,9 +40,18 @@
 	color: white;
 }
 
+.display {
+	margin: 20px auto;
+	text-align: center;
+}
+
+#maincanvas {
+	border: 1px solid #AAA;
+}
+
 #results {
 	width: 1100px;
-	height: 600px;
+	height: 400px;
 	display: block;
 	overflow-x: hidden;
 	overflow-y: auto;
