@@ -160,6 +160,7 @@ class Ingredient {
 	
 	isBaked(i) {
 		let baked = store.get(ingredient)
+		if (!baked) return false
 		return baked.indexOf(this.ingredient_names[i]) > -1
 	}
 	
