@@ -101,7 +101,7 @@ class Dough {
 	
 	setIngredient(dim) {
 		// compute width pixels to change for simulation (200 pixels wide * cookie_width/max_width of area)
-		this.dw = 200*dim.w/14/frames
+		this.dw = 200*dim.w/11/frames
 		this.dx = this.dw/2
 		// compute pixels to change for simulation (240 pixels * cookie_height/max_height of area)
 		this.dh = 400*dim.h/1.9/frames
@@ -206,7 +206,9 @@ class Butter extends Ingredient {
 				for (let j = 0; j < 5; j++) {
 					let x = 8*j+4*row
 					let crystal = new createjs.Shape()
-					crystal.graphics.beginFill("yellow").drawCircle(x, row*8, 4)
+					crystal.graphics.beginFill("yellow").drawEllipse(x, row*8, 8, 8)
+					crystal.rect = new createjs.Rectangle(x,row*8,8,8)
+					crystal.dir = Math.random()
 					glob.addChild(crystal)
 				}
 			}
@@ -221,8 +223,9 @@ class Butter extends Ingredient {
 		dough.ball.getChildAt(1).children.forEach(glob => {
 			if (glob.y <= dough.rect.y) glob.y += 5
 			glob.children.forEach(crystal => {
-				crystal.x += Math.random() < 0.5? 1:-1
-				crystal.y += Math.random() < 0.5? 1:-1
+				crystal.rect.x += crystal.dir < 0.5? 1:-1
+				//crystal.rect.width += .1
+				crystal.graphics.beginFill("yellow").drawEllipse(crystal.rect.x, crystal.rect.y, crystal.rect.width, crystal.rect.height)
 			})
 		})
 	}
