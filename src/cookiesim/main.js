@@ -89,13 +89,14 @@ class Dough {
 		this.ball.x = 80
 		this.ball.y = 30
 		this.buildDough(level)
+		this.bakedball = null
 	}
 	
 	buildDough(level) {
 		this.ball.removeAllChildren()
 		this.shape = new createjs.Shape()
-		this.shape.graphics.beginFill("#B5651D").beginStroke("#B5651D").drawEllipse(25,50,200,240)
-		this.rect = new createjs.Rectangle(25,50,200,240)
+		this.shape.graphics.beginFill("#B5651D").beginStroke("#B5651D").drawEllipse(75,50,200,240).endStroke()
+		this.rect = new createjs.Rectangle(75,50,200,240)
 	    this.ball.addChild(this.shape)
 	}
 	
@@ -114,7 +115,7 @@ class Dough {
 		this.rect.y += this.dy
 		this.rect.width += this.dw
 		this.rect.height -= this.dh
-		this.shape.graphics.beginFill("#B5651D").beginStroke("#B5651D").drawEllipse(this.rect.x,this.rect.y,this.rect.width,this.rect.height)
+		this.shape.graphics.beginFill("#B5651D").beginStroke("#B5651D").drawEllipse(this.rect.x,this.rect.y,this.rect.width,this.rect.height).endStroke()
 	}
 }
 
@@ -146,7 +147,7 @@ class Ingredient {
 			dough.setIngredient(cookiedim[ingredient_names[i]])
 			this.buildIngredients(dough)
 			if (this.isBaked(i)) 
-				for (let j = 0; j < frames; j++) this.update()
+				for (let j = 0; j < frames; j++) this.update(i)
 		}
 	}
 	
@@ -167,7 +168,6 @@ class Ingredient {
 	render(stage) {
 		let dough = this.doughs[this.getLevel()]
 		stage.addChild(dough.ball)
-		stage.update()
 	}
 
 		
@@ -196,37 +196,37 @@ class Butter extends Ingredient {
 	
 	buildIngredients(dough) {
 		let butter = new createjs.Container()
-		butter.x = 25
-		butter.y = 50
-		for (let i = 0; i <= dough.level; i++) {
-			let glob = new createjs.Container()
-			glob.x = [75,25,125][i]
-			glob.y = [50,100,150][i]
-			for (let row = 0; row < 2; row++) {
-				for (let j = 0; j < 5; j++) {
-					let x = 8*j+4*row
-					let crystal = new createjs.Shape()
-					crystal.graphics.beginFill("yellow").drawEllipse(x, row*8, 8, 8)
-					crystal.rect = new createjs.Rectangle(x,row*8,8,8)
-					crystal.dir = Math.random()
-					glob.addChild(crystal)
-				}
+		butter.x = 0
+		butter.y = 0
+		for (let row = 0; row < 2*(dough.level+1); row++) {
+			for (let col = 0; col < 5; col++) {
+				let crystal = new createjs.Shape()
+				crystal.x = 8*col+4*row+150
+				crystal.y = row*8+150
+				crystal.height = 8
+				crystal.graphics.beginFill("yellow").drawEllipse(0, 0, 8, 8)
+				let rand = Math.random()
+				crystal.dx = rand < 0.3?-4:rand > 0.6?4:0
+				rand = Math.random()
+				crystal.dy = rand < 0.3?3:rand > 0.6?2:0
+				butter.addChild(crystal)
 			}
-			butter.addChild(glob)
 		}
 		dough.ball.addChild(butter)
 	}
 	
-	update() {
-		let dough = this.doughs[this.getLevel()] 
+	update(level) {
+		let dough = this.doughs[level] 
 		dough.update()
-		dough.ball.getChildAt(1).children.forEach(glob => {
-			if (glob.y <= dough.rect.y) glob.y += 5
-			glob.children.forEach(crystal => {
-				crystal.rect.x += crystal.dir < 0.5? 1:-1
-				//crystal.rect.width += .1
-				crystal.graphics.beginFill("yellow").drawEllipse(crystal.rect.x, crystal.rect.y, crystal.rect.width, crystal.rect.height)
-			})
+		let butter = dough.ball.getChildAt(1)
+		butter.children.forEach(crystal => {
+			crystal.x += crystal.dx
+			crystal.y += crystal.dy
+			if (crystal.y < dough.rect.y)
+				crystal.y = dough.rect.y+8
+			crystal.height -= 0.2
+			crystal.graphics.clear()
+			crystal.graphics.beginFill("yellow").drawEllipse(0, 0, 8, crystal.height)
 		})
 	}
 }
@@ -300,10 +300,11 @@ class CookieSim {
 	
 	render() {
 		this.running = false
+		this.bakeButton.disabled = this.ingredient.isBaked(this.ingredient.getLevel())
 		this.mainstage.removeAllChildren()
 		this.showGrid()
 		this.ingredient.render(this.mainstage)
-		this.bakeButton.disabled = this.ingredient.isBaked(this.ingredient.getLevel())
+		this.mainstage.update()
 	}
 	
 	bake() {
@@ -312,12 +313,12 @@ class CookieSim {
 	}
 	
 	update() {
-		this.ingredient.update()
+		this.ingredient.update(this.ingredient.getLevel())
 		this.mainstage.update()
 	}
 	
 	showGrid() {
-		for(let x = 0; x < 400; x+=20) {
+		for(let x = 0; x < 500; x+=20) {
 			let horz = new createjs.Shape()
 			horz.graphics.setStrokeDash([2,2])
 			horz.graphics.beginStroke("#EEE").setStrokeStyle(1).moveTo(x,0)
@@ -329,7 +330,7 @@ class CookieSim {
 			let vert = new createjs.Shape()
 			vert.graphics.setStrokeDash([2,2])
 			vert.graphics.beginStroke("#EEE").setStrokeStyle(1).moveTo(0,y)
-			vert.graphics.lineTo(400,y)
+			vert.graphics.lineTo(500,y)
 			vert.graphics.endStroke()
 			this.mainstage.addChild(vert)
 		}
