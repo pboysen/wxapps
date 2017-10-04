@@ -104,7 +104,7 @@ class Readout {
 		this.altitude.value = trial.altitude.toFixed(1)
 		this.temp.value = trial.temp.toFixed(1)
 		this.vapor.value = trial.vapor.toFixed(1)
-		this.dewpoint.value = trial.dewpoint.toFixed(1)
+		//this.dewpoint.value = trial.dewpoint.toFixed(1)
 	}
 }
 
@@ -128,7 +128,7 @@ class Settings {
 		let event = /msie|trident/g.test(window.navigator.userAgent.toLowerCase())?"change":"input"
 		this.temp.addEventListener(event, e => slidef(e,this.temp,this.tempout,this.listener))
 		this.vapor.addEventListener(event, e => slidef(e,this.vapor,this.vaporout,this.listener))
-		this.dewpoint.addEventListener(event, e => slidef(e,this.dewpoint,this.dewpointout,this.listener))
+		//this.dewpoint.addEventListener(event, e => slidef(e,this.dewpoint,this.dewpointout,this.listener))
 	}
 	
 	getTemp() { return this.temp.valueAsNumber }
@@ -147,10 +147,11 @@ class Settings {
 		this.vapor.value = value
 		this.vaporout.value = value.toFixed(1)
 		this.readout.vapor.value = this.vaporout.value
+		this.setDewpoint(dewpoint(value))
 	}
  	
 	setDewpoint(value) {
-		this.dewpoint.value = value
+		//this.dewpoint.value = value
 		this.dewpointout.value = value.toFixed(1)
 		this.readout.dewpoint.value = this.dewpointout.value
 	}
