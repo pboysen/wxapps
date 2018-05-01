@@ -7,10 +7,11 @@ let image = searchParams.get('img')
 if (!image) image = prompt("Enter image url:","")
 let edit = searchParams.get('mode') == "edit"
 let scale = searchParams.get('scale') || 1.0
-let tool = searchParams.get('tool') || "vectors"
+let tool = searchParams.get('tool') || "pressure"
 let ex = searchParams.get('ex') || ""
 let width = searchParams.get('w') || 20
 let height = searchParams.get('h') || 20
+let opt = searchParams.get('opt') || "all"
 
 let linetypes = {
 	dry:{w:1,c:"#000"},
@@ -30,6 +31,10 @@ createjs.MotionGuidePlugin.install()
 function dist(p1,p2) { 
 	let dx = p1.x - p2.x, dy = p1.y - p2.y
 	return Math.sqrt(dx*dx + dy*dy)
+}
+
+function angle(p1, p2) {
+    return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
 }
 
 function getSymbols() {
@@ -102,13 +107,6 @@ function removeSymbol(symbol) {
 			break;
 		}
 	}
-}
-
-function deleteLastSymbol() {
-	let symbols = getSymbols()
-	if (symbols.length == 0) return
-	symbols.splice(symbols.length-1,1)
-	store.set(image+ex,symbols)
 }
 
 function deleteSymbols() {
@@ -218,6 +216,12 @@ class PressureRegion extends createjs.Container {
 	toJSON(x,y) {
 		return {type:"region", high: this.high, pt:{x:x,y:y}}
 	}		
+
+	getLength() { return 2*30+2 }
+
+	getInst() {
+		return "<p>Click location and select an icon to add. Click icon in map to delete.</p>"
+	}
 }
 
 class Pressures extends createjs.Container {
@@ -225,21 +229,27 @@ class Pressures extends createjs.Container {
 		super()
 		this.x = x
 		this.y = 2
-		for (let i = 0; i < 8; i++) {
-			let v = new Vector(x,45*i,"assets/left-arrow.png",drawsim)
-			this.addChild(v)
+		if (opt == "all" || opt == "arrows")
+			for (let i = 0; i < 8; i++) {
+				let v = new Vector(x,45*i,"assets/left-arrow.png",drawsim)
+				this.addChild(v)
+				x += 30
+			}
+		if (opt == "all" || opt == "hl") {
+			this.addChild(new PressureRegion(x,true,drawsim))
+			x += 30
+			this.addChild(new PressureRegion(x,false,drawsim))
 			x += 30
 		}
-		this.addChild(new PressureRegion(x,true,drawsim))
-		x += 30
-		this.addChild(new PressureRegion(x,false,drawsim))
-		x += 30
 	}
 	
-	getLength() { return 10*30+2 }
+	getLength() {
+		let n = opt == "all"?10:opt == "arrows"?8:2
+		return n*30+2 
+	}
 
 	getInst() {
-		return "<p>Click location and select a vector or pressure region to add. Click vector or pressure region to delete.</p>"
+		return "<p>Click location and select an icon to add. Click icon in map to delete.</p>"
 	}
 }
 
@@ -589,23 +599,39 @@ class Ellipse extends createjs.Container {
 class Field {
 	static showSymbol(stage,json) {
 		let pts = json.pts
-		let path = new createjs.Container()
 		let shape = new createjs.Shape()
-	    shape.graphics.beginStroke("#000")
+	    shape.graphics.beginStroke(opt?"#0f0":"#000")
+	    if (pts.length == 0) return
 		let oldX = pts[0].x
 		let oldY = pts[0].y
 		let oldMidX = oldX
 		let oldMidY = oldY
 	    json.pts.forEach(pt => {
 			let midPoint = new createjs.Point(oldX + pt.x >> 1, oldY+pt.y >> 1)
-	        shape.graphics.setStrokeStyle(1).moveTo(midPoint.x, midPoint.y)
+	        shape.graphics.setStrokeStyle(2).moveTo(midPoint.x, midPoint.y)
 	        shape.graphics.curveTo(oldX, oldY, oldMidX, oldMidY)
 	        oldX = pt.x
 	        oldY = pt.y
 	        oldMidX = midPoint.x
 	        oldMidY = midPoint.y
 	    })
+		let path = new createjs.Container()
 		path.addChild(shape)
+	    if (opt == 'head' && pts.length > 4) {
+	    	let lastpt = pts[pts.length-4]
+	    	let endpt = pts[pts.length-1]
+	    	let head = new createjs.Shape()
+		    head.graphics.f("#0f0").setStrokeStyle(2).beginStroke("#0f0").mt(4,0).lt(-4,-4).lt(-4,4).lt(4,0)
+		    head.x = endpt.x
+		    head.y = endpt.y
+		    head.rotation = angle(lastpt,endpt)
+		    path.addChild(head)		    
+	    }
+    	path.cursor = "not-allowed"
+		path.addEventListener("click", e => {
+			removeSymbol(json)
+			path.stage.removeChild(path)
+		})
 		stage.addChild(path)
 	}
 	
@@ -620,17 +646,10 @@ class Field {
 		createjs.Ticker.framerate = 10
 		this.back = back
 		this.mouseDown = false
-		document.onkeypress = function(e) { 
-			if (e.key === "Delete") {
-				deleteLastSymbol()
-				drawsim.mainstage.clear()
-				drawsim.mainstage.addChild(back)
-				drawsim.showSymbols()
-			}
-		}
+		this.w = 1
 		drawsim.mainstage.addEventListener("stagemousedown", e => {
 			this.currentShape = new createjs.Shape()
-		    this.currentShape.graphics.beginStroke("#000")
+		    this.currentShape.graphics.beginStroke(opt?"#0f0":"#000")
 			drawsim.mainstage.addChild(this.currentShape)
 		    this.oldX = this.oldMidX = e.stageX
 		    this.oldY = this.oldMidY = e.stageY
@@ -642,7 +661,7 @@ class Field {
 	        this.pt = new createjs.Point(e.stageX, e.stageY)
 			this.pts = this.pts.concat({x:e.stageX,y:e.stageY})
 			let midPoint = new createjs.Point(this.oldX + this.pt.x >> 1, this.oldY+this.pt.y >> 1)
-	        this.currentShape.graphics.setStrokeStyle(1).moveTo(midPoint.x, midPoint.y)
+	        this.currentShape.graphics.setStrokeStyle(opt?3:2).moveTo(midPoint.x, midPoint.y)
 	        this.currentShape.graphics.curveTo(this.oldX, this.oldY, this.oldMidX, this.oldMidY)
 	        this.oldX = this.pt.x
 	        this.oldY = this.pt.y
@@ -651,15 +670,16 @@ class Field {
 		})
 		drawsim.mainstage.addEventListener("stagemouseup", e => {
 			this.mouseDown = false
+			if (this.pts.length == 0) return
 			drawsim.mainstage.removeChild(this.currentShape)
 			let symbol = {type:"field", pts: this.pts}
-			Field.showSymbol(drawsim.mainstage,symbol)
+			Field.showSymbol(drawsim.mainstage,symbol,this.w,this.color)
 			addSymbol(symbol)
 		})
 	}
 	
 	getInst() {
-		return "<p>Join horizontal field lines on left and right by drawing over top of image. Lines should not cross.  Press delete to delete last line.</p>"
+		return opt?"<p>Click and drag to draw a line. Click on line when red cursor appears to delete.":"<p>Join horizontal field lines on left and right by drawing over top of image. Lines should not cross. <br/>Click on line when red cursor appears to delete.</p>"
 	}
 }
 
@@ -776,8 +796,6 @@ class DrawSim {
 		let bnd = img.getBounds()
 		this.mainstage.canvas.width = bnd.width + 40
 		this.mainstage.canvas.height = bnd.height + 40
-		let panel = document.getElementById("panel")
-		panel.width = bnd.width + 40
 		img.x = 20
 		img.y = 25
 	}
