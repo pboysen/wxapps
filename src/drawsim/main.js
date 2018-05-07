@@ -1,4 +1,4 @@
-import {getStore} from "../utils"
+import {getStore} from "../utils"   
 import {Url} from "url" 
 
 let store = getStore(), searchParams = new URLSearchParams(window.location.search.substring(1))
@@ -21,7 +21,7 @@ let linetypes = {
 	jet300:{w:5,c:"#800080"}
 }
 
-let linetype = "dry"
+let linetype = "dry" 
 let linetypeButton = null
 
 createjs.MotionGuidePlugin.install()
@@ -625,7 +625,11 @@ class Field {
 		    head.x = endpt.x
 		    head.y = endpt.y
 		    head.rotation = angle(lastpt,endpt)
-		    path.addChild(head)		    
+		    path.addChild(head)
+			let name = new createjs.Text(json.name,"12px Arial","#000")
+	    	name.x = pts[0].x
+	    	name.y = pts[0].y
+	    	path.addChild(name)
 	    }
     	path.cursor = "not-allowed"
 		path.addEventListener("click", e => {
@@ -673,6 +677,9 @@ class Field {
 			if (this.pts.length == 0) return
 			drawsim.mainstage.removeChild(this.currentShape)
 			let symbol = {type:"field", pts: this.pts}
+		    if (opt == 'head' && this.pts.length > 4) {
+		    	symbol.name = prompt("Enter name:","")
+		    }
 			Field.showSymbol(drawsim.mainstage,symbol,this.w,this.color)
 			addSymbol(symbol)
 		})
