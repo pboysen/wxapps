@@ -600,7 +600,7 @@ class Field {
 	static showSymbol(stage,json) {
 		let pts = json.pts
 		let shape = new createjs.Shape()
-	    shape.graphics.beginStroke(opt?"#0f0":"#000")
+	    shape.graphics.beginStroke("#000")
 	    if (pts.length == 0) return
 		let oldX = pts[0].x
 		let oldY = pts[0].y
@@ -619,16 +619,16 @@ class Field {
 		path.addChild(shape)
 	    if (opt == 'head' && pts.length > 4) {
 	    	let lastpt = pts[pts.length-4]
-	    	let endpt = pts[pts.length-1]
+	    	let endpt = pts[pts.length-3]
 	    	let head = new createjs.Shape()
-		    head.graphics.f("#0f0").setStrokeStyle(2).beginStroke("#0f0").mt(4,0).lt(-4,-4).lt(-4,4).lt(4,0)
+		    head.graphics.f("#000").setStrokeStyle(2).beginStroke("#000").mt(4,0).lt(-4,-4).lt(-4,4).lt(4,0)
 		    head.x = endpt.x
 		    head.y = endpt.y
 		    head.rotation = angle(lastpt,endpt)
 		    path.addChild(head)
-			let name = new createjs.Text(json.name,"12px Arial","#000")
-	    	name.x = pts[0].x
-	    	name.y = pts[0].y
+			let name = new createjs.Text(json.name,"14px Arial","#000"), mid = Math.trunc(pts.length/2)
+	    	name.x = pts[mid].x
+	    	name.y = pts[mid].y
 	    	path.addChild(name)
 	    }
     	path.cursor = "not-allowed"
@@ -647,13 +647,13 @@ class Field {
 	}
 	
 	constructor(back,drawsim) {
-		createjs.Ticker.framerate = 10
+		createjs.Ticker.framerate = 5
 		this.back = back
 		this.mouseDown = false
 		this.w = 1
 		drawsim.mainstage.addEventListener("stagemousedown", e => {
 			this.currentShape = new createjs.Shape()
-		    this.currentShape.graphics.beginStroke(opt?"#0f0":"#000")
+		    this.currentShape.graphics.beginStroke("#000")
 			drawsim.mainstage.addChild(this.currentShape)
 		    this.oldX = this.oldMidX = e.stageX
 		    this.oldY = this.oldMidY = e.stageY
@@ -678,7 +678,7 @@ class Field {
 			drawsim.mainstage.removeChild(this.currentShape)
 			let symbol = {type:"field", pts: this.pts}
 		    if (opt == 'head' && this.pts.length > 4) {
-		    	symbol.name = prompt("Enter name:","")
+		    	symbol.name = prompt("Name the Process:","")
 		    }
 			Field.showSymbol(drawsim.mainstage,symbol,this.w,this.color)
 			addSymbol(symbol)
