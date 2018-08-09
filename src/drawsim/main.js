@@ -1,8 +1,8 @@
 import {getStore} from "../utils"   
 import {Url} from "url" 
-
+ 
 let store = getStore(), searchParams = new URLSearchParams(window.location.search.substring(1))
-
+ 
 let image = searchParams.get('img')
 if (!image) image = prompt("Enter image url:","")
 let edit = searchParams.get('mode') == "edit"
@@ -429,7 +429,7 @@ class IsoPleth {
 	}
 	
 	getInst() {
-		return "<p>Click and drag to draw line. Supply value when prompted.  Click value to delete.</p>"
+		return "<p>Press and drag mouse to draw line. Release when done. Supply a value when prompted.  Click value to delete.</p>"
 	}
 }
 
@@ -550,7 +550,7 @@ class Line {
 	}
 	
 	getInst() {
-		return "<p>Select a line type, then click and drag to draw. <br/>Drawing another line of the same type will replace the previous line.</p>"
+		return "<p>Select a line type, then press and drag mouse to draw. Release when done.<br/>Drawing another line of the same type will replace the previous line.</p>"
 	}
 }
 
@@ -686,7 +686,7 @@ class Field {
 	}
 	
 	getInst() {
-		return opt?"<p>Click and drag to draw a line. Click on line when red cursor appears to delete.":"<p>Join horizontal field lines on left and right by drawing over top of image. Lines should not cross. <br/>Click on line when red cursor appears to delete.</p>"
+		return opt?"<p>Press and drag mouse to draw a line. Release when done. Click on line when red cursor appears to delete.":"<p>Join horizontal field lines on left and right by drawing over top of image. Lines should not cross. <br/>Click on line when red cursor appears to delete.</p>"
 	}
 }
 

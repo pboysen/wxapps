@@ -5,6 +5,7 @@ createjs.MotionGuidePlugin.install()
 let searchParams = new URLSearchParams(window.location.search.substring(1))
 
 let tool = searchParams.get('tool') || "grid"
+let mode = searchParams.get('mode') || "view"
 
 let store = getStore()
 let init_grid_clouds = [
@@ -16,40 +17,46 @@ let init_grid_clouds = [
 let init_stability_clouds = [
 	"altocumulus1","cumulus1","stratus1","cirrostratus1","nimbostratus1", 
 	"cirrus1","cumulonimbus3","cumulus2", "altostratus1","altocumulus2"
-                    ]
+]
+
+let init_extreme_clouds = [
+"Hurricanes","Extreme_Heat","Floods","Extreme_Cold","Tornadoes","Lightning" 
+]
+
+let init_casualty = [
+"Animation_side_flsh","gnd_current_sq","direct_strike","tips","POW","Animation_upward_streamer"                   
+]
+
+let casualty_labels = {
+	gnd_current_sq:"ground current",
+	Animation_side_flsh:"side flash",
+	tips:"contact",
+	Animation_upward_streamer:"upward streamer",
+	POW:"blunt trauma",
+	direct_strike:"direct strike"
+}
+
+let cloud_images = {grid: init_grid_clouds,stability: init_stability_clouds,extreme: init_extreme_clouds,casualty: init_casualty}
+              
 let clouds = []
 let forms = ["streaks","sheets","heaps","rain","rain"]
 
 function getClouds() {
 	let clouds = store.get(tool+"_clouds")
 	if (!clouds) {
-		clouds = tool == "grid"? init_grid_clouds: init_stability_clouds
+		clouds = cloud_images[tool]
 		store.set(tool+"_clouds",clouds)
 	}
 	return clouds
 }
 
-function updateClouds() {
+function updateClouds(compare) {
 	// sort clouds by y location (reversed) and x
 	let map = []
 	clouds.forEach(c => {
 		map = map.concat({name:c.name,x:c.x,y:c.y})
 	})
-	map.sort(tool == "grid"?
-		function compare(a,b) {
-			// y is in reverse order
-			if (a.y > b.y) return 1
-			if (a.y < b.y) return -1
-			if (a.x > b.x) return 1
-			if (a.x < b.x) return -1
-			return 0
-		}:
-			function compare(a,b) {
-			if (a.y > 200 && b.y < 200) return 1
-			if (a.y < b.y) return -1
-			return 1
-		}
-	)
+	map.sort(compare)
 			
 	let newclouds = []
 	map.forEach(c => { newclouds = newclouds.concat(c.name) })
@@ -61,53 +68,89 @@ function removeClouds() {
 }
 
 class Cloud {
-	constructor(stage,name,x,y) {
+	constructor(stage,name,x,y,alt) {
 		let cloud = new createjs.Container()
 		cloud.x = x
 		cloud.y = y
-		cloud.cursor = "grab"
 		cloud.name = name
 		let bmap = new createjs.Bitmap("assets/"+name+".png")
-		bmap.scaleX = 0.5
-		bmap.scaleY = 0.5
-		let txt = new createjs.Text(name.slice(0,-1),"12px Arial","#FFF")
-		txt.x = 15
-		txt.y = 85
+		if (tool == "grid" || tool == "stability") {
+			bmap.scaleX = 0.5
+			bmap.scaleY = 0.5
+		}
 		cloud.addChild(bmap)
-		cloud.addChild(txt)
+		if (tool != "extreme") {
+			let txt = new createjs.Text(alt?alt:name.slice(0,-1),"12px Arial","#FFF")
+			txt.x = 15
+			txt.y = 85
+			cloud.addChild(txt)
+		}
 		let ofx = 0, ofy = 0, orgx = 0, orgy = 0
-		bmap.addEventListener("mousedown", e => {
-		    ofx = cloud.x - e.stageX
-		    ofy = cloud.y - e.stageY
-		    orgx = cloud.x
-		    orgy = cloud.y
-		    cloud.cursor = "grabbing"
-		    stage.setChildIndex( cloud, stage.getNumChildren()-1)
-		});
-		bmap.addEventListener("pressmove", e => {
-		    cloud.x = e.stageX + ofx
-		    cloud.y = e.stageY + ofy
-		});
-		bmap.addEventListener("pressup", e => {
-		    cloud.cursor = "grab"
-		    let dropped = null
-		    clouds.forEach(c => {
-		    	let r = new createjs.Rectangle(c.x,c.y,100,100)
-		    	if (r.contains(e.stageX,e.stageY) && c.name != cloud.name) dropped = c
-		    })
-		    if (dropped) {
-		    	// swap clouds
-		    	let dx = dropped.x, dy = dropped.y
-		    	dropped.x = orgx
-		    	dropped.y = orgy
-		    	cloud.x = dx
-		    	cloud.y = dy
-		    	updateClouds()
-		    } else {
-		    	cloud.x = orgx
-		    	cloud.y = orgy
-		    }
-		})
+		if (mode == "edit") {
+			cloud.cursor = "grab"
+			bmap.addEventListener("mousedown", e => {
+			    ofx = cloud.x - e.stageX
+			    ofy = cloud.y - e.stageY
+			    orgx = cloud.x
+			    orgy = cloud.y
+			    cloud.cursor = "grabbing"
+			    stage.setChildIndex( cloud, stage.getNumChildren()-1)
+			});
+			bmap.addEventListener("pressmove", e => {
+			    cloud.x = e.stageX + ofx
+			    cloud.y = e.stageY + ofy
+			});
+			bmap.addEventListener("pressup", e => {
+			    cloud.cursor = "grab"
+			    let dropped = null
+			    clouds.forEach(c => {
+			    	let r = new createjs.Rectangle(c.x,c.y,100,100)
+			    	if (r.contains(e.stageX,e.stageY) && c.name != cloud.name) dropped = c
+			    })
+			    if (dropped) {
+			    	// swap clouds
+			    	let dx = dropped.x, dy = dropped.y
+			    	dropped.x = orgx
+			    	dropped.y = orgy
+			    	cloud.x = dx
+			    	cloud.y = dy
+			    	switch(tool) {
+			    	case 'grid': 
+			    		updateClouds(function compare(a,b) {
+			    			// y is in reverse order
+			    			if (a.y > b.y) return 1
+			    			if (a.y < b.y) return -1
+			    			if (a.x > b.x) return 1
+			    			if (a.x < b.x) return -1
+			    			return 0
+			    		})
+			    		break;
+			    	case 'stability': 
+				    	updateClouds(function compare(a,b) {
+							if (a.y > 200 && b.y < 200) return -1
+							if (a.y < 200 && b.y > 200) return 1
+							if (a.x > b.x) return 1
+							if (a.x < b.x) return -1
+							return 0
+						})
+						break;
+			    	case 'extreme': 
+			    	case 'casualty':
+			    		updateClouds(function compare(a,b) {
+							if (a.x > b.x) return 1
+							if (a.x < b.x) return -1
+							return 0
+						})
+						break;
+			    	}
+			    } else {
+			    	cloud.x = orgx
+			    	cloud.y = orgy
+			    }
+			    return
+			})
+		} else
+			cloud.cursor = "arrow"
 		return cloud
 	}
 }
@@ -125,7 +168,7 @@ class Grid {
 			}
 		}
 		for (let i = 1 ; i <= 3; i++) {
-			let level = new createjs.Text("Level "+(4-i),"12px Arial","#00F")
+			let level = new createjs.Text("Level "+(4-i)+"(low)","12px Arial","#00F")
 			level.x = 5
 			level.y = yorg + 50 + 100*(i-1)
 			stage.addChild(level)
@@ -202,6 +245,41 @@ class Stability {
 	}
 }
 
+class Extreme {
+	constructor(stage,xorg,yorg) {
+		this.showClouds(stage,xorg,yorg)
+	}
+	
+	showClouds(stage,xorg,yorg) {
+		let x = xorg - 10
+		let y = yorg - 10
+		getClouds().forEach(name => {
+			let c = new Cloud(stage,name,x,y)
+			clouds = clouds.concat(c)
+			stage.addChild(c)
+			x += 101
+		})
+	}
+}
+
+class Casualty {
+	constructor(stage,xorg,yorg) {
+		this.showClouds(stage,xorg,yorg)
+	}
+	
+	showClouds(stage,xorg,yorg) {
+		let x = xorg - 10
+		let y = yorg - 10
+		let clds = getClouds()
+		for (let i = 0; i < clds.length; i++) {
+			let c = new Cloud(stage,clds[i],x,y,casualty_labels[clds[i]])
+			clouds = clouds.concat(c)
+			stage.addChild(c)
+			x += 101
+		}
+	}
+}
+
 class CloudSim {
 	constructor() {
 		this.mainstage = new createjs.Stage("maincanvas")
@@ -209,6 +287,7 @@ class CloudSim {
 		this.mainstage.enableMouseOver()
 		let inst = document.getElementById("instruct")
 		let reset = document.getElementById("reset")
+		if (mode == "view") reset.disabled = true
 		switch (tool) {
 			case "grid": {
 				this.grid = new Grid(this.mainstage,50,50)
@@ -228,6 +307,28 @@ class CloudSim {
 					removeClouds()
 					clouds.forEach(c => this.mainstage.removeChild(c))
 					this.stability.showClouds(this.mainstage,10,10)
+				})
+				break;
+			}
+			case "extreme": {
+				document.getElementById("maincanvas").height = 100
+				this.extreme = new Extreme(this.mainstage,10,10)
+				inst.innerHTML = "Order images by dragging and dropping so that the highest average of yearly fatalities is on the left and the lowest is on the right."
+				reset.addEventListener("click", e => {
+					removeClouds()
+					clouds.forEach(c => this.mainstage.removeChild(c))
+					this.extreme.showClouds(this.mainstage,10,10)
+				})
+				break;
+			}
+			case "casualty": {
+				document.getElementById("maincanvas").height = 100
+				this.casualty = new Casualty(this.mainstage,10,10)
+				inst.innerHTML = "Order images by dragging and dropping so that the highest casualty potential is on the left and the lowest is on the right."
+				reset.addEventListener("click", e => {
+					removeClouds()
+					clouds.forEach(c => this.mainstage.removeChild(c))
+					this.casualty.showClouds(this.mainstage,10,10)
 				})
 				break;
 			}
