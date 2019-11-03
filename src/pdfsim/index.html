@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<!--
+Copyright 2014 Mozilla Foundation
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html dir="ltr" mozdisallowselectionprint>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="google" content="notranslate">
+<title>ProjectX Case Designer</title>
+
+<style type="text/css">
+body {
+	background-color: #FFFFFF;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+#casePanel {
+	width: 100%;
+	height: 32px;
+	padding: 5px;
+	background-color: lightblue;
+}
+
+ #casePanel input {
+	width: 120px;
+	display: inline-block;
+	margin: 4px 0 4px 20px;
+}
+
+#casePanel span {
+	color: white;
+	font-size: 28px;
+	font-weight: bold;
+	font-family: "Brush Script MT";
+}
+
+#titles {
+	border-radius: 4px;
+	border: 1px solid gray;
+	display: inline-block;
+	margin-left: 20px;
+}
+
+#titles button {
+	background-color: white;
+	border-radius: 4px;
+	color: black;
+	margin: 0 4px 0 4px;
+};
+
+#phaseWrapper {
+	white-space: nowrap;
+	background-color: lightblue;
+	height: 28px;
+	border: 1px solid gray;
+	vertical-align: middle;
+}
+
+#phasePanel {
+	display: inline-block;
+	background-color: lightblue;
+	border-bottom: 1px solid black;
+	border-top: 1px solid black;
+	padding: 2px;
+	width: 100%;
+	white-space: nowrap;
+	height: 24px;
+	cursor: pointer;
+}
+
+.phase {
+	font-size: 12px;
+	font-family: Arial, Helvetica, sans-serif;
+	display: inline-block;
+	margin: 0 5px 0px 5px;
+	white-space: nowrap;
+}
+
+.phase button {
+	border-radius: 5px;
+	padding: 2px 4px 2px 4px;
+	background-color: white;
+	color: black;
+}
+
+.phase button:hover {
+	border-radius: 5px;
+	padding: 2px 4px 2px 4px;
+	background-color: #e6bbad;
+	color: white;
+}
+
+.phaseStatus {
+	vertical-align: middle;
+	display: inline-block;
+	margin: 0 2px 0 2px;
+}
+
+#contentDisplay {
+	width: 100%;
+	height: 100%;
+	white-space: nowrap;
+}
+
+#viewerWrapper {
+	float: left;
+}
+
+#viewerContainer {
+	height: 100%;
+	position:absolute;
+	overflow: auto;
+}
+
+#widgetPanel {
+	position: absolute;
+	left: 25%;
+	padding: 0 2px 4px 2px;
+	top: 70px;
+	width: 184px;
+	height: 22px;
+	z-index: 1;
+	border-radius: 0 0 5px 5px;
+	background-color: lightblue;
+	box-shadow: 2px 2px gray;
+}
+
+.widgetOption {
+	font-size: 14px;
+	font-family: Arial, Helvetica, sans-serif;
+	vertical-align: middle;
+	padding: 2px;
+	text-align: center;
+	cursor: pointer;
+}
+
+#toolWrapper {
+	width: 40%;
+	height: 1000px;
+	border-left: thick solid lightblue;
+	float: right;
+}
+
+.widget {
+	cursor: pointer;
+	background-color: #e6bbad;
+	box-sizing: border-box;
+	margin: 0;
+}
+
+.widget input[type="text"] {
+	width: 150px;
+	border: 2px solid lightblue;
+	border-radius: 4px;
+}
+
+.widget textarea {
+	rows: 4;
+	cols: 50;
+	border: 2px solid lightblue;
+	border-radius: 4px;
+  	resize: both;
+  	overflow: auto;
+}
+
+.widget select {
+	width: 150px;
+	border: 2px solid lightblue;
+	border-radius: 4px;
+}
+
+.widget .carryforward {
+	width: 100px;
+	height: 24px;
+	border: 1px solid lightblue;
+	background-color: white;
+  	resize: both;
+  	overflow: auto;
+}
+
+.widget .media {
+	width: 100px;
+	height: 100px;
+	border: 1px solid lightblue;
+	background-color: white;
+  	resize: both;
+  	overflow: auto;
+}
+
+.widget .diagnosticpath {
+	width: 50%;
+	height: 800px;
+	border: 1px solid lightblue;
+	background-color: white;
+	opacity: 1;
+}
+
+
+#toolMenu {
+	width: 100%;
+	height: 28px;
+	font-size: 12px;
+	font-family: Arial, Helvetica, sans-serif;
+	background-color: lightblue;
+	color: black;
+	border-bottom: 1px solid black;
+	white-space: nowrap;
+}
+
+.toolTab {
+	height: 18px;
+	padding: 2px;
+	border-radius: 5px 5px 0 0;
+	background-color: #FFFFFF;
+	margin: 6px 4px 0 4px;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.toolTab[state] {
+	height: 24px;
+}
+
+.addTab {
+	font-size: 20px;
+	font-family: Arial, Helvetica, sans-serif;
+	background-color: lightblue;
+	margin: 0 4px 0px 8px;
+	color: white;
+	display: inline-block;
+	cursor: pointer;
+}
+
+#toolContent {
+	width: 100%;
+	height: 100%;
+	overflow: both;
+}
+
+#Resources {
+	display: none;
+}
+
+#Comments {
+	display: none;
+}
+
+#Observations {
+	display: none;
+}
+
+/* popup dialogs */
+.popupDialog {
+	font-size: 12px;
+	font-family: Arial, Helvetica, sans-serif;
+	padding: 4px;
+	color: black;
+	border: 1px solid black;
+	border-radius: 5px;
+	box-shadow: 2px 2px gray;
+	background-color: #e6bbad;
+	display:none;
+	position: absolute;
+	left: 20%;
+	top: 20%;
+}
+
+.popupDialog .title {
+	font-weight: bold;
+	font-color: black;
+	text-align: center;
+}
+
+.popupDialog .instructions {
+	width: 200px;
+}
+
+.popupDialog .error {
+	margin: 4px;
+	border: 1px solid gray;
+	padding: 2px;
+	margin: 4px;
+	display: none;
+	background: yellow;
+	color: black;
+}
+
+.popupDialog .buttonBar {
+	padding: 4px;
+	margin: 10px;
+	white-space: nowrap:                 
+  	box-sizing: border-box;
+}
+
+.popupDialog .buttonBar button {
+	background-color: lightblue;
+	border-radius: 4px;
+	color: black;
+	float: left;
+	margin-right: 10px;
+}
+
+.popupDialog .buttonBar button[title="Cancel"] {
+	float: right;
+}
+
+#addList {
+	width: 300px;
+}
+
+#listMenu input[type="text"] {
+	width: 80px;
+	margin: 4px;
+}
+
+#toolsDialog {
+	width: 250px;
+	position: absolute;
+	top: 100px;
+}
+</style>
+
+
+<link rel="stylesheet" href="../node_modules/pdfjs-dist/web/pdf_viewer.css">
+<script src="../node_modules/pdfjs-dist/build/pdf.js" type="text/javascript"></script>
+<script src="../node_modules/pdfjs-dist/web/pdf_viewer.js" type="text/javascript"></script>
+<link>
+</head>
+<body tabindex="-1">
+	<div id="casePanel">
+		<span>ProjectX Case Designer</span>
+		<div id="titles">
+			<input type="text" id="case-title" placeholder="Enter case title" size="20" />
+			<input type="text" id="phase-title" placeholder="Enter phase title" size="20" />
+			<button onClick=updateTitles() name="Update">Update</em></button>
+		</div>	
+</div>
+	<div id="phaseWrapper">
+		<div id="phasePanel"></div>
+	</div>
+	<div id="contentDisplay">
+		<div id="viewerWrapper">
+			<div id="viewerContainer"></div>
+			<div id="widgetPanel">
+				<img class="widgetOption" src="images/textfield.png" title="textfield" alt="" />
+				<img class="widgetOption" src="images/textarea.png" title="textarea" alt="" />
+				<img class="widgetOption" src="images/select.png" title="select" alt="" />
+				<img class="widgetOption" src="images/cforward.png" title="carryforward" alt="" />
+				<img class="widgetOption" src="images/media.png" title="media" alt="" />
+				<img class="widgetOption" src="images/diagpath.png" title="diagnosticpath" alt="" />
+			</div>
+			<div id="addList" class="popupDialog">
+				<div class="title">Bullet Converter</div>
+				<div class="instructions">
+					<p>Provide a name and type for your list.<br/>
+					  <em>Be sure you have clicked on the first bullet in
+						the list.</em>
+					</p>
+				</div>
+				<input id="listName" type="text" placeholder="List name" />
+				<br /><br/>
+				<input type="radio" name="listType" value="radio" checked="true" />
+				<b>Multiple Choice</b>
+				<p>Students may choose one of many answers</p>
+				<br />
+				<input type="radio" name="listType" value="checkbox" />
+				<b>Checklist</b>
+				<p>Students may choose zero or more answers.</p>
+				<div class="error">Please supply a name for the list.</div>
+				<div class="buttonBar">
+					<button onClick=saveList()>Save</button>
+					<button onClick=deleteList()>Delete</button>
+					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+				</div>
+			</div>
+			<div id="textfield" class="popupDialog">
+				<div class="title">Textfield Properties</div>
+				<div class="instructions">
+					<p>Provide a name and width in characters.</p>
+					</p>
+				</div>
+				<input id="textfieldName" type="text" placeholder="Textfield name" /><br/><br/>
+				<select name="textsize">
+					<option disabled="true" selected="true">Select width</option>
+					<option>10 characters</option>
+					<option>20 characters</option>
+					<option>40 characters</option>
+				</select>
+				<div class="error">Please supply a name and width for the textfield.</div>
+				<div class="buttonBar">
+					<button onClick=saveTextfield()>Save</button>
+					<button onClick=deleteTextfield()>Delete</button>
+					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+				</div>
+			</div>
+		</div>
+		<div id="toolWrapper">
+			<div id="toolsDialog" class="popupDialog">
+				<div class="title">Tool Selector</div>
+				<div class="instructions">
+					<p>Select the tools to include in the Toolbox.</p>
+				</div>
+				<input type="checkbox" value="Resources">
+				Resources<br />
+				<input type="checkbox" value="Comments">
+				Comments<br />
+				<input type="checkbox" value="Observations">
+				Observations<br />
+				<div class="error"></div>
+				<div class="buttonBar">
+					<button onClick="saveTools()">Save</button>
+					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+				</div>
+			</div>
+			<div id="toolMenu"></div>
+			<div id="toolContent">
+				<div id="Resources">
+					<img src="images/resources.png"/>
+				</div>
+				<div id="Comments">
+					<img src="images/comments.png"/>
+				</div>
+				<div id="Observations">
+					<img src="images/observations.png"/>
+				</div>
+				<div id="Roster"></div>
+			</div>
+		</div>
+	</div>
+	<script src="pageviewer.js" type="text/javascript"></script>
+</body>
+</html>
