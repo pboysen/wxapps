@@ -30,7 +30,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 var CMAP_URL = 'node_modules/pdfjs-dist/cmaps/';
 var CMAP_PACKED = true;
 
-var DEFAULT_URL = 'examples.pdf';
+var DEFAULT_URL = 'designerhelp.pdf';
 var PAGE_TO_VIEW = 1;
 var DEFAULT_SCALE = 1.0;
 

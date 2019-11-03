@@ -58,7 +58,34 @@ body {
 	border-radius: 4px;
 	color: black;
 	margin: 0 4px 0 4px;
-};
+}
+
+#titles button:hover {
+	border-radius: 5px;
+	background-color: #e6bbad;
+	color: white;
+}
+
+#files {
+	float: right;
+	background-color: lightblue;
+	border-radius: 4px;
+	color: black;
+	margin: 10px;
+}
+
+#files button {
+	background-color: white;
+	border-radius: 4px;
+	color: black;
+	margin: 0 4px 0 4px;
+}
+
+#files button:hover {
+	border-radius: 5px;
+	background-color: #e6bbad;
+	color: white;
+}
 
 #phaseWrapper {
 	white-space: nowrap;
@@ -97,7 +124,6 @@ body {
 
 .phase button:hover {
 	border-radius: 5px;
-	padding: 2px 4px 2px 4px;
 	background-color: #e6bbad;
 	color: white;
 }
@@ -345,6 +371,10 @@ body {
 			<input type="text" id="case-title" placeholder="Enter case title" size="20" />
 			<input type="text" id="phase-title" placeholder="Enter phase title" size="20" />
 			<button onClick=updateTitles() name="Update">Update</em></button>
+		</div>	
+		<div id="files">
+			<button onclick=uploadPDF()>Upload PDF</button>
+			<button onclick=downloadPDF()>Save PDF</button>
 		</div>	
 </div>
 	<div id="phaseWrapper">
