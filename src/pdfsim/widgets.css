@@ -1,0 +1,53 @@
+.widget {
+	cursor: pointer;
+	background-color: #e6bbad;
+	box-sizing: border-box;
+	margin: 0;
+}
+
+.widget input[type="text"] {
+	width: 150px;
+	border: 2px solid lightblue;
+	border-radius: 4px;
+}
+
+.widget textarea {
+	rows: 4;
+	cols: 50;
+	border: 2px solid lightblue;
+	border-radius: 4px;
+  	resize: both;
+  	overflow: auto;
+}
+
+.widget select {
+	width: 150px;
+	border: 2px solid lightblue;
+	border-radius: 4px;
+}
+
+.widget .carryforward {
+	width: 100px;
+	height: 24px;
+	border: 1px solid lightblue;
+	background-color: white;
+  	resize: both;
+  	overflow: auto;
+}
+
+.widget .media {
+	width: 100px;
+	height: 100px;
+	border: 1px solid lightblue;
+	background-color: white;
+  	resize: both;
+  	overflow: auto;
+}
+
+.widget .diagnosticpath {
+	width: 50%;
+	height: 800px;
+	border: 1px solid lightblue;
+	background-color: white;
+	opacity: 1;
+}
