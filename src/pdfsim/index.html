@@ -394,13 +394,11 @@ body {
 			<div id="addList" class="popupDialog">
 				<div class="title">Bullet Converter</div>
 				<div class="instructions">
-					<p>Provide a name and type for your list.<br/>
+					<p>Select the type of list.<br/>
 					  <em>Be sure you have clicked on the first bullet in
 						the list.</em>
 					</p>
 				</div>
-				<input id="listName" type="text" placeholder="List name" />
-				<br /><br/>
 				<input type="radio" name="listType" value="radio" checked="true" />
 				<b>Multiple Choice</b>
 				<p>Students may choose one of many answers</p>
@@ -421,7 +419,6 @@ body {
 					<p>Provide a name and width in characters.</p>
 					</p>
 				</div>
-				<input id="textfieldName" type="text" placeholder="Textfield name" /><br/><br/>
 				<select name="textsize">
 					<option disabled="true" selected="true">Select width</option>
 					<option>10 characters</option>
@@ -431,7 +428,66 @@ body {
 				<div class="error">Please supply a name and width for the textfield.</div>
 				<div class="buttonBar">
 					<button onClick=saveTextfield()>Save</button>
-					<button onClick=deleteTextfield()>Delete</button>
+					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+				</div>
+			</div>
+			<div id="textarea" class="popupDialog">
+				<div class="title">Textarea Properties</div>
+				<div class="instructions">
+					<p>Provide a width in characters and height in lines.</p>
+					</p>
+				</div>
+				<div class="error"></div>
+				<div class="buttonBar">
+					<button onClick=saveTextarea()>Save</button>
+					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+				</div>
+			</div>
+			<div id="select" class="popupDialog">
+				<div class="title">Select Properties</div>
+				<div class="instructions">
+					<p>Provide a list of options separated by semicolons</p>
+					</p>
+				</div>
+				<div class="error"></div>
+				<div class="buttonBar">
+					<button onClick=saveSelect()>Save</button>
+					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+				</div>
+			</div>
+			<div id="cforward" class="popupDialog">
+				<div class="title">Carry Forward Properties</div>
+				<div class="instructions">
+					<p>Provide a list of options separated by semicolons</p>
+					</p>
+				</div>
+				<div class="error"></div>
+				<div class="buttonBar">
+					<button onClick=saveSelect()>Save</button>
+					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+				</div>
+			</div>
+			<div id="media" class="popupDialog">
+				<div class="title">Media Properties</div>
+				<div class="instructions">
+					<p>Provide a list of options separated by semicolons</p>
+					</p>
+				</div>
+				<div class="error"></div>
+				<div class="buttonBar">
+					<button onClick=saveSelect()>Save</button>
+					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+				</div>
+			</div>
+			<div id="diagpath" class="popupDialog">
+				<div class="title">Diagnostic Path Properties</div>
+				<div class="instructions">
+					<p>Provide a list of options separated by semicolons</p>
+					</p>
+				</div>
+				<div class="error"></div>
+				<div class="buttonBar">
+					<button onClick=saveSelect()>Save</button>
 					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
 				</div>
 			</div>
