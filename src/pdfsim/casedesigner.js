@@ -1,20 +1,3 @@
-/* Copyright 2014 Mozilla Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed toF in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-import {getStore} from "../utils"
-let store = getStore(),searchParams = new URLSearchParams(window.location.search.substring(1))
-
 'use strict';
 
 if (!pdfjsLib.getDocument || !pdfjsViewer.PDFPageView) {
@@ -22,13 +5,9 @@ if (!pdfjsLib.getDocument || !pdfjsViewer.PDFPageView) {
         '  `gulp dist-install`');
 }
 
-// The workerSrc property shall be specified.
-//
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'node_modules/pdfjs-dist/build/pdf.worker.js';
 
-// Some PDFs need external cmaps.
-//
 var CMAP_URL = 'node_modules/pdfjs-dist/cmaps/';
 var CMAP_PACKED = true;
 
@@ -36,18 +15,17 @@ var DEFAULT_URL = 'designerhelp.pdf';
 var PAGE_TO_VIEW = 1;
 var DEFAULT_SCALE = 1.0;
 
-var container = document.getElementById('viewerContainer');
 var pdfLinkService = new pdfjsViewer.PDFLinkService();
-var currentDocument = null;
+var phases = [null];
+var currentPDF = null;
 var currentCase = null;
 var currentTool = null;
-var currentPhase = 0;
+var currentPhase = 1;
 let menu = null;
 let bullet = null;
 var dragged = null;
 var alayer = null;
 var page = null;
-var testPhases = ["History", "CBC", "Uranalysis", "Lipid Panel","Expert Path","Expert Path Answer","Diagnosis","test","test","test","test","test","test","test","test","test"];
  
 var pdfFindController = new pdfjsViewer.PDFFindController({
   linkService: pdfLinkService,
@@ -63,45 +41,63 @@ function loadDocument(url) {
 	  cMapPacked: CMAP_PACKED,
 	});
 	loadingTask.promise.then(function(document) {
-		currentDocument = document;
+		currentPDF = document;
 		currentCase = getCase(url,document.numPages);
-		showPhase(1);
+	    fillPhasePanel();
+	    fillToolMenu();
+	    showPhase(currentPhase);
 	});
 }
 
 function getCase(url,nphases) {
-// get the object from browser store.  If not create object below
-	var phases = [];
 	var state = "viewing";
-	for (var i = 0; i < nphases; i++) {
+	for (var i = 1; i <= nphases; i++) {
 		var phase = {
-			"title": "phase title",
-			"widgets": [],
-			"tools": [],
-			"state": state,
-		}
-		phases.push(phase);
+			id: i,
+			page: currentPDF.getPage(i),
+			view: getNewView(),
+			properties: {
+				"title": "noname",
+				"state": state,
+				"widgets": [],
+				"tools": []
+			}
+		};
 		state = "locked";
+		loadPhase(phase);
 	};
+ // get the object from browser store.  If not create object below
 	return {
 		"title": "case title",
 		"url": url,
-		"phases": phases
+		"phases": []
 	}
 }
 
-function saveCase() {
-	// save case
+function getNewView() {
+	var view = document.createElement("div");
+	view.id = "viewerContainer";
+	view.onmousedown = function(e) {
+		if (e.target.tagName === "SELECT") { 
+			e.preventDefault();
+			return;
+		}
+		if (e.target.textContent === "•") {
+			bullet = e.target;
+			menu = document.getElementById("addList");
+			toggleMenu("show");
+			return;
+		};
+	}
+	return view;
 }
 
-function showPhase(pindex) {
-	// clear out viewer canvas for new page
-	container.innerHTML = '';
-	currentPhase = pindex;
-	page = currentDocument.getPage(pindex).then(function (pdfPage) {
+function loadPhase(phase) {
+	phases.push(phase);
+	phase.page.then(function (pdfPage) {
 	    var pdfPageView = new pdfjsViewer.PDFPageView({
-	      container: container,
-	      id: pindex,
+	      container: phase.view,
+	      id: phase.id,
 	      scale: DEFAULT_SCALE,
 	      defaultViewport: pdfPage.getViewport({scale:DEFAULT_SCALE}),
 	        linkService: pdfLinkService,
@@ -110,43 +106,52 @@ function showPhase(pindex) {
 	        annotationLayerFactory: new pdfjsViewer.DefaultAnnotationLayerFactory(),
 	        renderInteractiveForms: true,
 	    });
-	    // Associates the actual page with the view, and drawing it
 	    pdfPageView.setPdfPage(pdfPage);
 	    pdfPageView.draw();
-	    fillPhasePanel();
-	    fillToolMenu();
-	  });
-	document.getElementById("phase-title").value = currentCase.phases[pindex-1].title;
-};
-
-function updateTitles() {
-	console.log("update titles");
+	    // if there are no annotations the annotationLayer will not be added by pdf.js so add one.
+	    var layer = phase.view.getElementsByClassName("annotationLayer").item[0];
+	    if (!layer) {
+		    var pageView = phase.view.getElementsByClassName("page").item(0);
+	    	layer = document.createElement("div");
+	    	layer.className = "annotationLayer";
+	    	pageView.appendChild(layer);
+	    }
+	});	
+}
+// swap phase views 
+function showPhase(pindex) {
+	var wrapper = document.getElementById("viewerWrapper");
+	wrapper.replaceChild(phases[pindex].view,wrapper.children[0]);
+	document.getElementById("phase-title").value = phases[pindex].properties.title;
+	currentPhase = pindex;
 }
 
-window.addEventListener("contextmenu", e => { 
-	e.preventDefault(); 
-});
+function saveCase() {
+	console.log("saveCase");
+}
+
+function updateTitles() {
+	var caseTitle = document.getElementById("case-title").value;
+	var phaseTitle = document.getElementById("phase-title").value;
+	currentCase.title = caseTitle;
+	phases[currentPhase].properties.title = phaseTitle;
+	document.getElementById("ptitle"+currentPhase).innerHTML = phaseTitle;
+}
 
 function fillPhasePanel() {
-	var phasepanel = document.getElementById("phasePanel");
-	var index = 1;
-	currentCase.phases.forEach(function entry(phase) {
+	var phasePanel = document.getElementById("phasePanel");
+	for (var i = 1; i < phases.length; i++) {
 		var item = document.createElement("div");
 		item.className = "phase";
 		var button = document.createElement("button");
-		button.type = "button";
-		button.innerHTML = phase.title;
-		button.value = index++;
-		button.onclick = function(e) { showPhase(button.value)};
+		button.id = "ptitle"+i;
+		button.innerHTML = phases[i].properties.title;
+		button.value = i;
+		button.onclick = function(e) { showPhase(this.value)};
 		item.appendChild(button);
-		phasepanel.appendChild(item);
-	});
+		phasePanel.appendChild(item);
+	};
 }
-
-function setPosition(pageX,pageY) {
-    menu.style.left = pageX+'px';
-    menu.style.top = pageY+'px';
-};
 
 function toggleMenu(command){
   if (!menu) return;
@@ -162,22 +167,6 @@ function toggleMenu(command){
 function toggleError(menu,command) {
 	var error = menu.getElementsByClassName("error").item(0);
 	error.style.display = command === "show"? "block": "none"; 	
-}
-
-/* 
- * Handle creation of multiple choice and checklist widgets
- */
-container.onmousedown = function(e) {
-	if (e.target.tagName === "SELECT") { 
-		e.preventDefault();
-		return;
-	}
-	if (e.target.textContent === "•") {
-		bullet = e.target;
-		menu = document.getElementById("addList");
-		toggleMenu("show");
-		return;
-	};
 }
 
 function getListType() {
@@ -311,9 +300,16 @@ function makeWidget(e){
     alayer.appendChild(widget);
 }
 
+function setPosition(pageX,pageY) {
+    menu.style.left = pageX+'px';
+    menu.style.top = pageY+'px';
+};
+
+
 function placeWidget(widget,e,offsetX,offsetY) {
+	let view = phases[currentPhase].view;
 	widget.style.left = (e.pageX+offsetX)+"px";
-    widget.style.top = (e.pageY+offsetY+container.scrollTop-container.offsetTop) +'px';
+    widget.style.top = (e.pageY+offsetY+view.scrollTop-view.offsetTop) +'px';
 	
 }
 
@@ -358,7 +354,9 @@ var toolMenu = document.getElementById("toolMenu");
 
 function fillToolMenu() {
 	toolMenu.innerHTML = "";
-	currentCase.phases[currentPhase].tools.forEach(function entry(title) { addToolTab(title,"toolTab");});
+	phases[currentPhase].properties.tools.forEach(function entry(title) { 
+		addToolTab(title,"toolTab");
+	});
 	addToolTab("+","addTab");
 }
 
@@ -414,7 +412,7 @@ function saveTools() {
 	for (let i = 0; i< nodes.length; i++) {
 		if (nodes[i].type === "checkbox" && nodes[i].checked) tools.push(nodes[i].value);
 	};
-	currentCase.phases[currentPhase].tools = tools;
+	phases[currentPhase].tools = tools;
 	saveCase();
 	if (currentTool) {
 		currentTool.style.display = "none";

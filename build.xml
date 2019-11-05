@@ -1,0 +1,24 @@
+<?xml version="1.0" ?> 
+<project name="Case Designer" default="execute">
+
+	<target name="init" depends="clean">
+	</target>
+
+	<target name="compile" depends="init">
+	</target>
+	
+	<target name="execute">
+		<copy todir="c:/Users/pboysen/node/public">
+		    <fileset dir="src/pdfsim">
+		        <include name="**/*.css"/>
+		        <include name="**/*.js"/>
+		        <include name="**/*.html"/>
+		    </fileset>
+		</copy>			
+	</target>
+
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+	
+</project>
