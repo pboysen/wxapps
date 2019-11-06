@@ -128,6 +128,7 @@ body {
 
 #viewerContainer {
 	height: 100%;
+	width: 70%;
 	position:absolute;
 	overflow: auto;
 }
@@ -155,7 +156,7 @@ body {
 }
 
 #toolWrapper {
-	width: 40%;
+	width: 30%;
 	height: 1000px;
 	border-left: thick solid lightblue;
 	float: right;
@@ -199,7 +200,7 @@ body {
 #toolContent {
 	width: 100%;
 	height: 100%;
-	overflow: both;
+	overflow-y: scroll;
 }
 
 #Resources {
