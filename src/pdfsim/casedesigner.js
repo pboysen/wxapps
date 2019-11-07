@@ -5,8 +5,7 @@ if (!pdfjsLib.getDocument || !pdfjsViewer.PDFPageView) {
         '  `gulp dist-install`');
 }
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  'node_modules/pdfjs-dist/build/pdf.worker.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc ='node_modules/pdfjs-dist/build/pdf.worker.js';
 
 var CMAP_URL = 'node_modules/pdfjs-dist/cmaps/';
 var CMAP_PACKED = true;
@@ -16,7 +15,7 @@ var PAGE_TO_VIEW = 1;
 var DEFAULT_SCALE = 1.0;
 
 var pdfLinkService = new pdfjsViewer.PDFLinkService();
-var phases = [null];
+var phaseViews = [null];
 var currentPDF = null;
 var currentCase = null;
 var currentTool = null;
@@ -31,7 +30,10 @@ var pdfFindController = new pdfjsViewer.PDFFindController({
   linkService: pdfLinkService,
 });
 
-//let's get started
+if (typeof(Storage) === "undefined") {
+	alert("Local storage not supported. Use another browser.");
+};
+
 loadDocument(DEFAULT_URL);
 
 function loadDocument(url) {
@@ -42,37 +44,51 @@ function loadDocument(url) {
 	});
 	loadingTask.promise.then(function(document) {
 		currentPDF = document;
-		currentCase = getCase(url,document.numPages);
+		getCase(url,document.numPages);
 	    fillPhasePanel();
 	    fillToolMenu();
+	    updateTitle("case-title");
+	    updateTitle("phase-title");
 	    showPhase(currentPhase);
 	});
 }
 
 function getCase(url,nphases) {
+	currentCase = JSON.parse(localStorage.getItem(url));
+	if (!currentCase) {
+		currentCase = getNewCase(url,nphases);
+		saveCase();
+	};
+	for (var i = 1; i < currentCase.phases.length; i++)
+		loadPhase(currentCase.phases[i]);
+}
+
+function getNewCase(url,nphases) {
 	var state = "viewing";
+	var phases = [null]
 	for (var i = 1; i <= nphases; i++) {
 		var phase = {
-			id: i,
-			page: currentPDF.getPage(i),
-			view: getNewView(),
-			properties: {
-				"title": "noname",
-				"state": state,
-				"widgets": [],
-				"tools": []
-			}
+			"id": i,
+			"title": "empty",
+			"state": state,
+			"widgets": {},
+			"tools": []
 		};
+		phases.push(phase);
 		state = "locked";
-		loadPhase(phase);
 	};
- // get the object from browser store.  If not create object below
 	return {
 		"title": "case title",
 		"url": url,
-		"phases": []
+		"wid": 1,
+		"phases": phases
 	}
 }
+
+function saveCase() {
+	localStorage.setItem(currentCase.url, JSON.stringify(currentCase));
+}
+		
 
 function getNewView() {
 	var view = document.createElement("div");
@@ -93,10 +109,10 @@ function getNewView() {
 }
 
 function loadPhase(phase) {
-	phases.push(phase);
-	phase.page.then(function (pdfPage) {
+	phaseViews.push(getNewView());
+	currentPDF.getPage(phase.id).then(function (pdfPage) {
 	    var pdfPageView = new pdfjsViewer.PDFPageView({
-	      container: phase.view,
+	      container: phaseViews[phase.id],
 	      id: phase.id,
 	      scale: DEFAULT_SCALE,
 	      defaultViewport: pdfPage.getViewport({scale:DEFAULT_SCALE}),
@@ -109,49 +125,78 @@ function loadPhase(phase) {
 	    pdfPageView.setPdfPage(pdfPage);
 	    pdfPageView.draw();
 	    // if there are no annotations the annotationLayer will not be added by pdf.js so add one.
-	    var layer = phase.view.getElementsByClassName("annotationLayer").item[0];
+	    var layer = phaseViews[phase.id].getElementsByClassName("annotationLayer").item[0];
 	    if (!layer) {
-		    var pageView = phase.view.getElementsByClassName("page").item(0);
+		    var pageView = phaseViews[phase.id].getElementsByClassName("page").item(0);
 	    	layer = document.createElement("div");
 	    	layer.className = "annotationLayer";
 	    	pageView.appendChild(layer);
 	    }
+	    for (var key in phase.widgets) {
+	    	var value = phase.widgets[key];
+	    	var widget = getViewableWidget(value.type);
+	    	placeWidget(widget,value.rect.x,value.rect.y);
+	    };
+	    moveWidgetMenus();
 	});	
 }
 // swap phase views 
 function showPhase(pindex) {
 	var wrapper = document.getElementById("viewerWrapper");
-	wrapper.replaceChild(phases[pindex].view,wrapper.children[0]);
-	document.getElementById("phase-title").value = phases[pindex].properties.title;
+	wrapper.replaceChild(phaseViews[pindex],wrapper.children[0]);
+	// move menuLayer to active page so menus can scroll with content
+	moveWidgetMenus();
+	document.getElementById("phase-title").value = currentCase.phases[pindex].title;
 	currentPhase = pindex;
-}
-
-function saveCase() {
-	console.log("saveCase");
-}
-
-function updateTitles() {
-	var caseTitle = document.getElementById("case-title").value;
-	var phaseTitle = document.getElementById("phase-title").value;
-	currentCase.title = caseTitle;
-	phases[currentPhase].properties.title = phaseTitle;
-	document.getElementById("ptitle"+currentPhase).innerHTML = phaseTitle;
 }
 
 function fillPhasePanel() {
 	var phasePanel = document.getElementById("phasePanel");
-	for (var i = 1; i < phases.length; i++) {
+	var title = document.createElement("span");
+	title.innerHTML ="Phases:";
+	phasePanel.appendChild(title);
+	for (var i = 1; i < currentCase.phases.length; i++) {
 		var item = document.createElement("div");
 		item.className = "phase";
 		var button = document.createElement("button");
 		button.id = "ptitle"+i;
-		button.innerHTML = phases[i].properties.title;
+		button.innerHTML = currentCase.phases[i].title;
 		button.value = i;
 		button.onclick = function(e) { showPhase(this.value)};
 		item.appendChild(button);
 		phasePanel.appendChild(item);
 	};
 }
+
+function moveWidgetMenus() {
+	var page = document.getElementsByClassName("page").item(0);
+	/* page 1 may not be rendered yet when showPage is called.
+	 * Menus will be moved when it is rendered.
+	 */
+	if (page) {
+		var menuLayer = document.getElementById("menuLayer");
+		menuLayer.parentNode.removeChild(menuLayer);
+		page.appendChild(menuLayer);
+	};
+}
+
+function updateTitle(title) {
+	var input = document.getElementById(title);
+	input.addEventListener("keyup", function(event) {
+		if (event.keyCode != 13) return;
+	    event.preventDefault();
+	    input.blur();
+	    if (title === "case-title") {
+	    	currentCase.title = input.value;
+	    };
+	    if (title === "phase-title") {
+	    	currentCase.phases[currentPhase].title = input.value;
+	    	document.getElementById("ptitle"+currentPhase).innerHTML = input.value;
+	    }
+	    saveCase();
+	});
+}
+
 
 function toggleMenu(command){
   if (!menu) return;
@@ -176,50 +221,44 @@ function getListType() {
 	return "multiplechoice";
 }
 
-function makeList(name,type,bullet) {
-	var first = bullet;
+function makeList(type,bullet) {
+	var firstLeft = parseInt(bullet.style.left,10);
+	var firstTop = parseInt(bullet.style.left,10);
 	var index = 1;
 	alayer = document.getElementsByClassName("annotationLayer").item(0);
-	while (parseInt(bullet.style.left,10) >= parseInt(first.style.left,10)) {
-		if (parseInt(bullet.style.left,10) == parseInt(first.style.left,10)) {
-			var widget = document.createElement("section");
+	var list = document.createElement("div");
+	list.className = type;
+	while (parseInt(bullet.style.left,10) >= firstLeft) {
+		if (parseInt(bullet.style.left,10) == firstLeft) {
 			var item = document.createElement("input");
-			item.type = type;
-			item.name = name;
+			item.type = type === "multiplechoice"?"radio":"checkbox";
 			item.value = index++;
-		    widget.appendChild(item);
-			widget.style.left = (parseInt(bullet.style.left,10)-5)+"px";
-			widget.style.top = (parseInt(bullet.style.top,10)) + "px";
-		    alayer.appendChild(widget);
+			item.style.left = "0px";
+			item.style.top = (parseInt(bullet.style.top,10)-firstTop) + "px";
+		    list.appendChild(item);
 		};
 		bullet = bullet.nextElementSibling;
 	};
+	list.style.left = (firstLeft-5)+"px";
+	list.style.top = firstTop + "px";
+    alayer.appendChild(list);
 }
 function saveList() {
-	var name = document.getElementById("listName").value;
-	if (!name) {
-		toggleError(menu,"show");
-		return;
-	}
 	var type = getListType();
-	makeList(name,type,bullet);
+	makeList(type,bullet);
 	bullet = null;
 	toggleMenu("hide");
-}
-
-function deleteList() {
-	// use bullet location to delete items
 }
 
 /*
  * Functions to process widget operations
  */
-document.getElementById("widgetPanel").onmousedown = function(e) { makeWidget(e);}
+document.getElementById("widgetPanel").onmousedown = function(e) { 
+	makeNewWidget(e.target.title,e.pageX,e.pageY);
+}
 
-function makeWidget(e){
+function getViewableWidget(wtype) {
     var element;
-    var fullScreen = false;
-    var wtype = e.target.title;
     switch(wtype) {
     case "textfield":
         element = document.createElement('input');
@@ -253,51 +292,90 @@ function makeWidget(e){
     case "diagnosticpath":
         element = document.createElement('div');
         element.className = "diagnosticpath";
-        fullScreen = true;
         break;
     default:
     	return;
-   }
-    
-	alayer = document.getElementsByClassName("annotationLayer").item(0);
+   }    
 	var widget = document.createElement("section");
-	// place new widget directly below menu
-    if (fullScreen) {
-    	widget.style.left = "0px";
-       	widget.style.top = "0px";    	
-    } else
-    	placeWidget(widget,e,5,30);
     widget.className = "widget";
     widget.setAttribute("widgetType",wtype);
-    widget.onclick = function(e) {
-    	if (e.shiftKey) {
-    		/* display properties dialog */
-        	menu = document.getElementById(widget.getAttribute("widgetType"));
-        	if (!menu)  return;
-        	menu.style.top = "120px";
-        	toggleMenu("show");
-        	return;
-    	};
-    	if (e.altKey) {
-    		/* copy */
-    		var newCopy = widget.cloneNode(true);
-    		placeWidget(newCopy,e,5,5);
-    		newCopy.onclick = widget.onclick;
-    	    newCopy.setAttribute("widgetType",widget.widgetType);
-    	    setDraggable(newCopy);
-    	    alayer.appendChild(newCopy);
-    	    return;
-    	};
-    	if (e.ctrlKey) {
-    		widget = e.target.parentNode;
-    		widget.parentNode.removeChild(widget);
-    		// update json
-    	};
-  	
-    };
+    setMenuHandler(widget);
+    setDraggable(widget);	
     widget.appendChild(element);
-    setDraggable(widget);
+    return widget;
+}
+
+function makeNewWidget(wtype,pageX,pageY){
+	// place new widget directly below menu
+	var widget = getViewableWidget(wtype);
+    if (wtype === "diagnosticpath")
+    	placeWidget(widget,0,0);
+    else
+    	placeWidget(widget,pageX+5,pageY+30);
+	alayer = document.getElementsByClassName("annotationLayer").item(0);
     alayer.appendChild(widget);
+    var wid = currentCase.id++;
+    widget.id = wid;
+    currentCase.phases[currentPhase].widgets[wid] = {
+    	"wid": wid,
+    	"type": wtype,
+    	"rect": widget.getBoundingClientRect(),
+    	"value":""
+    };
+    saveCase();
+
+}
+
+function setMenuHandler(widget) {
+    widget.onclick = function(e) {
+ 	 	var r = this.getBoundingClientRect();
+	 	var view = document.getElementById("viewerContainer");
+	 	var type = this.getAttribute("widgetType");
+	    if (e.pageY > (r.top+16)) return;
+	    if (e.pageX < (r.right - 53)) return;
+	    // copy
+		if (e.pageX < (r.right - 44)) {
+			makeNewWidget(type,e.pageX-100,e.pageY-30);
+		    return false;
+		};
+		/* display properties dialog */
+	 	if (e.pageX < (r.right - 24)) {
+	    	menu = document.getElementById(type);
+	    	if (!menu) return;
+    		menu.style.left = e.pageX+"px";
+    	    menu.style.top = (e.pageY+view.scrollTop-view.offsetTop) +'px';		    		
+	    	toggleMenu("show");
+	    	return false;
+		};
+		/* delete */
+		widget.parentNode.removeChild(widget);
+		localStorage.removeItem(currentCase.phases[currentPhase].widgets[widget.id]);
+		saveCase();
+		return false;
+    };
+};
+
+function showFileMenu(id) {
+	menu = document.getElementById(id);
+	if (!menu) return;
+	if (id === "openPDF") {
+		document.getElementById("opendirid").value="";
+		document.getElementById("openid").value="";
+	}else {
+		document.getElementById("savedirid").value="";
+		document.getElementById("saveid").value="";
+	};
+	menu.style.left = "60%";
+	menu.style.top = "5%";
+	toggleMenu("show");
+}
+
+function openPDF() {
+	var dir = document.getElementById("opendirid").files[0].webkitRelativePath;
+	toggleMenu("hide");
+}
+
+function savePDF() {
 }
 
 function setPosition(pageX,pageY) {
@@ -305,18 +383,15 @@ function setPosition(pageX,pageY) {
     menu.style.top = pageY+'px';
 };
 
-
-function placeWidget(widget,e,offsetX,offsetY) {
-	let view = phases[currentPhase].view;
-	widget.style.left = (e.pageX+offsetX)+"px";
-    widget.style.top = (e.pageY+offsetY+view.scrollTop-view.offsetTop) +'px';
-	
+function placeWidget(widget,pageX,pageY) {
+	let view = phaseViews[currentPhase];
+	widget.style.left = pageX+"px";
+    widget.style.top = (pageY+view.scrollTop-view.offsetTop) +'px';	
 }
 
 function setDraggable(widget) {  
   widget.onmousedown = function(e) {
-	  if (e.ctrlKey || e.shiftKey) return;
-	  widget.style.position = 'absolute';
+	  //widget.style.position = 'absolute';
 	  var left = widget.offsetLeft;
 	  var top = widget.offsetTop;
 	  var width = widget.offsetWidth;
@@ -328,7 +403,7 @@ function setDraggable(widget) {
 	  
 	  function moveAt(pageX, pageY) {
 	    widget.style.left = pageX - offsetX + 'px';
-	    widget.style.top = pageY - offsetY + 'px';			
+	    widget.style.top = pageY - offsetY + 'px';
 	  }
 
 	  window.onmousemove = function onMouseMove(e) {
@@ -337,16 +412,19 @@ function setDraggable(widget) {
 			  moveAt(e.pageX, e.pageY);
 	  }
 
-	  widget.onmouseup = function() {
-	    window.onmousemove = null;
+	  widget.onmouseup = function() {		  
+		  window.onmousemove = null;
+		  currentCase.phases[currentPhase].widgets[widget.id].rect = widget.getBoundingClientRect();
+		  saveCase();
 	  };
   };  
 }
 
-function saveTextfield() {}
-function deleteTextfield() {}
-
-
+function saveTextfield() {};
+function saveTextarea() {};
+function saveSelect() {};
+function saveCarryforward() {};
+function saveMedia() {};
 /*
  * Functions to process toolbox operations
  */
@@ -354,7 +432,7 @@ var toolMenu = document.getElementById("toolMenu");
 
 function fillToolMenu() {
 	toolMenu.innerHTML = "";
-	phases[currentPhase].properties.tools.forEach(function entry(title) { 
+	currentCase.phases[currentPhase].tools.forEach(function entry(title) { 
 		addToolTab(title,"toolTab");
 	});
 	addToolTab("+","addTab");
@@ -401,7 +479,6 @@ function selectTool(tab) {
 function showToolsDialog(e) {
 	if (menu) return;
 	menu = document.getElementById("toolsDialog");
-	setPosition(e.pageX+50,e.pageY+50);
 	toggleMenu("show");	
 }
 
@@ -412,8 +489,7 @@ function saveTools() {
 	for (let i = 0; i< nodes.length; i++) {
 		if (nodes[i].type === "checkbox" && nodes[i].checked) tools.push(nodes[i].value);
 	};
-	phases[currentPhase].tools = tools;
-	saveCase();
+	currentCase.phases[currentPhase].tools = tools;
 	if (currentTool) {
 		currentTool.style.display = "none";
 		currentTool.setAttribute("state","none");
@@ -421,4 +497,5 @@ function saveTools() {
 	}
 	toggleMenu("hide");
 	fillToolMenu();
+	saveCase();
 }

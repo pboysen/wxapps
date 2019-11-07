@@ -30,15 +30,15 @@ limitations under the License.
 	<div id="casePanel">
 		<span>ProjectX Case Designer</span>
 		<div id="titles">
-			<input type="text" id="case-title" placeholder="Case title" size="20" />
-			<input type="text" id="phase-title" placeholder="Phase title" size="20" />
-			<button onClick=updateTitles() name="Update">Update</button>
+			<span>Case Title:</span><input type="text" id="case-title" placeholder="Case title" size="20" />
+			<span>Phase Title:</span><input type="text" id="phase-title" placeholder="Phase title" size="20" onkeyup="updateTitle" />
 		</div>	
 		<div id="files">
-			<button onclick=uploadPDF()>Upload PDF</button>
-			<button onclick=downloadPDF()>Save PDF</button>
+			<span>PDF File </span>
+			<button onclick=showFileMenu("openPDF")>Open</button>
+			<button onclick=showFileMenu("savePDF")>Save</button>
 		</div>	
-</div>
+	</div>
 	<div id="phaseWrapper">
 		<div id="phasePanel"></div>
 	</div>
@@ -53,71 +53,135 @@ limitations under the License.
 				<img class="widgetOption" src="images/media.png" title="media" alt="" />
 				<img class="widgetOption" src="images/diagpath.png" title="diagnosticpath" alt="" />
 			</div>
-			<div id="addList" class="popupDialog">
-				<div class="title">Bullet Converter</div>
-				<div class="instructions">
-					<p>Provide a name and type for your list.<br/>
-					  <em>Be sure you have clicked on the first bullet in
-						the list.</em>
-					</p>
+			<div id="menuLayer">
+				<div id="addList" class="popupDialog">
+					<div class="title">List Properties</div>
+					<div class="instructions">
+						<p>Select a type for your list.<br/>
+						  <em>Be sure you have clicked on the first bullet in
+							the list.</em>
+						</p>
+					</div>
+					<input type="radio" name="listType" value="multiplechoice" checked="checked" />
+					<b>Multiple Choice</b>
+					<p>Students may choose one of many answers.</p>
+					<input type="radio" name="listType" value="checklist" />
+					<b>Checklist</b>
+					<p>Students may choose zero or more answers.</p>
+					<div class="error"></div>
+					<div class="buttonBar">
+						<button onClick=saveList()>Save</button>
+						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+					</div>
 				</div>
-				<input id="listName" type="text" placeholder="List name" />
-				<br /><br/>
-				<input type="radio" name="listType" value="radio" checked="true" />
-				<b>Multiple Choice</b>
-				<p>Students may choose one of many answers</p>
-				<br />
-				<input type="radio" name="listType" value="checkbox" />
-				<b>Checklist</b>
-				<p>Students may choose zero or more answers.</p>
-				<div class="error">Please supply a name for the list.</div>
-				<div class="buttonBar">
-					<button onClick=saveList()>Save</button>
-					<button onClick=deleteList()>Delete</button>
-					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+				<div id="textfield" class="popupDialog">
+					<div class="title">Textfield Properties</div>
+					<div class="instructions">
+						<p>Select a width in characters.</p>
+					</div>
+					<select name="textsize">
+						<option>Select a width</option>
+						<option value="10">10</option>
+						<option selected="selected" value="20">20</option>
+						<option value="40">40</option>
+						<option value="80">80</option>
+					</select><br/>
+					<input type="checkbox" name="optional"> Optional<br/>
+					<div class="error">Select a width in characters.</div>
+					<div class="buttonBar">
+						<button onClick=saveTextfield()>Save</button>
+						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+					</div>
 				</div>
-			</div>
-			<div id="textfield" class="popupDialog">
-				<div class="title">Textfield Properties</div>
-				<div class="instructions">
-					<p>Provide a name and width in characters.</p>
-					</p>
+				<div id="textarea" class="popupDialog">
+					<div class="title">Textarea Properties</div>
+					<div class="instructions">
+						<p>Choose whether the student must<br/>supply an answer.</p>
+					</div>
+					<input type="checkbox" name="optional"> Optional<br/>
+					<div class="error"></div>
+					<div class="buttonBar">
+						<button onClick=saveTextarea()>Save</button>
+						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+					</div>
 				</div>
-				<input id="textfieldName" type="text" placeholder="Textfield name" /><br/><br/>
-				<select name="textsize">
-					<option disabled="true" selected="true">Select width</option>
-					<option>10 characters</option>
-					<option>20 characters</option>
-					<option>40 characters</option>
-				</select>
-				<div class="error">Please supply a name and width for the textfield.</div>
-				<div class="buttonBar">
-					<button onClick=saveTextfield()>Save</button>
-					<button onClick=deleteTextfield()>Delete</button>
-					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+				<div id="select" class="popupDialog">
+					<div class="title">Select Properties</div>
+					<div class="instructions">
+						<p>Enter option names separated by semicolons.<br/>
+						Pick optional if the students doesn't have to<br/>pick an option.</p>
+					</div>
+					Select Options: <input type="text" name="select-options" 
+					placeholder="Option names"/><br/>
+					<input type="checkbox" name="optional"> Optional<br/>
+					<div class="error">You must supply at least one option.</div>
+					<div class="buttonBar">
+						<button onClick=saveSelect()>Save</button>
+						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+					</div>
+				</div>
+				<div id="carryforward" class="popupDialog">
+					<div class="title">Carry-forward Properties</div>
+					<div class="instructions">
+						<p>Pick an answer supplied from<br/>a previous phase.</p>
+					</div>
+					<select name="answer">
+						<option disabled="disabled" selected="selected">Choose an answer.</option>
+					</select>
+					<div class="error">You must supply at least one answer.</div>
+					<div class="buttonBar">
+						<button onClick=saveCarryforward()>Save</button>
+						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+					</div>
+				</div>
+				<div id="media" class="popupDialog">
+					<div class="title">Media Properties</div>
+					<div class="instructions">
+						<p>Enter a url to display.</p>
+					</div>
+					Display URL: <input type="text" name="display-url" placeholder="Enter a URL"/>
+					<div class="error">You must supply a URL</div>
+					<div class="buttonBar">
+						<button onClick=saveMedia()>Save</button>
+						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+					</div>
+				</div>
+				<div id="diagnosticpath" class="popupDialog">
+					<div class="title">Diagnostic Path Properties</div>
+					<div class="instructions">
+						<p>Supply a URL only when the answer should be displayed. 
+						Leave it blank for student mode.</p>
+					</div>
+					Expert Path URL: <input type="text" name="expert-path" placeholder="Enter a URL"/>
+					<div class="error"></div>
+					<div class="buttonBar">
+						<button onClick=saveExpertPath()>Save</button>
+						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+					</div>
 				</div>
 			</div>
 		</div>
 		<div id="toolWrapper">
-			<div id="toolsDialog" class="popupDialog">
-				<div class="title">Tool Selector</div>
-				<div class="instructions">
-					<p>Select the tools to include in the Toolbox.</p>
-				</div>
-				<input type="checkbox" value="Resources">
-				Resources<br />
-				<input type="checkbox" value="Comments">
-				Comments<br />
-				<input type="checkbox" value="Observations">
-				Observations<br />
-				<div class="error"></div>
-				<div class="buttonBar">
-					<button onClick="saveTools()">Save</button>
-					<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
-				</div>
-			</div>
 			<div id="toolMenu"></div>
 			<div id="toolContent">
+				<div id="toolsDialog" class="popupDialog">
+					<div class="title">Tool Selector</div>
+					<div class="instructions">
+						<p>Select the tools to include in the Toolbox<br/>
+						for this phase.</p>
+					</div>
+					<input type="checkbox" value="Resources">
+					Resources<br />
+					<input type="checkbox" value="Comments">
+					Comments<br />
+					<input type="checkbox" value="Observations">
+					Observations<br />
+					<div class="error"></div>
+					<div class="buttonBar">
+						<button onClick="saveTools()">Save</button>
+						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+					</div>
+				</div>
 				<div id="Resources">
 					<img src="images/resources.png"/>
 				</div>
@@ -130,7 +194,33 @@ limitations under the License.
 				<div id="Roster"></div>
 			</div>
 		</div>
-	</div>
+		<div id="openPDF" class="popupDialog">
+			<div class="title">PDF File Open</div>
+			<div class="instructions">
+				<p>Select a PDF file to open.<br/>
+				</p>
+			</div>
+			<input id="opendirid" type="file" webkitdirectory><br/>
+			<input id="openid" type="file" onchange=openPDF() accept=".pdf" files="files">
+			<div class="error"></div>
+			<div class="buttonBar">
+				<button type="button" onclick=toggleMenu("hide") title="Cancel">Cancel</button>
+			</div>
+		</div>
+		<div id="savePDF" class="popupDialog">
+			<div class="title">PDF File Save</div>
+			<div class="instructions">
+				<p>Select where to save the PDF file.<br/>
+				</p>
+			</div>
+			<input id="savedirid" type="file" webkitdirectory><br/>
+			<input id="saveid" type="file" webkitdirectory onchange=savePDF() accept=".pdf" files="files">
+			<div class="error"></div>
+			<div class="buttonBar">
+				<button type="button" onclick=toggleMenu("hide") title="Cancel">Cancel</button>
+			</div>
+		</div>
+</div>
 	<script src="casedesigner.js" type="text/javascript"></script>
 </body>
 </html>
