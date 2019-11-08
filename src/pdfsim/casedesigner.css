@@ -25,6 +25,18 @@ body {
 	color: white;
 }
 
+#files {
+	float: right;
+	margin-right: 20px;
+}
+
+#files img {
+	margin: 0px;
+	padding: 0px;
+	display: inline-block;
+	cursor: pointer;
+}
+
 #titles {
 	font-family: var(--main-font-family);
 	display: inline-block;
@@ -37,30 +49,6 @@ body {
 
 #titles input {
 	margin: 0px 5px 0px 5px;
-}
-
-#files {
-	font-family: var(--main-font-family);
-	font-size: 16px;
-	font-weight: bold;
-	float: right;
-	background-color: var(--main-bg-color);
-	border-radius: 4px;
-	color: white;
-	margin: 10px;
-}
-
-#files button {
-	background-color: white;
-	border-radius: 4px;
-	color: black;
-	margin: 0 4px 0 4px;
-}
-
-#files button:hover {
-	border-radius: 5px;
-	background-color: var(--main-comp-color);
-	color: white;
 }
 
 #phaseWrapper {
@@ -176,6 +164,10 @@ body {
 	white-space: nowrap;
 }
 
+#toolMenu img {
+	//padding: 4px;
+}
+
 .toolTab {
 	height: 18px;
 	padding: 2px;
@@ -228,7 +220,7 @@ body {
 	border-radius: 5px;
 	box-shadow: 2px 2px gray;
 	background-color: var(--main-comp-color);
-	display:none;
+	visibility:hidden;
 	z-index: 100;
 	position: absolute;
 }
@@ -248,7 +240,7 @@ body {
 	border: 1px solid gray;
 	padding: 2px;
 	margin: 4px;
-	display: none;
+	visiblity:hidden;
 	background: yellow;
 	color: black;
 }

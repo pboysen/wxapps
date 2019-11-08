@@ -47,8 +47,6 @@ function loadDocument(url) {
 		getCase(url,document.numPages);
 	    fillPhasePanel();
 	    fillToolMenu();
-	    updateTitle("case-title");
-	    updateTitle("phase-title");
 	    showPhase(currentPhase);
 	});
 }
@@ -70,6 +68,7 @@ function getNewCase(url,nphases) {
 		var phase = {
 			"id": i,
 			"title": "empty",
+			"submit": "submit",
 			"state": state,
 			"widgets": {},
 			"tools": []
@@ -78,7 +77,6 @@ function getNewCase(url,nphases) {
 		state = "locked";
 	};
 	return {
-		"title": "case title",
 		"url": url,
 		"wid": 1,
 		"phases": phases
@@ -101,7 +99,9 @@ function getNewView() {
 		if (e.target.textContent === "•") {
 			bullet = e.target;
 			menu = document.getElementById("addList");
-			toggleMenu("show");
+			menu.style.left = bullet.style.left;
+		    menu.style.top = bullet.style.top;		    		
+			toggleMenu("visible");
 			return;
 		};
 	}
@@ -146,7 +146,7 @@ function showPhase(pindex) {
 	wrapper.replaceChild(phaseViews[pindex],wrapper.children[0]);
 	// move menuLayer to active page so menus can scroll with content
 	moveWidgetMenus();
-	document.getElementById("phase-title").value = currentCase.phases[pindex].title;
+	//document.getElementById("phase-title").value = currentCase.phases[pindex].title;
 	currentPhase = pindex;
 }
 
@@ -180,74 +180,61 @@ function moveWidgetMenus() {
 	};
 }
 
-function updateTitle(title) {
+function updatePhaseTitle(title) {
 	var input = document.getElementById(title);
-	input.addEventListener("keyup", function(event) {
-		if (event.keyCode != 13) return;
-	    event.preventDefault();
-	    input.blur();
-	    if (title === "case-title") {
-	    	currentCase.title = input.value;
-	    };
-	    if (title === "phase-title") {
-	    	currentCase.phases[currentPhase].title = input.value;
-	    	document.getElementById("ptitle"+currentPhase).innerHTML = input.value;
-	    }
-	    saveCase();
-	});
+    currentCase.phases[currentPhase].title = input.value;
+    document.getElementById("ptitle"+currentPhase).innerHTML = input.value;
+	saveCase();
 }
 
 
 function toggleMenu(command){
   if (!menu) return;
-  if (command === "show")
-	  menu.style.display = "block";
-  else {
-	  toggleError(menu,"hide");
-	  menu.style.display = "none";
-	  menu = null;
-  }
+	menu.style.visibility = command;
+	toggleError(menu,"hidden");
 };
 
 function toggleError(menu,command) {
 	var error = menu.getElementsByClassName("error").item(0);
-	error.style.display = command === "show"? "block": "none"; 	
+	error.style.visibility = command;
 }
 
 function getListType() {
 	var radios = document.getElementsByName('listType');
 	for (var i = 0, length = radios.length; i < length; i++)
 	   if (radios[i].checked) return radios[i].value;
-	return "multiplechoice";
+	return "list";
 }
 
-function makeList(type,bullet) {
+function makeList(type) {
 	var firstLeft = parseInt(bullet.style.left,10);
-	var firstTop = parseInt(bullet.style.left,10);
+	var firstTop = parseInt(bullet.style.top,10);
 	var index = 1;
-	alayer = document.getElementsByClassName("annotationLayer").item(0);
-	var list = document.createElement("div");
-	list.className = type;
-	while (parseInt(bullet.style.left,10) >= firstLeft) {
-		if (parseInt(bullet.style.left,10) == firstLeft) {
-			var item = document.createElement("input");
-			item.type = type === "multiplechoice"?"radio":"checkbox";
+	var list = makeNewWidget(type,firstLeft,firstTop);
+	console.log(list);
+	var subtype = type === "multiplechoice"?"radio":"checkbox";
+	var nextLeft = parseInt(bullet.style.left,10);
+	while (nextLeft >= firstLeft) {
+		if (nextLeft == firstLeft) {
+			itemLeft = parseInt(bullet.style.left,10)-firstLeft-3;
+			itemTop = parseInt(bullet.style.top,10)-firstTop+2;
+			var item = makeNewWidget(subtype,itemLeft,itemTop);
+			item.type = subtype;
 			item.value = index++;
-			item.style.left = "0px";
-			item.style.top = (parseInt(bullet.style.top,10)-firstTop) + "px";
-		    list.appendChild(item);
+			item.style.left = itemLeft+"px";
+			item.style.top = "px";
+			list.appendChild(item);
 		};
 		bullet = bullet.nextElementSibling;
+		nextLeft = parseInt(bullet.style.left,10);
 	};
-	list.style.left = (firstLeft-5)+"px";
-	list.style.top = firstTop + "px";
-    alayer.appendChild(list);
+	return list;
 }
 function saveList() {
 	var type = getListType();
-	makeList(type,bullet);
+	makeList(type);
 	bullet = null;
-	toggleMenu("hide");
+	toggleMenu("hidden");
 }
 
 /*
@@ -257,18 +244,18 @@ document.getElementById("widgetPanel").onmousedown = function(e) {
 	makeNewWidget(e.target.title,e.pageX,e.pageY);
 }
 
-function getViewableWidget(wtype) {
+function getViewableWidget(type) {
     var element;
-    switch(wtype) {
+    var draggable = true;
+	var widget = document.createElement("section");
+    widget.className = "widget";
+    widget.setAttribute("widgetType",type);
+    switch(type) {
     case "textfield":
         element = document.createElement('input');
         element.type = 'text';
         element.placeholder="Enter text";
     	break;
-    case "checkbox":
-        element = document.createElement('input');
-        element.type = 'checkbox';
-   	break;
     case "textarea":
         element = document.createElement('textarea');
         element.placeholder="Enter paragraph";
@@ -292,35 +279,46 @@ function getViewableWidget(wtype) {
     case "diagnosticpath":
         element = document.createElement('div');
         element.className = "diagnosticpath";
+        draggable = false;
+        break;
+    case "list":
+        element = makeList(type);
+        element.className = "list";
+        draggable = false;
         break;
     default:
     	return;
    }    
-	var widget = document.createElement("section");
-    widget.className = "widget";
-    widget.setAttribute("widgetType",wtype);
-    setMenuHandler(widget);
-    setDraggable(widget);	
+    if (draggable) {
+        setMenuHandler(widget);
+    	setDraggable(widget);	
+    };
     widget.appendChild(element);
     return widget;
 }
 
-function makeNewWidget(wtype,pageX,pageY){
-	// place new widget directly below menu
-	var widget = getViewableWidget(wtype);
-    if (wtype === "diagnosticpath")
+function makeNewWidget(type,pageX,pageY){
+	var widget = getViewableWidget(type);
+	switch(type) {
+	case "diagnosticpath":
     	placeWidget(widget,0,0);
-    else
+    	break;
+	case "list":
+    	placeWidget(widget,pageX,pageY);
+		break;
+	default:
     	placeWidget(widget,pageX+5,pageY+30);
+	}
 	alayer = document.getElementsByClassName("annotationLayer").item(0);
     alayer.appendChild(widget);
-    var wid = currentCase.id++;
-    widget.id = wid;
-    currentCase.phases[currentPhase].widgets[wid] = {
-    	"wid": wid,
-    	"type": wtype,
+    var id = currentCase.id++;
+    widget.id = id;
+    currentCase.phases[currentPhase].widgets[id] = {
+    	"id": id,
+    	"type": type,
     	"rect": widget.getBoundingClientRect(),
-    	"value":""
+    	"value":"",
+    	"optional": false,    	
     };
     saveCase();
 
@@ -341,10 +339,11 @@ function setMenuHandler(widget) {
 		/* display properties dialog */
 	 	if (e.pageX < (r.right - 24)) {
 	    	menu = document.getElementById(type);
-	    	if (!menu) return;
-    		menu.style.left = e.pageX+"px";
-    	    menu.style.top = (e.pageY+view.scrollTop-view.offsetTop) +'px';		    		
-	    	toggleMenu("show");
+	    	if (menu) {
+	    		menu.style.left = widget.style.left;
+	    	    menu.style.top = widget.style.top;		    		
+		    	toggleMenu("visible");
+	    	};
 	    	return false;
 		};
 		/* delete */
@@ -356,32 +355,20 @@ function setMenuHandler(widget) {
 };
 
 function showFileMenu(id) {
-	menu = document.getElementById(id);
+	var menu = document.getElementById(id);
 	if (!menu) return;
-	if (id === "openPDF") {
-		document.getElementById("opendirid").value="";
-		document.getElementById("openid").value="";
-	}else {
-		document.getElementById("savedirid").value="";
-		document.getElementById("saveid").value="";
-	};
 	menu.style.left = "60%";
 	menu.style.top = "5%";
-	toggleMenu("show");
+	toggleMenu("visible");
 }
 
 function openPDF() {
 	var dir = document.getElementById("opendirid").files[0].webkitRelativePath;
-	toggleMenu("hide");
+	toggleMenu("hidden");
 }
 
 function savePDF() {
 }
-
-function setPosition(pageX,pageY) {
-    menu.style.left = pageX+'px';
-    menu.style.top = pageY+'px';
-};
 
 function placeWidget(widget,pageX,pageY) {
 	let view = phaseViews[currentPhase];
@@ -452,7 +439,7 @@ function addToolTab(title,className) {
 	var element = null;
 	if (title === "+") {
 		element = document.createElement("img");
-		element.src = "images/toolbox.png";
+		element.src = "assets/toolbox.png";
 		element.alt = "Configure tools";
 		element.title = "Configure tools";
 	} else {
@@ -479,7 +466,7 @@ function selectTool(tab) {
 function showToolsDialog(e) {
 	if (menu) return;
 	menu = document.getElementById("toolsDialog");
-	toggleMenu("show");	
+	toggleMenu("visible");	
 }
 
 function saveTools() {
@@ -495,7 +482,7 @@ function saveTools() {
 		currentTool.setAttribute("state","none");
 		currentTool = null;
 	}
-	toggleMenu("hide");
+	toggleMenu("hidden");
 	fillToolMenu();
 	saveCase();
 }

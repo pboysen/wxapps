@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html dir="ltr" mozdisallowselectionprint>
 <!--
 Copyright 2014 Mozilla Foundation
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<html dir="ltr" mozdisallowselectionprint>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -29,14 +29,8 @@ limitations under the License.
 <body tabindex="-1">
 	<div id="casePanel">
 		<span>ProjectX Case Designer</span>
-		<div id="titles">
-			<span>Case Title:</span><input type="text" id="case-title" placeholder="Case title" size="20" />
-			<span>Phase Title:</span><input type="text" id="phase-title" placeholder="Phase title" size="20" onkeyup="updateTitle" />
-		</div>	
 		<div id="files">
-			<span>PDF File </span>
-			<button onclick=showFileMenu("openPDF")>Open</button>
-			<button onclick=showFileMenu("savePDF")>Save</button>
+			<img src="assets/PDF_32.png" onClick="showFileMenu("fileMenu")/>
 		</div>	
 	</div>
 	<div id="phaseWrapper">
@@ -46,20 +40,18 @@ limitations under the License.
 		<div id="viewerWrapper">
 			<div id="viewerContainer"></div>
 			<div id="widgetPanel">
-				<img class="widgetOption" src="images/textfield.png" title="textfield" alt="" />
-				<img class="widgetOption" src="images/textarea.png" title="textarea" alt="" />
-				<img class="widgetOption" src="images/select.png" title="select" alt="" />
-				<img class="widgetOption" src="images/cforward.png" title="carryforward" alt="" />
-				<img class="widgetOption" src="images/media.png" title="media" alt="" />
-				<img class="widgetOption" src="images/diagpath.png" title="diagnosticpath" alt="" />
+				<img class="widgetOption" src="assets/textfield.png" title="textfield" alt="" />
+				<img class="widgetOption" src="assets/textarea.png" title="textarea" alt="" />
+				<img class="widgetOption" src="assets/select.png" title="select" alt="" />
+				<img class="widgetOption" src="assets/cforward.png" title="carryforward" alt="" />
+				<img class="widgetOption" src="assets/media.png" title="media" alt="" />
+				<img class="widgetOption" src="assets/diagpath.png" title="diagnosticpath" alt="" />
 			</div>
 			<div id="menuLayer">
 				<div id="addList" class="popupDialog">
 					<div class="title">List Properties</div>
 					<div class="instructions">
 						<p>Select a type for your list.<br/>
-						  <em>Be sure you have clicked on the first bullet in
-							the list.</em>
 						</p>
 					</div>
 					<input type="radio" name="listType" value="multiplechoice" checked="checked" />
@@ -71,7 +63,7 @@ limitations under the License.
 					<div class="error"></div>
 					<div class="buttonBar">
 						<button onClick=saveList()>Save</button>
-						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
 				<div id="textfield" class="popupDialog">
@@ -85,12 +77,12 @@ limitations under the License.
 						<option selected="selected" value="20">20</option>
 						<option value="40">40</option>
 						<option value="80">80</option>
-					</select><br/>
+					</select><br/><br/>
 					<input type="checkbox" name="optional"> Optional<br/>
-					<div class="error">Select a width in characters.</div>
+					<div class="error"></div>
 					<div class="buttonBar">
 						<button onClick=saveTextfield()>Save</button>
-						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
 				<div id="textarea" class="popupDialog">
@@ -102,7 +94,7 @@ limitations under the License.
 					<div class="error"></div>
 					<div class="buttonBar">
 						<button onClick=saveTextarea()>Save</button>
-						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
 				<div id="select" class="popupDialog">
@@ -112,38 +104,39 @@ limitations under the License.
 						Pick optional if the students doesn't have to<br/>pick an option.</p>
 					</div>
 					Select Options: <input type="text" name="select-options" 
-					placeholder="Option names"/><br/>
+					placeholder="Option names"/><br/><br/>
 					<input type="checkbox" name="optional"> Optional<br/>
-					<div class="error">You must supply at least one option.</div>
+					<div class="error">Enter at least one option.</div>
 					<div class="buttonBar">
 						<button onClick=saveSelect()>Save</button>
-						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
 				<div id="carryforward" class="popupDialog">
 					<div class="title">Carry-forward Properties</div>
 					<div class="instructions">
-						<p>Pick an answer supplied from<br/>a previous phase.</p>
+						<p>Pick a widget from a previous phase.</p>
 					</div>
 					<select name="answer">
-						<option disabled="disabled" selected="selected">Choose an answer.</option>
+						<option disabled="disabled" selected="selected">Select a widget.</option>
 					</select>
-					<div class="error">You must supply at least one answer.</div>
+					<div class="error">Select one.</div>
 					<div class="buttonBar">
 						<button onClick=saveCarryforward()>Save</button>
-						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
 				<div id="media" class="popupDialog">
 					<div class="title">Media Properties</div>
 					<div class="instructions">
-						<p>Enter a url to display.</p>
+						<p>Enter a media url to show.<br/>
+						For example, youTube, website, ...</p>
 					</div>
-					Display URL: <input type="text" name="display-url" placeholder="Enter a URL"/>
+					URL: <input type="text" name="display-url" placeholder="Enter a URL"/>
 					<div class="error">You must supply a URL</div>
 					<div class="buttonBar">
 						<button onClick=saveMedia()>Save</button>
-						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
 				<div id="diagnosticpath" class="popupDialog">
@@ -156,7 +149,7 @@ limitations under the License.
 					<div class="error"></div>
 					<div class="buttonBar">
 						<button onClick=saveExpertPath()>Save</button>
-						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
 			</div>
@@ -179,45 +172,37 @@ limitations under the License.
 					<div class="error"></div>
 					<div class="buttonBar">
 						<button onClick="saveTools()">Save</button>
-						<button type="button" onClick=toggleMenu("hide") title="Cancel">Cancel</button>
+						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
 				<div id="Resources">
-					<img src="images/resources.png"/>
+					<img src="assets/resources.png"/>
 				</div>
 				<div id="Comments">
-					<img src="images/comments.png"/>
+					<img src="assets/comments.png"/>
 				</div>
 				<div id="Observations">
-					<img src="images/observations.png"/>
+					<img src="assets/observations.png"/>
 				</div>
 				<div id="Roster"></div>
 			</div>
 		</div>
-		<div id="openPDF" class="popupDialog">
-			<div class="title">PDF File Open</div>
+		<div id="fileMenu" class="popupDialog">
+			<div class="title">Document Options</div>
 			<div class="instructions">
-				<p>Select a PDF file to open.<br/>
-				</p>
+				<ol>
+					<li>Select the working folder your document is in.</li>
+					<li>Select the PDF document to edit.</li>
+					<li>Click Edit or Save the document.</li>
+				</ol> 
 			</div>
-			<input id="opendirid" type="file" webkitdirectory><br/>
-			<input id="openid" type="file" onchange=openPDF() accept=".pdf" files="files">
+			<span>Folder: </span><input id="folder" type="file" webkitdirectory><br/>
+			<span>Document: </span><input id="document" type="file" accept=".pdf">
 			<div class="error"></div>
 			<div class="buttonBar">
-				<button type="button" onclick=toggleMenu("hide") title="Cancel">Cancel</button>
-			</div>
-		</div>
-		<div id="savePDF" class="popupDialog">
-			<div class="title">PDF File Save</div>
-			<div class="instructions">
-				<p>Select where to save the PDF file.<br/>
-				</p>
-			</div>
-			<input id="savedirid" type="file" webkitdirectory><br/>
-			<input id="saveid" type="file" webkitdirectory onchange=savePDF() accept=".pdf" files="files">
-			<div class="error"></div>
-			<div class="buttonBar">
-				<button type="button" onclick=toggleMenu("hide") title="Cancel">Cancel</button>
+				<button type="button" onclick=openPDF() title="Open">Cancel</button>
+				<button type="button" onclick=SavePDF() title="Cancel">Cancel</button>
+				<button type="button" onclick=toggleMenu("hidden") title="Cancel">Cancel</button>
 			</div>
 		</div>
 </div>
