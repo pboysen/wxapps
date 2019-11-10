@@ -30,11 +30,16 @@ limitations under the License.
 	<div id="casePanel">
 		<span>ProjectX Case Designer</span>
 		<div id="files">
-			<img src="assets/PDF_32.png" onClick="showFileMenu("fileMenu")/>
+			<button onClick="showFileUpload()"><img src="assets/fileupload.png"/></button>
+			<button onClick="showFileDownload()"><img src="assets/filedownload.png"/></button>
 		</div>	
 	</div>
 	<div id="phaseWrapper">
-		<div id="phasePanel"></div>
+		<div id="phasePanel">
+		</div>
+			<div id="phaseMenu class="popupDialog">
+			this is atest
+			</div>
 	</div>
 	<div id="contentDisplay">
 		<div id="viewerWrapper">
@@ -42,6 +47,7 @@ limitations under the License.
 			<div id="widgetPanel">
 				<img class="widgetOption" src="assets/textfield.png" title="textfield" alt="" />
 				<img class="widgetOption" src="assets/textarea.png" title="textarea" alt="" />
+				<img class="widgetOption" src="assets/choice.png" title="list" alt="" />
 				<img class="widgetOption" src="assets/select.png" title="select" alt="" />
 				<img class="widgetOption" src="assets/cforward.png" title="carryforward" alt="" />
 				<img class="widgetOption" src="assets/media.png" title="media" alt="" />
@@ -55,11 +61,9 @@ limitations under the License.
 						</p>
 					</div>
 					<input type="radio" name="listType" value="multiplechoice" checked="checked" />
-					<b>Multiple Choice</b>
-					<p>Students may choose one of many answers.</p>
+					<b>Multiple Choice</b><br/>
 					<input type="radio" name="listType" value="checklist" />
-					<b>Checklist</b>
-					<p>Students may choose zero or more answers.</p>
+					<b>Checklist</b></br>
 					<div class="error"></div>
 					<div class="buttonBar">
 						<button onClick=saveList()>Save</button>
@@ -81,7 +85,7 @@ limitations under the License.
 					<input type="checkbox" name="optional"> Optional<br/>
 					<div class="error"></div>
 					<div class="buttonBar">
-						<button onClick=saveTextfield()>Save</button>
+						<button onClick=saveTextfield>Save</button>
 						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
@@ -152,6 +156,20 @@ limitations under the License.
 						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
+				<div id="list" class="popupDialog">
+					<div class="title">Making a List</div>
+					<div class="instructions">
+						<p>Click on the first bullet in a bulleted<br/>
+						list to make it a multiple-choice<br/>
+						question or a checklist.<br/><br/>
+						 Cancel this dialog to start.
+					    </p>
+					</div>
+					<div class="error"></div>
+					<div class="buttonBar">
+						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div id="toolWrapper">
@@ -191,17 +209,17 @@ limitations under the License.
 			<div class="title">Document Options</div>
 			<div class="instructions">
 				<ol>
-					<li>Select the working folder your document is in.</li>
-					<li>Select the PDF document to edit.</li>
-					<li>Click Edit or Save the document.</li>
+					<li>Select your working folder.</li>
+					<li>Select the PDF document.</li>
+					<li>Click Open or Save.</li>
 				</ol> 
 			</div>
-			<span>Folder: </span><input id="folder" type="file" webkitdirectory><br/>
+			<span>Folder: </span><input id="folder" type="file"><br/>
 			<span>Document: </span><input id="document" type="file" accept=".pdf">
 			<div class="error"></div>
 			<div class="buttonBar">
-				<button type="button" onclick=openPDF() title="Open">Cancel</button>
-				<button type="button" onclick=SavePDF() title="Cancel">Cancel</button>
+				<button type="button" onclick=openPDF() title="Open">Open</button>
+				<button type="button" onclick=SavePDF() title="Save">Save</button>
 				<button type="button" onclick=toggleMenu("hidden") title="Cancel">Cancel</button>
 			</div>
 		</div>

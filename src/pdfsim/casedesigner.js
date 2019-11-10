@@ -3,7 +3,7 @@
 if (!pdfjsLib.getDocument || !pdfjsViewer.PDFPageView) {
   alert('Please build the pdfjs-dist library using\n' +
         '  `gulp dist-install`');
-}
+};
 
 pdfjsLib.GlobalWorkerOptions.workerSrc ='node_modules/pdfjs-dist/build/pdf.worker.js';
 
@@ -18,7 +18,6 @@ var pdfLinkService = new pdfjsViewer.PDFLinkService();
 var phaseViews = [null];
 var currentPDF = null;
 var currentCase = null;
-var currentTool = null;
 var currentPhase = 1;
 let menu = null;
 let bullet = null;
@@ -93,18 +92,18 @@ function getNewView() {
 	view.id = "viewerContainer";
 	view.onmousedown = function(e) {
 		if (e.target.tagName === "SELECT") { 
-			e.preventDefault();
 			return;
-		}
+		};
 		if (e.target.textContent === "•") {
 			bullet = e.target;
+			console.log(bullet.style.top);
 			menu = document.getElementById("addList");
 			menu.style.left = bullet.style.left;
 		    menu.style.top = bullet.style.top;		    		
 			toggleMenu("visible");
 			return;
 		};
-	}
+	};
 	return view;
 }
 
@@ -131,13 +130,13 @@ function loadPhase(phase) {
 	    	layer = document.createElement("div");
 	    	layer.className = "annotationLayer";
 	    	pageView.appendChild(layer);
-	    }
-	    for (var key in phase.widgets) {
+	    };
+/*	    for (var key in phase.widgets) {
 	    	var value = phase.widgets[key];
 	    	var widget = getViewableWidget(value.type);
 	    	placeWidget(widget,value.rect.x,value.rect.y);
 	    };
-	    moveWidgetMenus();
+*/	    moveWidgetMenus();
 	});	
 }
 // swap phase views 
@@ -162,7 +161,15 @@ function fillPhasePanel() {
 		button.id = "ptitle"+i;
 		button.innerHTML = currentCase.phases[i].title;
 		button.value = i;
-		button.onclick = function(e) { showPhase(this.value)};
+		item.onclick = function(e) {
+	 	 	var r = this.getBoundingClientRect();
+	 	 	console.log(r);
+			if (e.pageX > parseInt(button.style.left,10) > (r.right-16)) {
+				menu = document.getElementById("phaseMenu");
+				toggleMenu("visible");
+			} else
+				showPhase(this.value)
+		};
 		item.appendChild(button);
 		phasePanel.appendChild(item);
 	};
@@ -188,65 +195,77 @@ function updatePhaseTitle(title) {
 }
 
 
-function toggleMenu(command){
-  if (!menu) return;
-	menu.style.visibility = command;
-	toggleError(menu,"hidden");
+function toggleMenu(command) {
+	if (menu) menu.style.visibility = command;
+	if (command === "visible") {
+		var error = menu.getElementsByClassName("error").item(0);
+		error.style.visibility = "hidden";
+	} else {
+		menu = null;
+	};
 };
 
-function toggleError(menu,command) {
-	var error = menu.getElementsByClassName("error").item(0);
-	error.style.visibility = command;
+function saveList() {
+	var widget = makeList(getListType());
+	bullet = null;
+	toggleMenu("hidden");
+	saveCase();
 }
 
 function getListType() {
 	var radios = document.getElementsByName('listType');
 	for (var i = 0, length = radios.length; i < length; i++)
 	   if (radios[i].checked) return radios[i].value;
-	return "list";
+	return "multiplechoice";
 }
 
 function makeList(type) {
 	var firstLeft = parseInt(bullet.style.left,10);
 	var firstTop = parseInt(bullet.style.top,10);
-	var index = 1;
-	var list = makeNewWidget(type,firstLeft,firstTop);
-	console.log(list);
+	var list = makeNewWidget(type,firstLeft-6,firstTop-12);
 	var subtype = type === "multiplechoice"?"radio":"checkbox";
-	var nextLeft = parseInt(bullet.style.left,10);
+	var nextLeft = firstLeft;
+	var node = bullet;
+	var value = 1;
 	while (nextLeft >= firstLeft) {
 		if (nextLeft == firstLeft) {
-			itemLeft = parseInt(bullet.style.left,10)-firstLeft-3;
-			itemTop = parseInt(bullet.style.top,10)-firstTop+2;
+			var itemLeft = parseInt(node.style.left,10)-firstLeft;
+			var itemTop = parseInt(node.style.top,10)-firstTop;
 			var item = makeNewWidget(subtype,itemLeft,itemTop);
-			item.type = subtype;
-			item.value = index++;
+			var input = item.firstChild;
+			if (subtype === "radio")
+				input.name = list.id;
+			else
+				input.name = item.id;
+			input.type = subtype;
+			input.value = value++;
 			item.style.left = itemLeft+"px";
-			item.style.top = "px";
-			list.appendChild(item);
+			item.style.top = itemTop+"px";
+			list.firstChild.appendChild(item);
 		};
-		bullet = bullet.nextElementSibling;
-		nextLeft = parseInt(bullet.style.left,10);
+		node = node.nextElementSibling;
+		nextLeft = parseInt(node.style.left,10);
 	};
 	return list;
-}
-function saveList() {
-	var type = getListType();
-	makeList(type);
-	bullet = null;
-	toggleMenu("hidden");
 }
 
 /*
  * Functions to process widget operations
  */
-document.getElementById("widgetPanel").onmousedown = function(e) { 
-	makeNewWidget(e.target.title,e.pageX,e.pageY);
+document.getElementById("widgetPanel").onmousedown = function(e) {
+	var type = e.target.title;
+	if (type === "list") {
+		menu = document.getElementById(type);
+		menu.style.left = e.pageX+"px";
+	    menu.style.top = e.pageY+"px";		    		
+		toggleMenu("visible");
+	} else
+		makeNewWidget(type,e.pageX,e.pageY);
 }
 
 function getViewableWidget(type) {
     var element;
-    var draggable = true;
+    var draggable = true, showmenu = true;
 	var widget = document.createElement("section");
     widget.className = "widget";
     widget.setAttribute("widgetType",type);
@@ -281,36 +300,35 @@ function getViewableWidget(type) {
         element.className = "diagnosticpath";
         draggable = false;
         break;
-    case "list":
-        element = makeList(type);
-        element.className = "list";
+    case "radio":
+        element = document.createElement('input');
+        element.type = "radio";
+        draggable = false;
+        showmenu = false;
+        break;
+    case "checkbox":
+        element = document.createElement('input');
+        element.type = "checkbox";
+        draggable = false;
+        showmenu = false;
+        break;
+    case "multiplechoice":
+    case "checklist":
+        element = document.createElement('div');
+    	element.className = "list";
         draggable = false;
         break;
     default:
     	return;
-   }    
-    if (draggable) {
-        setMenuHandler(widget);
-    	setDraggable(widget);	
-    };
-    widget.appendChild(element);
-    return widget;
+   };    
+	if (showmenu) setMenuHandler(widget);
+	if (draggable) setDraggable(widget);	
+	widget.appendChild(element);
+	return widget;
 }
 
-function makeNewWidget(type,pageX,pageY){
+function makeNewWidget(type,left,top) {
 	var widget = getViewableWidget(type);
-	switch(type) {
-	case "diagnosticpath":
-    	placeWidget(widget,0,0);
-    	break;
-	case "list":
-    	placeWidget(widget,pageX,pageY);
-		break;
-	default:
-    	placeWidget(widget,pageX+5,pageY+30);
-	}
-	alayer = document.getElementsByClassName("annotationLayer").item(0);
-    alayer.appendChild(widget);
     var id = currentCase.id++;
     widget.id = id;
     currentCase.phases[currentPhase].widgets[id] = {
@@ -320,8 +338,25 @@ function makeNewWidget(type,pageX,pageY){
     	"value":"",
     	"optional": false,    	
     };
-    saveCase();
-
+	switch(type) {
+	case "diagnosticpath":
+		placeWidget(widget,0,0);
+    	break;
+	case "radio":
+	case "checkbox":
+    	placeWidget(widget,left,top);
+    	break;
+	case "multiplechoice":
+	case "checklist":
+		widget.style.left =left + "px";
+	    widget.style.top = top +'px';	
+		break;
+ 	default:
+    	placeWidget(widget,left+5,top+30);
+	};
+	alayer = document.getElementsByClassName("annotationLayer").item(0);
+    alayer.appendChild(widget);
+    return widget;
 }
 
 function setMenuHandler(widget) {
@@ -329,15 +364,17 @@ function setMenuHandler(widget) {
  	 	var r = this.getBoundingClientRect();
 	 	var view = document.getElementById("viewerContainer");
 	 	var type = this.getAttribute("widgetType");
-	    if (e.pageY > (r.top+16)) return;
-	    if (e.pageX < (r.right - 53)) return;
+	    if (e.pageY > (r.top + 16)) return;
+	    if (e.pageX < (r.right - 60)) return;
 	    // copy
-		if (e.pageX < (r.right - 44)) {
+		if (e.pageX < (r.right - 40)) {
 			makeNewWidget(type,e.pageX-100,e.pageY-30);
 		    return false;
 		};
 		/* display properties dialog */
 	 	if (e.pageX < (r.right - 24)) {
+	 		if (type == "multiplechoice" || type === "checklist")
+	 			type = "addList";
 	    	menu = document.getElementById(type);
 	    	if (menu) {
 	    		menu.style.left = widget.style.left;
@@ -348,26 +385,26 @@ function setMenuHandler(widget) {
 		};
 		/* delete */
 		widget.parentNode.removeChild(widget);
-		localStorage.removeItem(currentCase.phases[currentPhase].widgets[widget.id]);
+		//localStorage.removeItem(currentCase.phases[currentPhase].widgets[widget.id]);
 		saveCase();
 		return false;
     };
 };
 
-function showFileMenu(id) {
-	var menu = document.getElementById(id);
-	if (!menu) return;
-	menu.style.left = "60%";
-	menu.style.top = "5%";
+function showFileMenu() {
+	if (menu) return;
+	menu = document.getElementById("fileMenu");
 	toggleMenu("visible");
 }
 
 function openPDF() {
-	var dir = document.getElementById("opendirid").files[0].webkitRelativePath;
+	var folder = document.getElementById("folder").files[0];
+	var doc = document.getElementById("document").files[0];
 	toggleMenu("hidden");
 }
 
 function savePDF() {
+	toggleMenu("hidden");
 }
 
 function placeWidget(widget,pageX,pageY) {
@@ -391,13 +428,13 @@ function setDraggable(widget) {
 	  function moveAt(pageX, pageY) {
 	    widget.style.left = pageX - offsetX + 'px';
 	    widget.style.top = pageY - offsetY + 'px';
-	  }
+	  };
 
 	  window.onmousemove = function onMouseMove(e) {
 		  // don't move if resizing
 		  if (widget.clientWidth == width && widget.clientHeight == height)
 			  moveAt(e.pageX, e.pageY);
-	  }
+	  };
 
 	  widget.onmouseup = function() {		  
 		  window.onmousemove = null;
@@ -416,6 +453,8 @@ function saveMedia() {};
  * Functions to process toolbox operations
  */
 var toolMenu = document.getElementById("toolMenu");
+var currentTool = null;
+var currentTab = null;
 
 function fillToolMenu() {
 	toolMenu.innerHTML = "";
@@ -451,15 +490,21 @@ function addToolTab(title,className) {
 }
 
 function selectTool(tab) {
+	console.log(currentTab,currentTool);
+	if (currentTab) {
+		currentTab.parentElement.removeAttribute("selected");
+		currentTab = null;
+	}
+	currentTab = tab;
+	tab.parentElement.setAttribute("selected","true");
 	var newTool = document.getElementById(tab.textContent);
-	if (currentTool) {
+	if (newTool == currentTool) {
 		currentTool.style.display = "none";
-		tab.parentElement.removeAttribute("state");
-	};
-	if (newTool != currentTool) {
+		currentTool = null;
+	} else {
+		if (currentTool) currentTool.style.display = "none";
 		currentTool = newTool;
 		currentTool.style.display = "block";
-		tab.parentElement.setAttribute("state","showing");
 	};
 }; 
 
@@ -479,7 +524,7 @@ function saveTools() {
 	currentCase.phases[currentPhase].tools = tools;
 	if (currentTool) {
 		currentTool.style.display = "none";
-		currentTool.setAttribute("state","none");
+		currentTool.removeAttribute("selected");
 		currentTool = null;
 	}
 	toggleMenu("hidden");

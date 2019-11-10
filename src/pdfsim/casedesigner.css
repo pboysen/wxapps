@@ -30,11 +30,17 @@ body {
 	margin-right: 20px;
 }
 
-#files img {
+#files button {
+	border-radius: 5px;
+	padding: 2px 4px 2px 4px;
+	background-color: white;
+	color: black;
 	margin: 0px;
-	padding: 0px;
-	display: inline-block;
-	cursor: pointer;
+}
+
+#files button:hover {
+	background-color: var(--main-comp-color);
+	color: white;
 }
 
 #titles {
@@ -80,13 +86,22 @@ body {
 }
 
 .phase {
-	min-width: 50px;
+	min-width: 20px;
 	font-size: 12px;
 	font-family: var(--main-font-family);
 	display: inline-block;
-	margin: 0 5px 0px 5px;
+	margin: 0 16px 0px 5px;
 	white-space: nowrap;
+	padding-right: 16px;
+	
 }
+
+.phase:hover {
+   	background-image: url("assets/phaseprops.png");
+   	background-position: 95% 0%;
+   	background-repeat: no-repeat;
+}
+
 
 .phase button {
 	border-radius: 5px;
@@ -130,7 +145,6 @@ body {
 	left: 300px;
 	top: 0px;
 	padding: 0 2px 4px 2px;
-	width: 184px;
 	height: 22px;
 	z-index: 10;
 	border-radius: 0 0 5px 5px;
@@ -178,7 +192,7 @@ body {
 	cursor: pointer;
 }
 
-.toolTab[state] {
+.toolTab[selected] {
 	height: 24px;
 }
 
@@ -221,7 +235,7 @@ body {
 	box-shadow: 2px 2px gray;
 	background-color: var(--main-comp-color);
 	visibility:hidden;
-	z-index: 100;
+	z-index: 10;
 	position: absolute;
 }
 
@@ -247,7 +261,7 @@ body {
 
 .popupDialog .buttonBar {
 	padding: 4px;
-	margin: 10px;
+	margin: 15px;
 	white-space: nowrap:                 
   	box-sizing: border-box;
 }
@@ -265,7 +279,7 @@ body {
 }
 
 #addList {
-	width: 300px;
+	width: 200px;
 	position: absolute;
 	left: 0px;
 	top: 0px;
@@ -281,4 +295,9 @@ body {
 	position: relative;
 	top: 20px;
 	left: 20px;
+}
+
+#fileMenu {
+	left: 60%;
+	top: 5%;
 }

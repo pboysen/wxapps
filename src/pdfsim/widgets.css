@@ -2,68 +2,85 @@
 	cursor: pointer;
 	box-sizing: border-box;
 	padding-top:16px;
-}
-
-.widget:hover {
-   	background-image: url("images/widget.png");
+	padding-bottom:16px;
+	margin: 0;
    	background-position: 95% 0%;
    	background-repeat: no-repeat;
 }
 
-.widget input[type="text"] {
-	width: 150px;
-	border: 2px solid lightblue;
-	border-radius: 4px;
+.widget[widgettype="textfield"] {
 }
 
-.widget textarea {
+.widget[widgettype="textfield"]:hover {
+   	background-image: url("assets/widget.png");
+}
+
+.widget[widgettype="textarea"] {
 	rows: 4;
 	cols: 50;
-	border: 2px solid lightblue;
-	border-radius: 4px;
   	resize: both;
   	overflow: auto;
 }
 
-.widget select {
-	width: 150px;
-	border: 2px solid lightblue;
-	border-radius: 4px;
+.widget[widgettype="textarea"]:hover {
+    background-image: url("assets/widget.png");
 }
 
-.widget .carryforward {
+.widget[widgettype="select"] {
+}
+
+.widget[widgettype="select"]:hover {
+   	background-image: url("assets/widget.png");
+}
+
+.widget[widgettype="carryforward"] {
+	background-color: white;
+}
+
+.carryforward {
 	width: 100px;
 	height: 24px;
-	border: 1px solid lightblue;
-	background-color: white;
   	resize: both;
-  	overflow: auto;
+  	overflow: auto;	
+	border: 1px dashed black;
+}
+.widget[widgettype="carryforward"]:hover {
+   	background-image: url("assets/widget.png");
 }
 
-.widget .media {
+
+.media {
 	width: 300px;
 	height: 200px;
-	border: 1px solid lightblue;
 	background-color: white;
-  	resize: both;
-  	overflow: auto;
+  	border: 1px solid black;
+	resize: both;
+  	overflow: auto;	
+}
+.widget[widgettype="media"]:hover {
+   	background-image: url("assets/widget.png");
 }
 
-.widget .diagnosticpath {
+.widget[widgettype="diagnosticpath"] {
 	width: 50%;
 	height: 800px;
-	border: 1px solid lightblue;
 	background-color: white;
 	opacity: 1;
 }
 
-.widget .list {
-	position: absolute;
-	width: 50px;
-	background-color: lightblue;
-	border: 1px solid red;
+.widget[widgettype="diagnosticpath"]:hover {
+   	background-image: url("assets/widget.png");
 }
 
-.list input {
+.widget[widgettype="multiplechoice"] {
+	width: 40px;
+	height: 100px;
+	overflow: visible;
+}
+
+.widget[widgettype="multiplechoice"]:hover {
+	background-image: url("assets/widget-nocopy.png");	
+}
+.widget .list input {
 	position: absolute;
 }
