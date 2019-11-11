@@ -17,6 +17,7 @@ body {
 	height: 32px;
 	padding: 5px;
 	background-color: var(--main-bg-color);
+	text-align: center;
 }
 
 #casePanel:nth-child(1) {
@@ -235,7 +236,7 @@ body {
 	box-shadow: 2px 2px gray;
 	background-color: var(--main-comp-color);
 	visibility:hidden;
-	z-index: 10;
+	z-index: 20;
 	position: absolute;
 }
 

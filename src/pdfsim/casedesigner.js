@@ -10,7 +10,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc ='node_modules/pdfjs-dist/build/pdf.worke
 var CMAP_URL = 'node_modules/pdfjs-dist/cmaps/';
 var CMAP_PACKED = true;
 
-var DEFAULT_URL = 'designerhelp.pdf';
+var DEFAULT_URL = 'Designer Help.pdf';
 var PAGE_TO_VIEW = 1;
 var DEFAULT_SCALE = 1.0;
 
@@ -19,6 +19,7 @@ var phaseViews = [null];
 var currentPDF = null;
 var currentCase = null;
 var currentPhase = 1;
+var currentWidget = null;
 let menu = null;
 let bullet = null;
 var dragged = null;
@@ -43,6 +44,8 @@ function loadDocument(url) {
 	});
 	loadingTask.promise.then(function(document) {
 		currentPDF = document;
+		// temporarily remove local storate
+		localStorage.removeItem(url);
 		getCase(url,document.numPages);
 	    fillPhasePanel();
 	    fillToolMenu();
@@ -96,7 +99,6 @@ function getNewView() {
 		};
 		if (e.target.textContent === "•") {
 			bullet = e.target;
-			console.log(bullet.style.top);
 			menu = document.getElementById("addList");
 			menu.style.left = bullet.style.left;
 		    menu.style.top = bullet.style.top;		    		
@@ -142,10 +144,9 @@ function loadPhase(phase) {
 // swap phase views 
 function showPhase(pindex) {
 	var wrapper = document.getElementById("viewerWrapper");
-	wrapper.replaceChild(phaseViews[pindex],wrapper.children[0]);
+	wrapper.replaceChild(phaseViews[pindex],wrapper.firstElementChild);
 	// move menuLayer to active page so menus can scroll with content
 	moveWidgetMenus();
-	//document.getElementById("phase-title").value = currentCase.phases[pindex].title;
 	currentPhase = pindex;
 }
 
@@ -163,16 +164,26 @@ function fillPhasePanel() {
 		button.value = i;
 		item.onclick = function(e) {
 	 	 	var r = this.getBoundingClientRect();
-	 	 	console.log(r);
-			if (e.pageX > parseInt(button.style.left,10) > (r.right-16)) {
+			if (e.pageX  > (r.right-16)) {
 				menu = document.getElementById("phaseMenu");
+				document.getElementById("phaseTitle").value = this.firstElementChild.innerHTML;
+				menu.style.left = e.pageX+"px";
+				menu.style.top = e.pageY+"px";
 				toggleMenu("visible");
 			} else
-				showPhase(this.value)
+				showPhase(this.firstChild.value);
 		};
 		item.appendChild(button);
 		phasePanel.appendChild(item);
 	};
+}
+
+function savePhase() {
+	var input = document.getElementById("phaseTitle");
+    currentCase.phases[currentPhase].title = input.value;
+    document.getElementById("ptitle"+currentPhase).innerHTML = input.value;
+	saveCase();
+	toggleMenu("hidden");
 }
 
 function moveWidgetMenus() {
@@ -182,16 +193,11 @@ function moveWidgetMenus() {
 	 */
 	if (page) {
 		var menuLayer = document.getElementById("menuLayer");
-		menuLayer.parentNode.removeChild(menuLayer);
-		page.appendChild(menuLayer);
+		if (menuLayer) {
+			menuLayer.parentNode.removeChild(menuLayer);
+			page.appendChild(menuLayer);
+		};
 	};
-}
-
-function updatePhaseTitle(title) {
-	var input = document.getElementById(title);
-    currentCase.phases[currentPhase].title = input.value;
-    document.getElementById("ptitle"+currentPhase).innerHTML = input.value;
-	saveCase();
 }
 
 
@@ -206,10 +212,37 @@ function toggleMenu(command) {
 };
 
 function saveList() {
-	var widget = makeList(getListType());
+	var listType = getListType();
+	if (currentWidget) {
+		if (currentWidget.widgetType != listType)
+			changeListType(listType);
+	} else
+		currentWidget = makeList(listType);
+	// pick up optional
+	saveCase();				
 	bullet = null;
+	currentWidget = null;
 	toggleMenu("hidden");
-	saveCase();
+}
+
+function changeListType(newType) {
+	currentWidget.type = "list";
+	currentWidget.setAttribute("widgettype",newType);
+	var subtype = (newType === "multiplechoice")?"radio":"checkbox";
+	var phase = currentCase.phases[currentPhase];
+	var list = phase.widgets[currentWidget.id];
+	list.widgettype = newType;
+	for (var i=1; i <= list.childIds.length; i++) {
+		var item = phase.widgets[list.childIds[i-1]];
+		item.type = subtype;
+		var section = document.getElementById(item.id);
+		section.setAttribute("widgettype",subtype);
+		console.log(section);
+		var input = section.firstElementChild;
+		input.type = subtype;
+		input.name = (subtype === "radio")?list.id:item.id;
+		input.value = i;		
+	}
 }
 
 function getListType() {
@@ -223,6 +256,7 @@ function makeList(type) {
 	var firstLeft = parseInt(bullet.style.left,10);
 	var firstTop = parseInt(bullet.style.top,10);
 	var list = makeNewWidget(type,firstLeft-6,firstTop-12);
+	var listData = currentCase.phases[currentPhase].widgets[list.id];
 	var subtype = type === "multiplechoice"?"radio":"checkbox";
 	var nextLeft = firstLeft;
 	var node = bullet;
@@ -232,16 +266,15 @@ function makeList(type) {
 			var itemLeft = parseInt(node.style.left,10)-firstLeft;
 			var itemTop = parseInt(node.style.top,10)-firstTop;
 			var item = makeNewWidget(subtype,itemLeft,itemTop);
-			var input = item.firstChild;
-			if (subtype === "radio")
-				input.name = list.id;
-			else
-				input.name = item.id;
+			item.type = subtype;
+			listData.childIds.push(item.id);
+			var input = item.firstElementChild;
+			input.name = (subtype === "radio")?list.id:item.id;
 			input.type = subtype;
 			input.value = value++;
 			item.style.left = itemLeft+"px";
 			item.style.top = itemTop+"px";
-			list.firstChild.appendChild(item);
+			list.appendChild(item);
 		};
 		node = node.nextElementSibling;
 		nextLeft = parseInt(node.style.left,10);
@@ -268,7 +301,7 @@ function getViewableWidget(type) {
     var draggable = true, showmenu = true;
 	var widget = document.createElement("section");
     widget.className = "widget";
-    widget.setAttribute("widgetType",type);
+    widget.setAttribute("widgettype",type);
     switch(type) {
     case "textfield":
         element = document.createElement('input');
@@ -292,8 +325,8 @@ function getViewableWidget(type) {
         element.className = "carryforward";
         break;
     case "media":
-        element = document.createElement('div');
-        element.className = "media";
+        element = document.createElement('iframe');
+        element.className = "media-iframe";
         break;
     case "diagnosticpath":
         element = document.createElement('div');
@@ -314,28 +347,28 @@ function getViewableWidget(type) {
         break;
     case "multiplechoice":
     case "checklist":
-        element = document.createElement('div');
-    	element.className = "list";
-        draggable = false;
-        break;
+    	draggable = false;
+    	showmenu = true;
+    	break;
     default:
     	return;
    };    
 	if (showmenu) setMenuHandler(widget);
 	if (draggable) setDraggable(widget);	
-	widget.appendChild(element);
+	if (element) widget.appendChild(element);
 	return widget;
 }
 
 function makeNewWidget(type,left,top) {
 	var widget = getViewableWidget(type);
-    var id = currentCase.id++;
+    var id = (currentCase.wid++).toString();
     widget.id = id;
     currentCase.phases[currentPhase].widgets[id] = {
     	"id": id,
     	"type": type,
     	"rect": widget.getBoundingClientRect(),
     	"value":"",
+    	"childIds":[],
     	"optional": false,    	
     };
 	switch(type) {
@@ -373,6 +406,7 @@ function setMenuHandler(widget) {
 		};
 		/* display properties dialog */
 	 	if (e.pageX < (r.right - 24)) {
+	 		currentWidget = this;
 	 		if (type == "multiplechoice" || type === "checklist")
 	 			type = "addList";
 	    	menu = document.getElementById(type);
@@ -383,13 +417,21 @@ function setMenuHandler(widget) {
 	    	};
 	    	return false;
 		};
-		/* delete */
-		widget.parentNode.removeChild(widget);
-		//localStorage.removeItem(currentCase.phases[currentPhase].widgets[widget.id]);
+		deleteWidget(widget);
 		saveCase();
 		return false;
     };
 };
+
+function deleteWidget(widget) {
+	var phaseData = currentCase.phases[currentPhase].widgets;
+	// remove children for lists if any
+	phaseData[widget.id].childIds.forEach(function(id) {
+		delete phaseData[id];
+	});
+	delete phaseData[widget.id];		
+	widget.parentNode.removeChild(widget);
+}
 
 function showFileMenu() {
 	if (menu) return;
@@ -444,11 +486,42 @@ function setDraggable(widget) {
   };  
 }
 
-function saveTextfield() {};
-function saveTextarea() {};
-function saveSelect() {};
-function saveCarryforward() {};
-function saveMedia() {};
+function saveTextfield() {
+	// save data
+	var size = document.getElementById("textwidth").value;
+	currentWidget.firstElementChild.size = size;
+	// optional
+	toggleMenu("hidden");
+}
+
+function saveTextarea() {
+	var r = currentWidget.firstElementChild.getBoundingClientRect();
+	//optional
+	toggleMenu("hidden");	
+}
+
+function saveSelect() {
+	// save data
+	var options = document.getElementById("select-options").value;
+	console.log(options);
+	// save data
+	toggleMenu("hidden");	
+}
+
+function saveCarryforward() {
+	var value = document.getElementById("carryForwardSource").value;
+	console.log(value);
+	// id of source widget
+	// save data
+	toggleMenu("hidden");	
+}
+
+function saveMedia() {
+	var src = document.getElementById("iframe-src").value;
+	currentWidget.firstElementChild.setAttribute("src",src);
+	// save data
+	toggleMenu("hidden");	
+}
 /*
  * Functions to process toolbox operations
  */
@@ -490,7 +563,6 @@ function addToolTab(title,className) {
 }
 
 function selectTool(tab) {
-	console.log(currentTab,currentTool);
 	if (currentTab) {
 		currentTab.parentElement.removeAttribute("selected");
 		currentTab = null;

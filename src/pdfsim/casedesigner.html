@@ -37,9 +37,6 @@ limitations under the License.
 	<div id="phaseWrapper">
 		<div id="phasePanel">
 		</div>
-			<div id="phaseMenu class="popupDialog">
-			this is atest
-			</div>
 	</div>
 	<div id="contentDisplay">
 		<div id="viewerWrapper">
@@ -54,6 +51,19 @@ limitations under the License.
 				<img class="widgetOption" src="assets/diagpath.png" title="diagnosticpath" alt="" />
 			</div>
 			<div id="menuLayer">
+				<div id="phaseMenu" class="popupDialog">
+					<div class="title">Phase Properties</div>
+					<div class="instructions">
+						<p>Enter a title for your phase.<br/>
+						</p>
+					</div>
+					<span>Phase Title: </span><input type="text" id="phaseTitle"/>
+					<div class="error"></div>
+					<div class="buttonBar">
+						<button onClick=savePhase()>Save</button>
+						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
+					</div>
+				</div>
 				<div id="addList" class="popupDialog">
 					<div class="title">List Properties</div>
 					<div class="instructions">
@@ -75,7 +85,7 @@ limitations under the License.
 					<div class="instructions">
 						<p>Select a width in characters.</p>
 					</div>
-					<select name="textsize">
+					<select id="textwidth">
 						<option>Select a width</option>
 						<option value="10">10</option>
 						<option selected="selected" value="20">20</option>
@@ -85,7 +95,7 @@ limitations under the License.
 					<input type="checkbox" name="optional"> Optional<br/>
 					<div class="error"></div>
 					<div class="buttonBar">
-						<button onClick=saveTextfield>Save</button>
+						<button onClick=saveTextfield()>Save</button>
 						<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 					</div>
 				</div>
@@ -107,8 +117,8 @@ limitations under the License.
 						<p>Enter option names separated by semicolons.<br/>
 						Pick optional if the students doesn't have to<br/>pick an option.</p>
 					</div>
-					Select Options: <input type="text" name="select-options" 
-					placeholder="Option names"/><br/><br/>
+					Select Options: <input type="text" id="select-options" 
+					placeholder="Option Names"/><br/><br/>
 					<input type="checkbox" name="optional"> Optional<br/>
 					<div class="error">Enter at least one option.</div>
 					<div class="buttonBar">
@@ -119,9 +129,10 @@ limitations under the License.
 				<div id="carryforward" class="popupDialog">
 					<div class="title">Carry-forward Properties</div>
 					<div class="instructions">
-						<p>Pick a widget from a previous phase.</p>
+						<p>Select a widget from a previous phase.<br/>
+						It's value will be displayed here.</p>
 					</div>
-					<select name="answer">
+					<select id="carryForwardSource">
 						<option disabled="disabled" selected="selected">Select a widget.</option>
 					</select>
 					<div class="error">Select one.</div>
@@ -136,7 +147,7 @@ limitations under the License.
 						<p>Enter a media url to show.<br/>
 						For example, youTube, website, ...</p>
 					</div>
-					URL: <input type="text" name="display-url" placeholder="Enter a URL"/>
+					URL: <input type="text" id="iframe-src" placeholder="Enter a URL"/>
 					<div class="error">You must supply a URL</div>
 					<div class="buttonBar">
 						<button onClick=saveMedia()>Save</button>
@@ -149,7 +160,7 @@ limitations under the License.
 						<p>Supply a URL only when the answer should be displayed. 
 						Leave it blank for student mode.</p>
 					</div>
-					Expert Path URL: <input type="text" name="expert-path" placeholder="Enter a URL"/>
+					Expert Path URL: <input type="text" id="expert-path" placeholder="Enter a URL"/>
 					<div class="error"></div>
 					<div class="buttonBar">
 						<button onClick=saveExpertPath()>Save</button>
