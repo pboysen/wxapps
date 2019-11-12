@@ -5,9 +5,9 @@ if (!pdfjsLib.getDocument || !pdfjsViewer.PDFPageView) {
         '  `gulp dist-install`');
 };
 
-pdfjsLib.GlobalWorkerOptions.workerSrc ='node_modules/pdfjs-dist/build/pdf.worker.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc ='pdfjs/pdf.worker.js';
 
-var CMAP_URL = 'node_modules/pdfjs-dist/cmaps/';
+var CMAP_URL = 'pdfjs/cmaps/';
 var CMAP_PACKED = true;
 
 var DEFAULT_URL = 'Designer Help.pdf';
