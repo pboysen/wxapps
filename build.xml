@@ -5,14 +5,25 @@
 	</target>
 
 	<target name="compile" depends="init">
-	</target>
-	
-	<target name="execute">
-		<copy todir="c:/Users/pboysen/node/public">
-		    <fileset dir="src/pdfsim">
+		<copy todir="c:/Users/pboysen/git/projectx/projectx">
+		    <fileset dir="src/projectx">
+		        <include name="assets"/>
 		        <include name="**/*.css"/>
 		        <include name="**/*.js"/>
 		        <include name="**/*.html"/>
+		        <include name="Designer Help.pdf"/>
+		    </fileset>
+		</copy>
+	</target>
+	
+	<target name="execute">
+		<copy todir="c:/Users/pboysen/git/public">
+		    <fileset dir="src/projectx">
+		        <include name="assets"/>
+		        <include name="**/*.css"/>
+		        <include name="**/*.js"/>
+		        <include name="**/*.html"/>
+		        <include name="Designer Help.pdf"/>
 		    </fileset>
 		</copy>			
 	</target>
