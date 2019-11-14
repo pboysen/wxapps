@@ -8,6 +8,12 @@
    	background-repeat: no-repeat;
 }
 
+.widget span:first-child {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	font-size: 14px;
+}
 .widget[widgettype="textfield"] {
 }
 
@@ -50,14 +56,18 @@
 
 
 .media {
-	background-color: white;
   	border: 1px solid black;
 }
-.widget[widgettype="media"]:hover {
-   	background-image: url("assets/widget.png");
+
+.widget[widgettype="media"] div {
+	background-color: white;
 }
 
-.widget .media-iframe {
+.widget[widgettype="media"]:hover {
+   	background-image: url("assets/widget.png");
+ }
+
+.widget iframe {
 	width: 100%;
 	height: 100%;
 	resize: both;

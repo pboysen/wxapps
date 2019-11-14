@@ -20,9 +20,6 @@ var currentPDF = null;
 var currentCase = null;
 var currentPhase = 1;
 var currentWidget = null;
-let menu = null;
-let bullet = null;
-var dragged = null;
 var alayer = null;
 var page = null;
  
@@ -31,12 +28,13 @@ var pdfFindController = new pdfjsViewer.PDFFindController({
 });
 
 if (typeof(Storage) === "undefined") {
-	alert("Local storage not supported. Use another browser.");
+	alert("Browser storage is not supported. Please use another browser.");
 };
 
 loadDocument(DEFAULT_URL);
 
 function loadDocument(url) {
+	phaseViews = [null];
 	var loadingTask = pdfjsLib.getDocument({
 	  url: url,
 	  cMapUrl: CMAP_URL,
@@ -44,8 +42,6 @@ function loadDocument(url) {
 	});
 	loadingTask.promise.then(function(document) {
 		currentPDF = document;
-		// temporarily remove local storate
-		localStorage.removeItem(url);
 		getCase(url,document.numPages);
 	    fillPhasePanel();
 	    fillToolMenu();
@@ -56,21 +52,21 @@ function loadDocument(url) {
 function getCase(url,nphases) {
 	currentCase = JSON.parse(localStorage.getItem(url));
 	if (!currentCase) {
-		currentCase = getNewCase(url,nphases);
+		currentCase = getNewCase(file,nphases);
 		saveCase();
 	};
 	for (var i = 1; i < currentCase.phases.length; i++)
 		loadPhase(currentCase.phases[i]);
 }
 
-function getNewCase(url,nphases) {
+function getNewCase(file,nphases) {
 	var state = "viewing";
 	var phases = [null]
 	for (var i = 1; i <= nphases; i++) {
 		var phase = {
 			"id": i,
 			"title": "phase "+i,
-			"submit": "submit",
+			"submit": "Submit",
 			"state": state,
 			"widgets": {},
 			"tools": []
@@ -79,14 +75,14 @@ function getNewCase(url,nphases) {
 		state = "locked";
 	};
 	return {
-		"url": url,
+		"fileName": file.name,
 		"wid": 1,
 		"phases": phases
 	}
 }
 
 function saveCase() {
-	localStorage.setItem(currentCase.url, JSON.stringify(currentCase));
+	localStorage.setItem(currentCase.fileName, JSON.stringify(currentCase));
 }
 		
 
@@ -113,15 +109,15 @@ function loadPhase(phase) {
 	phaseViews.push(getNewView());
 	currentPDF.getPage(phase.id).then(function (pdfPage) {
 	    var pdfPageView = new pdfjsViewer.PDFPageView({
-	      container: phaseViews[phase.id],
-	      id: phase.id,
-	      scale: DEFAULT_SCALE,
-	      defaultViewport: pdfPage.getViewport({scale:DEFAULT_SCALE}),
-	        linkService: pdfLinkService,
-	        findController: pdfFindController,
-	        textLayerFactory: new pdfjsViewer.DefaultTextLayerFactory(),
-	        annotationLayerFactory: new pdfjsViewer.DefaultAnnotationLayerFactory(),
-	        renderInteractiveForms: true,
+		container: phaseViews[phase.id],
+		id: phase.id,
+		scale: DEFAULT_SCALE,
+		defaultViewport: pdfPage.getViewport({scale:DEFAULT_SCALE}),
+			linkService: pdfLinkService,
+			findController: pdfFindController,
+			textLayerFactory: new pdfjsViewer.DefaultTextLayerFactory(),
+			annotationLayerFactory: new pdfjsViewer.DefaultAnnotationLayerFactory(),
+			renderInteractiveForms: true,
 	    });
 	    pdfPageView.setPdfPage(pdfPage);
 	    pdfPageView.draw();
@@ -135,11 +131,11 @@ function loadPhase(phase) {
 	    };
 		var menuLayer = document.getElementById("menuLayer");
 	    pageView.appendChild(menuLayer.cloneNode(true));
-	    redisplayWidgets();
+	    drawWidgets();
 	});	
 }
 
-function redisplayWidgets() {}
+function drawWidgets() {}
 
 // swap phase views 
 function showPhase(pindex) {
@@ -150,10 +146,13 @@ function showPhase(pindex) {
 	currentPhase = pindex;
 	phaseButton = document.getElementById("ptitle"+currentPhase);
 	phaseButton.setAttribute("selected","true");
+	var title = currentCase.phases[pindex].submit;
+	document.getElementById("submitButton").firstElementChild.innerHTML = title;
 }
 
 function fillPhasePanel() {
 	var phasePanel = document.getElementById("phasePanel");
+	phasePanel.innerHTML = '';
 	var title = document.createElement("span");
 	title.innerHTML ="Phases:";
 	phasePanel.appendChild(title);
@@ -169,6 +168,7 @@ function fillPhasePanel() {
 			if (e.pageX  > (r.right-16)) {
 				menu = document.getElementById("phaseMenu");
 				document.getElementById("phaseTitle").value = this.firstElementChild.innerHTML;
+				document.getElementById("submitTitle").value = document.getElementById("submitButton").firstElementChild.innerHTML;
 				menu.style.left = e.pageX+"px";
 				menu.style.top = e.pageY+"px";
 				toggleMenu("visible");
@@ -183,34 +183,127 @@ function fillPhasePanel() {
 function savePhase() {
 	var input = document.getElementById("phaseTitle");
     currentCase.phases[currentPhase].title = input.value;
+	var button = document.getElementById("submitTitle");
+    currentCase.phases[currentPhase].submitTitle = button.innerHTML;
     document.getElementById("ptitle"+currentPhase).innerHTML = input.value;
+    document.getElementById("submitButton").firstElementChild.innerHTML = button.value;
 	saveCase();
 	toggleMenu("hidden");
 }
 
-function toggleMenu(command) {
-	if (menu) menu.style.visibility = command;
-	if (command === "visible") {
-		var error = menu.getElementsByClassName("error").item(0);
-		error.style.visibility = "hidden";
-	} else {
-		menu = null;
-	};
+/***************************************************************************
+ * File functions
+*****************************************************************************/
+var currentFile = null;
+
+function fileUpload(e) {
+	if (menu) return;
+	menu = document.getElementById("openFile");
+	toggleMenu("visible");
+}
+
+function fileDownload(e) {
+	if (menu) return;
+	menu = document.getElementById("saveFile");
+	toggleMenu("visible");
+}
+
+function dropHandler(e) {
+	e.preventDefault();
+	e.stopPropagation();
+	var files = [];
+	if (e.dataTransfer.items) {
+		for (var i = 0; i < e.dataTransfer.items.length; i++) {
+			// If dropped items aren't files, reject them
+			if (e.dataTransfer.items[i].kind === 'file') {
+				var file = e.dataTransfer.items[i].getAsFile();
+				files.push(file);
+			};
+	    };
+	 }; 
+	if (files.length == 1) {
+		var file = files[0];
+		if (file.type === "application/pdf") {
+			currentFile = file;
+			loadDocument(file.name);			
+			toggleMenu("hidden");
+		} else if (file.type === "") {
+			currentFile = file;
+			getFileBlob(file, function(blob) {
+				var len = parseInt(blob.slice(0,3));
+				console.log(len);
+				var json = blob.slice(4,len+4);
+				var pdf = blob.slice(len+4,blob.length);
+				localStorage.setItem(currentFile.name,json);
+				loadDocument(pdf);
+			});
+			toggleMenu("hidden");
+		} else
+			showMenuError("Only PDF and CASE files can be read.")
+	} else 
+		showMenuError("Please drop only one file.");
+	return false;
+}
+
+function dragOverHandler(e) {
+	e.preventDefault();
+	e.stopPropagation();	
+}
+
+var getFileBlob = function (file, cb) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        cb(reader.result);
+    }
+    reader.readAsArrayBuffer(file);
 };
 
-function saveList() {
-	var listType = getListType();
-	if (currentWidget) {
-		if (currentWidget.widgetType != listType)
-			changeListType(listType);
-	} else
-		currentWidget = makeList(listType);
-	// pick up optional
-	saveCase();				
-	bullet = null;
-	currentWidget = null;
-	toggleMenu("hidden");
+function saveFile() {
+	var fileName = document.getElementById("saveFileName").value;
+	if (fileName.length == 0) { 
+		showMenuError("Please specify a file name.");
+		return;
+	};
+	fileName += ".case";
+	if (!currentFile) {
+		showMenuError("A PDF file hasn't been opened.");
+		return;
+	};
+	var blob = getFileBlob(currentFile, function(blob) {
+		var json = localStorage.getItem(currentCase.fileName);
+		var jlen = new String(json.length);
+	    var file = new Blob([jlen,json,blob],{type:"application/case"});
+	    var a = document.createElement("a");
+	    a.href = URL.createObjectURL(file);
+	    a.download = fileName;
+	    a.click();
+	    URL.revokeObjectURL(a.href);
+		toggleMenu("hidden");		
+	});
 }
+
+/***************************************************************************
+ * Menu functions
+*****************************************************************************/
+var menu = null;
+
+function toggleMenu(command) {
+	showMenuError("");
+	if (menu) menu.style.visibility = command;
+	if (command === "hidden") menu = null;
+};
+
+function showMenuError(msg) {
+	if (!menu) return;
+	var error = menu.getElementsByClassName("error").item(0);
+	error.innerHTML = msg;
+	error.style.visibility = (msg.length > 0)?"visible":"hidden";	
+}
+
+/***************************************************************************
+ * List functions
+*****************************************************************************/
+var bullet = null;
 
 function changeListType(newType) {
 	currentWidget.type = "list";
@@ -224,7 +317,6 @@ function changeListType(newType) {
 		item.type = subtype;
 		var section = document.getElementById(item.id);
 		section.setAttribute("widgettype",subtype);
-		console.log(section);
 		var input = section.firstElementChild;
 		input.type = subtype;
 		input.name = (subtype === "radio")?list.id:item.id;
@@ -269,9 +361,24 @@ function makeList(type) {
 	return list;
 }
 
-/*
- * Functions to process widget operations
- */
+function saveList() {
+	var listType = getListType();
+	if (currentWidget) {
+		if (currentWidget.widgetType != listType)
+			changeListType(listType);
+	} else
+		currentWidget = makeList(listType);
+	// pick up optional
+	saveCase();				
+	bullet = null;
+	currentWidget = null;
+	toggleMenu("hidden");
+}
+
+
+/***************************************************************************
+ * Widget functions
+*****************************************************************************/
 document.getElementById("widgetPanel").onmousedown = function(e) {
 	var type = e.target.title;
 	if (type === "list") {
@@ -287,6 +394,8 @@ function getViewableWidget(type) {
     var element;
     var draggable = true, showmenu = true;
 	var widget = document.createElement("section");
+	var wid = document.createElement("span");
+	widget.appendChild(wid);
     widget.className = "widget";
     widget.setAttribute("widgettype",type);
     switch(type) {
@@ -312,8 +421,10 @@ function getViewableWidget(type) {
         element.className = "carryforward";
         break;
     case "media":
-        element = document.createElement('iframe');
-        element.className = "media-iframe";
+        var element = document.createElement("div");
+        var iframe = document.createElement('iframe');
+        iframe.className = "media-iframe";
+        element.appendChild(iframe);
         break;
     case "diagnosticpath":
         element = document.createElement('div');
@@ -349,6 +460,7 @@ function getViewableWidget(type) {
 function makeNewWidget(type,left,top) {
 	var widget = getViewableWidget(type);
     var id = (currentCase.wid++).toString();
+    widget.firstChild.innerHTML = "ID:"+id;
     widget.id = id;
     currentCase.phases[currentPhase].widgets[id] = {
     	"id": id,
@@ -420,22 +532,6 @@ function deleteWidget(widget) {
 	widget.parentNode.removeChild(widget);
 }
 
-function showFileMenu() {
-	if (menu) return;
-	menu = document.getElementById("fileMenu");
-	toggleMenu("visible");
-}
-
-function openPDF() {
-	var folder = document.getElementById("folder").files[0];
-	var doc = document.getElementById("document").files[0];
-	toggleMenu("hidden");
-}
-
-function savePDF() {
-	toggleMenu("hidden");
-}
-
 function placeWidget(widget,pageX,pageY) {
 	let view = phaseViews[currentPhase];
 	widget.style.left = pageX+"px";
@@ -490,14 +586,12 @@ function saveTextarea() {
 function saveSelect() {
 	// save data
 	var options = document.getElementById("select-options").value;
-	console.log(options);
 	// save data
 	toggleMenu("hidden");	
 }
 
 function saveCarryforward() {
 	var value = document.getElementById("carryForwardSource").value;
-	console.log(value);
 	// id of source widget
 	// save data
 	toggleMenu("hidden");	
@@ -505,13 +599,14 @@ function saveCarryforward() {
 
 function saveMedia() {
 	var src = document.getElementById("iframe-src").value;
-	currentWidget.firstElementChild.setAttribute("src",src);
+	var iframe = document.getElementsByClassName("media-iframe").item(0);
+	iframe.setAttribute("src",src);
 	// save data
 	toggleMenu("hidden");	
 }
-/*
- * Functions to process toolbox operations
- */
+/***************************************************************************
+ * Toolbox functions
+*****************************************************************************/
 var toolMenu = document.getElementById("toolMenu");
 var currentTool = null;
 var currentTab = null;

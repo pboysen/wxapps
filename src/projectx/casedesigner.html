@@ -30,17 +30,17 @@ limitations under the License.
 	<div id="casePanel">
 		<span>ProjectX Case Designer</span>
 		<div id="files">
-			<button onClick="fileUpload()"><img src="assets/fileupload.png"/></button>
-			<button onClick="fileDownload()"><img src="assets/filedownload.png"/></button>
+			<button onClick="fileUpload(event);"><img src="assets/fileupload.png"/></button>
+			<button onClick="fileDownload(event)"><img src="assets/filedownload.png"/></button>
 		</div>	
 	</div>
 	<div id="phaseWrapper">
-		<div id="phasePanel">
-		</div>
+		<div id="phasePanel"></div>
 	</div>
 	<div id="contentDisplay">
 		<div id="viewerWrapper">
-			<div id="viewerContainer"></div>
+			<div id="viewerContainer">
+			</div>
 			<div id="widgetPanel">
 				<img class="widgetOption" src="assets/textfield.png" title="textfield" alt="" />
 				<img class="widgetOption" src="assets/textarea.png" title="textarea" alt="" />
@@ -50,7 +50,7 @@ limitations under the License.
 				<img class="widgetOption" src="assets/media.png" title="media" alt="" />
 				<img class="widgetOption" src="assets/diagpath.png" title="diagnosticpath" alt="" />
 			</div>
-<!-- 			<div class="submit"><button onClick=submit()>Submit</button></div> -->
+ 			<div id="submitButton" class="submit"><button onClick=submit()>Submit</button></div>
 		</div>
 		<div id="toolWrapper">
 			<div id="toolMenu"></div>
@@ -85,21 +85,29 @@ limitations under the License.
 				<div id="Roster"></div>
 			</div>
 		</div>
-		<div id="fileMenu" class="popupDialog">
-			<div class="title">Document Options</div>
+		<div id="openFile" class="popupDialog">
+			<div class="title">Open File</div><br/>
 			<div class="instructions">
-				<ol>
-					<li>Select your working folder.</li>
-					<li>Select the PDF document.</li>
-					<li>Click Open or Save.</li>
-				</ol> 
+				<div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+				  	<p>Drop a PDF or CASE file here</p>
+				</div>
 			</div>
-			<span>Folder: </span><input id="folder" type="file"><br/>
-			<span>Document: </span><input id="document" type="file" accept=".pdf">
 			<div class="error"></div>
 			<div class="buttonBar">
-				<button type="button" onclick=openPDF() title="Open">Open</button>
-				<button type="button" onclick=SavePDF() title="Save">Save</button>
+				<button type="button" onclick=toggleMenu("hidden") title="Cancel">Cancel</button>
+			</div>
+		</div>
+		<div id="saveFile" class="popupDialog">
+			<div class="title">Save File</div><br/>
+			<div class="instructions">
+				<p>Enter the name of the file to save.<br/>
+				  It will be saved as a .case file.
+				</p>
+			</div>
+			<p>File: <input type="text" id="saveFileName" size="10"> <b>.case</b></p>
+			<div class="error"></div>
+			<div class="buttonBar">
+				<button type="button" onclick="saveFile();" title="Save">Save</button>
 				<button type="button" onclick=toggleMenu("hidden") title="Cancel">Cancel</button>
 			</div>
 		</div>
@@ -111,7 +119,8 @@ limitations under the License.
 				<p>Enter a title for your phase.<br/>
 				</p>
 			</div>
-			<span>Phase Title: </span><input type="text" id="phaseTitle"/>
+			<span>Phase Title: </span><input type="text" id="phaseTitle"/><br/><br/>
+			<span>Submit Title:</span><input type="text" id="submitTitle"/>
 			<div class="error"></div>
 			<div class="buttonBar">
 				<button onClick=savePhase()>Save</button>
@@ -138,6 +147,10 @@ limitations under the License.
 			<div class="title">Textfield Properties</div>
 			<div class="instructions">
 				<p>Select a width in characters.</p>
+				<p>Optional means that the student <br/>
+					does not need to enter text for this<br/>
+					widget to advance to the next phase.
+				</p>
 			</div>
 			<select id="textwidth">
 				<option>Select a width</option>
@@ -147,6 +160,15 @@ limitations under the License.
 				<option value="80">80</option>
 			</select><br/><br/>
 			<input type="checkbox" name="optional"> Optional<br/>
+			<div class="optional">
+				<span>Optional</span>
+				<p>If you don't want the student to<br/>
+				advance to the next phase until the<br/>
+				answer is correct, type in<br/>
+				one or more answers separated by semicolons.
+				</p>
+				<span>Answers: </span><input type="text" id="textfield-answers"><br/>
+			</div>
 			<div class="error"></div>
 			<div class="buttonBar">
 				<button onClick=saveTextfield()>Save</button>
@@ -156,7 +178,10 @@ limitations under the License.
 		<div id="textarea" class="popupDialog">
 			<div class="title">Textarea Properties</div>
 			<div class="instructions">
-				<p>Choose whether the student must<br/>supply an answer.</p>
+				<p>Optional means that the student <br/>
+					does not need to enter text for this<br/>
+					widget to advance to the next phase.
+				</p>
 			</div>
 			<input type="checkbox" name="optional"> Optional<br/>
 			<div class="error"></div>
@@ -169,7 +194,10 @@ limitations under the License.
 			<div class="title">Select Properties</div>
 			<div class="instructions">
 				<p>Enter option names separated by semicolons.<br/>
-				Pick optional if the students doesn't have to<br/>pick an option.</p>
+				<p>Optional means that the student <br/>
+					does not need to enter text for this<br/>
+					widget to advance to the next phase.
+				</p>
 			</div>
 			Select Options: <input type="text" id="select-options" 
 			placeholder="Option Names"/><br/><br/>

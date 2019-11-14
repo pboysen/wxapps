@@ -6,7 +6,7 @@
 }
 
 body {
-	background-color: #FFFFFF;
+	background-color: var(--main-fg-color);
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
@@ -23,7 +23,7 @@ body {
 #casePanel:nth-child(1) {
 	font-size: 28px;
 	font-family: "Brush Script MT";
-	color: white;
+	color: var(--main-fg-color);
 }
 
 #files {
@@ -34,23 +34,24 @@ body {
 #files button {
 	border-radius: 5px;
 	padding: 2px 4px 2px 4px;
-	background-color: white;
+	background-color: var(--main-fg-color);
+;
 	color: black;
 	margin: 0px;
 }
 
 #files button:hover {
 	background-color: var(--main-comp-color);
-	color: white;
+	color: var(--main-fg-color);
 }
 
 #titles {
 	font-family: var(--main-font-family);
+	font-size: 16px;
 	display: inline-block;
 	margin: 0px 10px 0 10px;
-	font-size: 16px;
 	font-weight: bold;
-	color: white;
+	color: var(--main-fg-color);
 	padding: 0px 5px 0 20px;
 }
 
@@ -82,7 +83,7 @@ body {
 	font-family: var(--main-font-family);
 	font-size: 16px;
 	font-weight: bold;
-	color: white;
+	color: var(--main-fg-color);
 	margin: 0 20px 0 10px;
 }
 
@@ -115,12 +116,12 @@ body {
 .phase button:hover {
 	border-radius: 5px;
 	background-color: var(--main-comp-color);
-	color: white;
+	color: var(--main-fg-color);
 }
 
 .phase button[selected] {
 	background-color: var(--main-comp-color);
-	color: white;
+	color: var(--main-fg-color);
 }
 .phaseStatus {
 	vertical-align: middle;
@@ -166,6 +167,23 @@ body {
 	cursor: pointer;
 }
 
+.submit {
+	position:absolute;
+	display: block;
+	left: 0px;
+	top: 500px;
+	width: 70%;
+	text-align: center;
+}
+
+.submit button {
+	border-radius: 5px;
+	padding: 2px 4px 2px 4px;
+	background-color: var(--main-comp-color);
+	color: black;
+	margin: 0px;
+}
+
 #toolWrapper {
 	width: 30%;
 	border-left: thick solid var(--main-bg-color);
@@ -181,13 +199,6 @@ body {
 	color: black;
 	border-bottom: 1px solid black;
 	white-space: nowrap;
-}
-
-.submit {
-	background-color: var(--main-bg-color);
-}
-#toolMenu img {
-	//padding: 4px;
 }
 
 .toolTab {
@@ -209,7 +220,7 @@ body {
 	font-family: var(--main-font-family);
 	background-color: var(--main-bg-color);
 	margin: 0 4px 0px 8px;
-	color: white;
+	color: var(--main-fg-color);
 	display: inline-block;
 	cursor: pointer;
 }
@@ -234,7 +245,7 @@ body {
 
 /* popup dialogs */
 .popupDialog {
-	font-size: 12px;
+	font-size: 14px;
 	font-family: var(--main-font-family);
 	padding: 8px;
 	color: black;
@@ -305,7 +316,22 @@ body {
 	left: 20px;
 }
 
-#fileMenu {
+#openFile {
 	left: 60%;
 	top: 5%;
+	width: 300px;
+}
+
+#saveFile {
+	left: 60%;
+	top: 5%;
+	width: 300px;
+}
+
+
+#drop_zone {
+  border: 2px dashed lightblue;
+  background-color: white;
+  width:  295px;
+  height: 120px;
 }
