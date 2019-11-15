@@ -52,7 +52,7 @@ function loadDocument(url) {
 function getCase(url,nphases) {
 	currentCase = JSON.parse(localStorage.getItem(url));
 	if (!currentCase) {
-		currentCase = getNewCase(file,nphases);
+		currentCase = getNewCase(url,nphases);
 		saveCase();
 	};
 	for (var i = 1; i < currentCase.phases.length; i++)
@@ -230,12 +230,17 @@ function dropHandler(e) {
 		} else if (file.type === "") {
 			currentFile = file;
 			getFileBlob(file, function(blob) {
-				var len = parseInt(blob.slice(0,3));
-				console.log(len);
-				var json = blob.slice(4,len+4);
-				var pdf = blob.slice(len+4,blob.length);
-				localStorage.setItem(currentFile.name,json);
-				loadDocument(pdf);
+				var view = new DataView(blob);
+				var len = view.getUint32(0);
+				var reader = new FileReader();
+				var fileName = file.name.split(".")[0];
+				reader.onload = function(e) {
+					localStorage.setItem(fileName+".pdf",reader.result);
+					reader.onload = function(e) {loadDocument(reader.result);};
+					var pdfData = new Blob([blob.slice(len+4)]);
+					reader.readAsDataURL(pdfData);
+				};
+				reader.readAsText(new Blob([blob.slice(4,len+4)]));
 			});
 			toggleMenu("hidden");
 		} else
@@ -250,11 +255,9 @@ function dragOverHandler(e) {
 	e.stopPropagation();	
 }
 
-var getFileBlob = function (file, cb) {
+const getFileBlob = function (file, cb) {
     var reader = new FileReader();
-    reader.onload = function(e) {
-        cb(reader.result);
-    }
+    reader.onload = function(e) { cb(reader.result);};
     reader.readAsArrayBuffer(file);
 };
 
@@ -269,12 +272,14 @@ function saveFile() {
 		showMenuError("A PDF file hasn't been opened.");
 		return;
 	};
-	var blob = getFileBlob(currentFile, function(blob) {
+	getFileBlob(currentFile, function(blob) {
 		var json = localStorage.getItem(currentCase.fileName);
-		var jlen = new String(json.length);
-	    var file = new Blob([jlen,json,blob],{type:"application/case"});
+		var lenBuffer = new ArrayBuffer(4);
+		var view = new DataView(lenBuffer);
+		view.setUint32(0,json.length);
+		var url = URL.createObjectURL(new Blob([lenBuffer,json,blob],{type: "application/case"}));
 	    var a = document.createElement("a");
-	    a.href = URL.createObjectURL(file);
+	    a.href = url;
 	    a.download = fileName;
 	    a.click();
 	    URL.revokeObjectURL(a.href);
