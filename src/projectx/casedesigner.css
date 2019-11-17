@@ -7,6 +7,8 @@
 
 body {
 	background-color: var(--main-fg-color);
+	width: 100%;
+	height: 100%;
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
@@ -18,16 +20,36 @@ body {
 	padding: 5px;
 	background-color: var(--main-bg-color);
 	text-align: center;
+	display: inline-block;
 }
 
-#casePanel:nth-child(1) {
+#roles {
+	margin: 5px;
+	padding: 2px;
+	float:left;
+	display: inline-block;
+}
+
+#roles span {
+	color: var(--main-fg-color);
+	background-color: var(--main-bg-color);
+}
+
+#roles select {
+	border-radius: 5px;
+	width: 100px;
+}
+
+#maintitle {
 	font-size: 28px;
 	font-family: "Brush Script MT";
 	color: var(--main-fg-color);
+	display: inline-block;
 }
 
 #files {
 	float: right;
+	display: inline-block;
 	margin-right: 20px;
 }
 
@@ -146,7 +168,7 @@ body {
 	overflow: auto;
 }
 
-#widgetPanel {
+#widgetBar {
 	position: relative;
 	left: 300px;
 	top: 0px;
@@ -156,6 +178,21 @@ body {
 	border-radius: 0 0 5px 5px;
 	background-color: var(--main-bg-color);
 	box-shadow: 2px 2px gray;
+}
+
+.configure-title {
+	margin: 2px;
+	font-weight: bold;
+	margin: 5px;
+	padding: 2px;
+}
+
+#basic-widgets, #licensed-widgets {
+	background-color: var(--main-fg-color);
+	border: 1px solid black;
+	margin: 10px;
+	padding: 2px;
+	border-radius: 5px;
 }
 
 .widgetOption {
@@ -245,6 +282,7 @@ body {
 
 /* popup dialogs */
 .popupDialog {
+	width: 300px;
 	font-size: 14px;
 	font-family: var(--main-font-family);
 	padding: 8px;
@@ -307,6 +345,12 @@ body {
 #listMenu input[type="text"] {
 	width: 80px;
 	margin: 4px;
+}
+
+#carryforward select {
+	width: 300px;
+	border-radius: 5px;
+	
 }
 
 #toolsDialog {

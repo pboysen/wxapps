@@ -15,6 +15,8 @@ var PAGE_TO_VIEW = 1;
 var DEFAULT_SCALE = 1.0;
 
 var pdfLinkService = new pdfjsViewer.PDFLinkService();
+const basicWidgetTypes = ["textfield","textarea","list","select","carryforward","media"];
+var jsonPrototypes = {};
 var phaseViews = [null];
 var currentPDF = null;
 var currentCase = null;
@@ -31,7 +33,13 @@ if (typeof(Storage) === "undefined") {
 	alert("Browser storage is not supported. Please use another browser.");
 };
 
+initJsonPrototypes();
+
 loadDocument(DEFAULT_URL);
+
+/***************************************************************************
+ * Cases and Phases functions
+*****************************************************************************/
 
 function loadDocument(url) {
 	phaseViews = [null];
@@ -77,8 +85,9 @@ function getNewCase(file,nphases) {
 	return {
 		"fileName": file.name,
 		"wid": 1,
+		"widgetbar": basicWidgetTypes,
 		"phases": phases
-	}
+	};
 }
 
 function saveCase() {
@@ -131,11 +140,13 @@ function loadPhase(phase) {
 	    };
 		var menuLayer = document.getElementById("menuLayer");
 	    pageView.appendChild(menuLayer.cloneNode(true));
-	    drawWidgets();
+	    drawPhaseWidgets(phase);
 	});	
 }
 
-function drawWidgets() {}
+function drawPhaseWidgets(phase) {
+	
+}
 
 // swap phase views 
 function showPhase(pindex) {
@@ -227,7 +238,7 @@ function dropHandler(e) {
 			currentFile = file;
 			loadDocument(file.name);			
 			toggleMenu("hidden");
-		} else if (file.type === "") {
+		} else if (file.type === "application/case" || file.name.endsWith(".case")) {
 			currentFile = file;
 			getFileBlob(file, function(blob) {
 				var view = new DataView(blob);
@@ -295,7 +306,19 @@ var menu = null;
 function toggleMenu(command) {
 	showMenuError("");
 	if (menu) menu.style.visibility = command;
-	if (command === "hidden") menu = null;
+	if (command === "visible") {
+		if (menu.getAttribute("onVisible")) {
+			switch (menu.id) {
+			case "carryforward":
+			case "textarea":
+				var select = menu.getElementsByClassName("cfSources").item(0);
+				getCFSources(select);
+				break;
+			default:
+			}
+		};
+	} else
+		menu = null;
 };
 
 function showMenuError(msg) {
@@ -384,11 +407,41 @@ function saveList() {
 /***************************************************************************
  * Widget functions
 *****************************************************************************/
-document.getElementById("widgetPanel").onmousedown = function(e) {
+function addPrototype(type,isSource,isTarget,isOptional,isDraggable) {
+	jsonPrototypes[type] = {
+		"type": type,
+		"id": 0,
+		"rect": null,
+		"value":"",
+		"optional": isOptional,
+		"isSource": isSource,
+		"isTarget": isTarget,
+		"isDraggable": isDraggable,
+		"sources":[],
+		"childIds":[]
+	};
+}
+
+function initJsonPrototypes() {
+	addPrototype("textfield",true,true,true,true);
+	addPrototype("textarea",true,true,true,true);
+	addPrototype("list",true,false,true,false);
+	addPrototype("select",true,false,true,true);
+	addPrototype("carryforward",false,true,false,true);
+	addPrototype("media",false,false,false,true);
+	addPrototype("radio",false,false,false,false);
+	addPrototype("checkbox",false,false,false,true);
+}
+
+function getNewJsonObject(type) { 
+	return JSON.parse(JSON.stringify(jsonPrototypes[type]))
+};
+
+document.getElementById("widgetBar").onmousedown = function(e) {
 	var type = e.target.title;
-	if (type === "list") {
+	if (type === "list" || type === "configure") {
 		menu = document.getElementById(type);
-		menu.style.left = e.pageX+"px";
+		menu.style.left = e.pageX-100+"px";
 	    menu.style.top = e.pageY+"px";		    		
 		toggleMenu("visible");
 	} else
@@ -467,31 +520,15 @@ function makeNewWidget(type,left,top) {
     var id = (currentCase.wid++).toString();
     widget.firstChild.innerHTML = "ID:"+id;
     widget.id = id;
-    currentCase.phases[currentPhase].widgets[id] = {
-    	"id": id,
-    	"type": type,
-    	"rect": widget.getBoundingClientRect(),
-    	"value":"",
-    	"childIds":[],
-    	"optional": false,    	
-    };
-	switch(type) {
-	case "diagnosticpath":
-		placeWidget(widget,0,0);
-    	break;
-	case "radio":
-	case "checkbox":
-    	placeWidget(widget,left,top);
-    	break;
-	case "multiplechoice":
-	case "checklist":
-		widget.style.left =left + "px";
-	    widget.style.top = top +'px';	
-		break;
- 	default:
+    var wrec = getNewJsonObject(type);
+    wrec.id = id;
+    wrec.rect = widget.getBoundingClientRect();
+    if (wrec.isDraggable)
     	placeWidget(widget,left+5,top+30);
-	};
-	alayer = document.getElementsByClassName("annotationLayer").item(0);
+    else
+    	placeWidget(widget,left,top);
+    currentCase.phases[currentPhase].widgets[id] = wrec;
+    alayer = document.getElementsByClassName("annotationLayer").item(0);
     alayer.appendChild(widget);
     return widget;
 }
@@ -537,10 +574,10 @@ function deleteWidget(widget) {
 	widget.parentNode.removeChild(widget);
 }
 
-function placeWidget(widget,pageX,pageY) {
+function placeWidget(widget,left,top) {
 	let view = phaseViews[currentPhase];
-	widget.style.left = pageX+"px";
-    widget.style.top = (pageY+view.scrollTop-view.offsetTop) +'px';	
+	widget.style.left = left+"px";
+    widget.style.top = view?(top+view.scrollTop-view.offsetTop) +'px':left+"px";	
 }
 
 function setDraggable(widget) {  
@@ -574,16 +611,34 @@ function setDraggable(widget) {
   };  
 }
 
+function getCFSources(select) {
+	var nullOption = select.firstElementChild;
+	select.innerHTML = '';
+	select.add(nullOption);
+	for (var i = 1; i < currentPhase; i++) {
+		for (var id in currentCase.phases[i].widgets) {
+			var widget = currentCase.phases[i].widgets[id];
+			if (widget.isSource) {
+				var option = document.createElement("option");
+				option.text = "ID "+widget.id + ". " + widget.type + " in "+currentCase.phases[i].title;
+				option.value = widget.id;
+				select.add(option);
+			};
+		};
+	};
+}
+
 function saveTextfield() {
-	// save data
-	var size = document.getElementById("textwidth").value;
-	currentWidget.firstElementChild.size = size;
-	// optional
+	var input = currentWidget.getElementsByTagName("input")[0];
+	input.size = document.getElementById("textwidth").value;
+	input.setAttribute("optional",menu.getElementsByClassName("isoptional")[0].checked);
+	console.log(input);
 	toggleMenu("hidden");
 }
 
 function saveTextarea() {
 	var r = currentWidget.firstElementChild.getBoundingClientRect();
+	currentWidget.firstElementChild.size = size;
 	//optional
 	toggleMenu("hidden");	
 }

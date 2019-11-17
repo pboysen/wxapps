@@ -4,8 +4,12 @@
 	padding-top:16px;
 	padding-bottom:16px;
 	margin: 0;
-   	background-position: 95% 0%;
+   	background-position: 100% 0%;
    	background-repeat: no-repeat;
+}
+
+.widget:hover {
+	background-image: url("assets/widget.png");	
 }
 
 .widget span:first-child {
@@ -14,12 +18,16 @@
 	left: 0px;
 	font-size: 14px;
 }
+
 .widget[widgettype="textfield"] {
 }
 
-.widget[widgettype="textfield"]:hover {
-   	background-image: url("assets/widget.png");
+.widget input::before {
+	content: "optional";
+	color: red;
+	font-size: 12px;
 }
+
 
 .widget[widgettype="textarea"] {
 	rows: 4;
@@ -27,16 +35,8 @@
   	overflow: auto;
 }
 
-.widget[widgettype="textarea"]:hover {
-    background-image: url("assets/widget.png");
-}
-
 .widget[widgettype="select"] select {
 	pointer-events: none;
-}
-
-.widget[widgettype="select"]:hover {
-   	background-image: url("assets/widget.png");
 }
 
 .widget[widgettype="carryforward"] {
@@ -50,10 +50,6 @@
   	overflow: auto;	
 	border: 1px dashed black;
 }
-.widget[widgettype="carryforward"]:hover {
-   	background-image: url("assets/widget.png");
-}
-
 
 .media {
   	border: 1px solid black;
@@ -61,28 +57,27 @@
 
 .widget[widgettype="media"] div {
 	background-color: white;
+	resize: both;
+	overflow: auto;
 }
-
-.widget[widgettype="media"]:hover {
-   	background-image: url("assets/widget.png");
- }
 
 .widget iframe {
 	width: 100%;
 	height: 100%;
-	resize: both;
-	overflow: auto;
 	pointer-events: none;
 }
 .widget[widgettype="diagnosticpath"] {
-	width: 50%;
+	width: 98%;
 	height: 800px;
 	background-color: white;
-	opacity: 1;
+	opacity: 0.7;
+	border:1px dashed black;
+	margin:5px;
 }
 
 .widget[widgettype="diagnosticpath"]:hover {
-   	background-image: url("assets/widget.png");
+   	background-position: 100% 11%;
+	background-image: url("assets/widget-nocopy.png");	
 }
 
 .widget[widgettype="multiplechoice"] {

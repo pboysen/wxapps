@@ -28,7 +28,14 @@ limitations under the License.
 </head>
 <body tabindex="-1">
 	<div id="casePanel">
-		<span>ProjectX Case Designer</span>
+		<div id="roles">
+			<span>Role: </span>
+			<select id="role">
+				<option>Designer</option>
+				<option>Student</option>
+			</select>
+		</div>
+		<span id="maintitle">ProjectX Case Designer</span>
 		<div id="files">
 			<button onClick="fileUpload(event);"><img src="assets/fileupload.png"/></button>
 			<button onClick="fileDownload(event)"><img src="assets/filedownload.png"/></button>
@@ -41,14 +48,14 @@ limitations under the License.
 		<div id="viewerWrapper">
 			<div id="viewerContainer">
 			</div>
-			<div id="widgetPanel">
+			<div id="widgetBar">
 				<img class="widgetOption" src="assets/textfield.png" title="textfield" alt="" />
 				<img class="widgetOption" src="assets/textarea.png" title="textarea" alt="" />
 				<img class="widgetOption" src="assets/choice.png" title="list" alt="" />
 				<img class="widgetOption" src="assets/select.png" title="select" alt="" />
 				<img class="widgetOption" src="assets/cforward.png" title="carryforward" alt="" />
 				<img class="widgetOption" src="assets/media.png" title="media" alt="" />
-				<img class="widgetOption" src="assets/diagpath.png" title="diagnosticpath" alt="" />
+				<img class="widgetOption" src="assets/phaseprops.png" title="configure" alt="" />
 			</div>
  			<div id="submitButton" class="submit"><button onClick=submit()>Submit</button></div>
 		</div>
@@ -113,6 +120,31 @@ limitations under the License.
 		</div>
 	</div>
 	<div id="menuLayer">
+		<div id="configure" class="popupDialog">
+			<div class="title">Configure Widgetbar</div>
+			<div class="instructions">
+				<p>Select the widgets you want on the Widgetbar.<br/>
+				</p>
+			</div>
+			<span class="configure-title">Basic Widgets</span><br/>
+			<div id="basic-widgets">
+				<span></span><input type="checkbox" id="widgetbar-textfield"> Textfield</span>
+				<span><input type="checkbox" id="widgetbar-textarea"> Textarea</span>
+				<span><input type="checkbox" id="widgetbar-list"> List</span><br/>
+				<span><input type="checkbox" id="widgetbar-select"> Select</span>
+				<span><input type="checkbox" id="widgetbar-carryforward"> Carryforward</span>
+				<span><input type="checkbox" id="widgetbar-media"> Media</span><br/>
+			</div>
+			<span class="configure-title">Licensed Widgets</span><br/>
+			<div id="licensed-widgets">
+				<span><input type="checkbox" id="widgetbar-diagnosticpath"> Diagnostic Path</span>
+			</div>
+			<div class="error"></div>
+			<div class="buttonBar">
+				<button onClick=saveWidgetBar()>Save</button>
+				<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
+			</div>
+		</div>
 		<div id="phaseMenu" class="popupDialog">
 			<div class="title">Phase Properties</div>
 			<div class="instructions">
@@ -159,7 +191,7 @@ limitations under the License.
 				<option value="40">40</option>
 				<option value="80">80</option>
 			</select><br/><br/>
-			<input type="checkbox" name="optional"> Optional<br/>
+			<input type="checkbox" class="isoptional"> Optional<br/>
 			<div class="optional">
 				<span>Optional</span>
 				<p>If you don't want the student to<br/>
@@ -184,6 +216,9 @@ limitations under the License.
 				</p>
 			</div>
 			<input type="checkbox" name="optional"> Optional<br/>
+			<select id="carryForwardSource">
+				<option disabled="disabled" selected="selected">Select a widget.</option>
+			</select>
 			<div class="error"></div>
 			<div class="buttonBar">
 				<button onClick=saveTextarea()>Save</button>
@@ -208,13 +243,13 @@ limitations under the License.
 				<button type="button" onClick=toggleMenu("hidden") title="Cancel">Cancel</button>
 			</div>
 		</div>
-		<div id="carryforward" class="popupDialog">
+		<div id="carryforward" class="popupDialog" onVisible="true">
 			<div class="title">Carry-forward Properties</div>
 			<div class="instructions">
-				<p>Select a widget from a previous phase.<br/>
+				<p>Select source widgets from a previous phases.<br/>
 				It's value will be displayed here.</p>
 			</div>
-			<select id="carryForwardSource">
+			<select class="cfSources" multiple="true">
 				<option disabled="disabled" selected="selected">Select a widget.</option>
 			</select>
 			<div class="error">Select one.</div>
