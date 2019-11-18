@@ -296,6 +296,10 @@ body {
 	position: absolute;
 }
 
+.popupDialog p {
+	white-space: normal;
+}
+
 .popupDialog .title {
 	font-weight: bold;
 	font-color: black;
@@ -303,7 +307,7 @@ body {
 }
 
 .popupDialog .instructions {
-	width: 200px;
+	width: 300px;
 }
 
 .popupDialog .error {
@@ -347,10 +351,17 @@ body {
 	margin: 4px;
 }
 
-#carryforward select {
+.cfSources {
 	width: 300px;
 	border-radius: 5px;
-	
+	overflow: auto;
+}
+
+.cfSources option:disabled {
+	font-weight: bold;
+	color: black;
+	text-align: center;
+	border-bottom: 1px solid lightgray;	
 }
 
 #toolsDialog {

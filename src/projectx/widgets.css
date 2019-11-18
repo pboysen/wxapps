@@ -22,12 +22,6 @@
 .widget[widgettype="textfield"] {
 }
 
-.widget input::before {
-	content: "optional";
-	color: red;
-	font-size: 12px;
-}
-
 
 .widget[widgettype="textarea"] {
 	rows: 4;

@@ -396,7 +396,7 @@ function saveList() {
 			changeListType(listType);
 	} else
 		currentWidget = makeList(listType);
-	// pick up optional
+	// pick up required
 	saveCase();				
 	bullet = null;
 	currentWidget = null;
@@ -407,13 +407,13 @@ function saveList() {
 /***************************************************************************
  * Widget functions
 *****************************************************************************/
-function addPrototype(type,isSource,isTarget,isOptional,isDraggable) {
+function addPrototype(type,isSource,isTarget,isRequired,isDraggable) {
 	jsonPrototypes[type] = {
 		"type": type,
 		"id": 0,
 		"rect": null,
 		"value":"",
-		"optional": isOptional,
+		"required": isRequired,
 		"isSource": isSource,
 		"isTarget": isTarget,
 		"isDraggable": isDraggable,
@@ -612,19 +612,33 @@ function setDraggable(widget) {
 }
 
 function getCFSources(select) {
-	var nullOption = select.firstElementChild;
 	select.innerHTML = '';
-	select.add(nullOption);
 	for (var i = 1; i < currentPhase; i++) {
+		var option = document.createElement("option");
+		option.text = currentCase.phases[i].title;
+		option.disabled = "disabled";
+		option.value = 0;
+		select.add(option);
 		for (var id in currentCase.phases[i].widgets) {
 			var widget = currentCase.phases[i].widgets[id];
 			if (widget.isSource) {
-				var option = document.createElement("option");
-				option.text = "ID "+widget.id + ". " + widget.type + " in "+currentCase.phases[i].title;
+				option = document.createElement("option");
+				option.text = widget.id+": " + widget.type;
 				option.value = widget.id;
 				select.add(option);
 			};
 		};
+	};
+}
+
+function showCFOrder(select) {
+	var order = document.getElementById("cfOrder");
+	order.value = "";
+	for (var i = 0; i < select.options.length; i++) {
+		if (select.options[i].selected) {
+			var id = select.options[i].value.split(":")[0];
+			order.value += (order.value =="")?id:(";"+id);
+		}
 	};
 }
 
