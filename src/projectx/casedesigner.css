@@ -114,18 +114,17 @@ body {
 	font-size: 12px;
 	font-family: var(--main-font-family);
 	display: inline-block;
-	margin: 0 16px 0px 5px;
+	margin: 0 5px 0px 5px;
 	white-space: nowrap;
-	padding-right: 16px;
+	padding-left: 16px;
 	
 }
 
 .phase:hover {
    	background-image: url("assets/phaseprops.png");
-   	background-position: 95% 0%;
+   	background-position: 0px 4px;
    	background-repeat: no-repeat;
 }
-
 
 .phase button {
 	border-radius: 5px;

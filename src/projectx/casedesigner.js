@@ -94,6 +94,9 @@ function saveCase() {
 	localStorage.setItem(currentCase.fileName, JSON.stringify(currentCase));
 }
 		
+function roleChange(role) {
+	console.log(role);
+}
 
 function getNewView() {
 	var view = document.createElement("div");
@@ -176,7 +179,7 @@ function fillPhasePanel() {
 		button.value = i;
 		item.onclick = function(e) {
 	 	 	var r = this.getBoundingClientRect();
-			if (e.pageX  > (r.right-16)) {
+			if (e.pageX  < (r.left+16)) {
 				menu = document.getElementById("phaseMenu");
 				document.getElementById("phaseTitle").value = this.firstElementChild.innerHTML;
 				document.getElementById("submitTitle").value = document.getElementById("submitButton").firstElementChild.innerHTML;

@@ -30,7 +30,7 @@ limitations under the License.
 	<div id="casePanel">
 		<div id="roles">
 			<span>Role: </span>
-			<select id="role">
+			<select id="role" onChange="roleChange(this.options[this.selectedIndex].text)">
 				<option>Designer</option>
 				<option>Student</option>
 			</select>
