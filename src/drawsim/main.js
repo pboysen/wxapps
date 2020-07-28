@@ -5,7 +5,6 @@ let store = getStore(), searchParams = new URLSearchParams(window.location.searc
  
 let image = searchParams.get('img')
 if (!image) image = prompt("Enter image url:","")
-let transform = searchParams.get('transform') || "false"
 let edit = searchParams.get('mode') == "edit"
 let scale = searchParams.get('scale') || 1.0
 let tool = searchParams.get('tool') || "pressure"
@@ -738,6 +737,32 @@ class Field {
 	}
 }
 
+class Transform {
+	constructor(back,drawsim) {
+		createjs.Ticker.framerate = 5
+		this.back = back
+		if (edit) {
+			document.getElementById("transform").style.visibility="visible";
+			document.getElementById("rotate").addEventListener("click", e => this.rotate(back, e));
+			document.getElementById("fliph").addEventListener("click", e => this.flipH(back, e));
+			document.getElementById("flipv").addEventListener("click", e => this.flipV(back, e));
+		}
+	}
+	rotate(img, e) {
+		img.rotation += 90;
+	}
+	
+	flipH(img, e) {
+		img.scaleX = img.scaleX == 1 ? -1 : 1;
+	}
+
+	flipV(img, e) {
+		img.scaleY = img.scaleY == 1 ? -1 : 1;
+	}
+
+	
+}
+
 class Toolbar extends createjs.Container {
 	constructor(tool,drawsim) {
 		super()
@@ -792,17 +817,16 @@ class DrawSim {
 		createjs.Touch.enable(this.mainstage)
 		let back = new createjs.Bitmap(image)
 		back.image.onload = function() {
-			drawsim.resize(back)
-			drawsim.mainstage.update();
+			let bnd = back.getBounds()
+			drawsim.mainstage.canvas.width = bnd.width + 40
+			drawsim.mainstage.canvas.height = bnd.height + 40
+			back.x = bnd.width / 2 + 20
+			back.y = bnd.width / 2 + 20
+		    back.regX = bnd.width / 2;
+		    back.regY = bnd.height / 2;
 		}
 		this.mainstage.addChild(back)
 		this.showSymbols()
-		if (transform == "true") {
-			document.getElementById("transform").style.visibility="visible";
-			document.getElementById("rotate").addEventListener("click", e => drawsim.rotate(back, e));
-			document.getElementById("fliph").addEventListener("click", e => drawsim.flipH(back, e));
-			document.getElementById("flipv").addEventListener("click", e => drawsim.flipV(back, e));
-		}
 		if (edit) {
 			this.mainstage.enableMouseOver()
 			//let inst = document.getElementById("instruct")
@@ -837,12 +861,11 @@ class DrawSim {
 				this.field = new Field(back,this)
 				//inst.innerHTML = this.field.getInst()
 				break
-			case "mindmap":
-				this.field = new Field(back,this)
-				//inst.innerHTML = this.field.getInst()
+			case "transform":
+				this.field = new Transform(back,this)
 				break
 			default: {
-					alert("Parameter tool should be pressure, airmass, isopleth, line, ellipse or field")
+					alert("Parameter tool should be pressure, airmass, isopleth, line, ellipse, field or transform")
 				}
 			}
 		}
@@ -858,29 +881,6 @@ class DrawSim {
 		})
 	}
 	
-	resize(back) {
-		let bnd = back.getBounds()
-		this.mainstage.canvas.width = bnd.width + 40
-		this.mainstage.canvas.height = bnd.height + 40
-		back.x = bnd.width / 2 + 20
-		back.y = bnd.width / 2 + 20
-	    back.regX = bnd.width / 2;
-	    back.regY = bnd.height / 2;
-	}
-	
-	rotate(img, e) {
-		img.rotation += 90;
-		console.log(img.rotation);
-	}
-	
-	flipH(img, e) {
-		img.scaleX = img.scaleX == 1 ? -1 : 1;
-	}
-
-	flipV(img, e) {
-		img.scaleY = img.scaleY == 1 ? -1 : 1;
-	}
-
 	showSymbols() {
 		let symbols = getSymbols()
 		symbols.forEach(json => {
