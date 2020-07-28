@@ -5,6 +5,7 @@ let store = getStore(), searchParams = new URLSearchParams(window.location.searc
  
 let image = searchParams.get('img')
 if (!image) image = prompt("Enter image url:","")
+let transform = searchParams.get('transform') || "false"
 let edit = searchParams.get('mode') == "edit"
 let scale = searchParams.get('scale') || 1.0
 let tool = searchParams.get('tool') || "pressure"
@@ -35,6 +36,37 @@ function dist(p1,p2) {
 
 function angle(p1, p2) {
     return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+}
+
+function componentToHex(c) {
+	  var hex = c.toString(16);
+	  return hex.length == 1 ? "0" + hex : hex;
+	}
+
+function rgbToHex(r, g, b) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function getMid(start, end) {
+	let mid = Math.abs((end - start) / 2);
+	return (start < end) ? start + mid : end + mid;
+}
+
+var descIsOpen = false;
+
+function getDesc(pt, json, cb) {
+	descIsOpen = true;
+	var editor = document.getElementById("editor");
+	editor.style.left = pt.x + "px";
+	editor.style.top = pt.y + "px";
+	editor.style.visibility = "visible";
+	document.getElementById("desc_editor").value = json.desc;
+	document.getElementById("save").addEventListener('click',function () {
+		descIsOpen = false;
+		json.desc = document.getElementById("desc_editor").value;
+		editor.style.visibility = "hidden";
+		cb();
+	});
 }
 
 function getSymbols() {
@@ -600,15 +632,16 @@ class Field {
 	static showSymbol(stage,json) {
 		let pts = json.pts
 		let shape = new createjs.Shape()
-	    shape.graphics.beginStroke("#000")
 	    if (pts.length == 0) return
 		let oldX = pts[0].x
 		let oldY = pts[0].y
 		let oldMidX = oldX
 		let oldMidY = oldY
+		this.color = json.color;
+	    shape.graphics.beginStroke(this.color);
 	    json.pts.forEach(pt => {
 			let midPoint = new createjs.Point(oldX + pt.x >> 1, oldY+pt.y >> 1)
-	        shape.graphics.setStrokeStyle(2).moveTo(midPoint.x, midPoint.y)
+	        shape.graphics.setStrokeStyle(4).moveTo(midPoint.x, midPoint.y)
 	        shape.graphics.curveTo(oldX, oldY, oldMidX, oldMidY)
 	        oldX = pt.x
 	        oldY = pt.y
@@ -617,19 +650,26 @@ class Field {
 	    })
 		let path = new createjs.Container()
 		path.addChild(shape)
-	    if (opt == 'head' && pts.length > 4) {
-	    	let lastpt = pts[pts.length-4]
+	    if ((opt == 'head' || opt == "colorhead") && pts.length > 4) {
+	    	let lastpt = pts[pts.length-6]
 	    	let endpt = pts[pts.length-3]
 	    	let head = new createjs.Shape()
-		    head.graphics.f("#000").setStrokeStyle(2).beginStroke("#000").mt(4,0).lt(-4,-4).lt(-4,4).lt(4,0)
+		    head.graphics.f(this.color).setStrokeStyle(4).beginStroke(this.color).mt(4,0).lt(-4,-4).lt(-4,4).lt(4,0)
 		    head.x = endpt.x
 		    head.y = endpt.y
 		    head.rotation = angle(lastpt,endpt)
 		    path.addChild(head)
-			let name = new createjs.Text(json.name,"14px Arial","#000"), mid = Math.trunc(pts.length/2)
-	    	name.x = pts[mid].x
-	    	name.y = pts[mid].y
-	    	path.addChild(name)
+			let desc = new createjs.Text(json.desc,"14px Arial","#000")
+	    	let mid = Math.trunc(pts.length/2)
+	    	desc.x = json.pts[mid].x
+	    	desc.y = json.pts[mid].y
+	        var rect = new createjs.Shape();
+	    	rect.graphics.beginFill("white");
+            rect.graphics.drawRect(desc.x, desc.y, desc.getMeasuredWidth(), desc.getMeasuredHeight());
+            rect.graphics.endFill();
+            rect.alpha = 0.9;
+            path.addChild(rect);
+	    	path.addChild(desc);
 	    }
     	path.cursor = "not-allowed"
 		path.addEventListener("click", e => {
@@ -653,19 +693,25 @@ class Field {
 		this.w = 1
 		drawsim.mainstage.addEventListener("stagemousedown", e => {
 			this.currentShape = new createjs.Shape()
-		    this.currentShape.graphics.beginStroke("#000")
-			drawsim.mainstage.addChild(this.currentShape)
 		    this.oldX = this.oldMidX = e.stageX
 		    this.oldY = this.oldMidY = e.stageY
 			this.mouseDown = true
 			this.pts = []
+			this.color = "#000"
+			if (opt == "colorhead") {
+				var ctx = document.getElementById("maincanvas").getContext("2d")
+			    var data = ctx.getImageData(this.oldX, this.oldY, 1, 1).data
+			    this.color = rgbToHex(data[0], data[1], data[2])
+			}
+		    this.currentShape.graphics.beginStroke(this.color)
+			drawsim.mainstage.addChild(this.currentShape)
 		})
 		drawsim.mainstage.addEventListener("stagemousemove", e => {
 			if (this.mouseDown == false) return
 	        this.pt = new createjs.Point(e.stageX, e.stageY)
 			this.pts = this.pts.concat({x:e.stageX,y:e.stageY})
 			let midPoint = new createjs.Point(this.oldX + this.pt.x >> 1, this.oldY+this.pt.y >> 1)
-	        this.currentShape.graphics.setStrokeStyle(opt?3:2).moveTo(midPoint.x, midPoint.y)
+	        this.currentShape.graphics.setStrokeStyle(4).moveTo(midPoint.x, midPoint.y)
 	        this.currentShape.graphics.curveTo(this.oldX, this.oldY, this.oldMidX, this.oldMidY)
 	        this.oldX = this.pt.x
 	        this.oldY = this.pt.y
@@ -676,12 +722,14 @@ class Field {
 			this.mouseDown = false
 			if (this.pts.length == 0) return
 			drawsim.mainstage.removeChild(this.currentShape)
-			let symbol = {type:"field", pts: this.pts}
-		    if (opt == 'head' && this.pts.length > 4) {
-		    	symbol.name = prompt("Name the Process:","")
+			let symbol = {type:"field", pts: this.pts, color: this.color, desc: ""}
+			Field.showSymbol(drawsim.mainstage, symbol)
+		    if ((opt == 'head' || opt == "colorhead") && this.pts.length > 4) {
+		    	symbol.desc = getDesc(this.pts[Math.trunc(this.pts.length/2)], symbol, function() {
+					Field.showSymbol(drawsim.mainstage, symbol)
+					addSymbol(symbol)		    		
+		    	});
 		    }
-			Field.showSymbol(drawsim.mainstage,symbol,this.w,this.color)
-			addSymbol(symbol)
 		})
 	}
 	
@@ -745,42 +793,53 @@ class DrawSim {
 		let back = new createjs.Bitmap(image)
 		back.image.onload = function() {
 			drawsim.resize(back)
+			drawsim.mainstage.update();
 		}
 		this.mainstage.addChild(back)
 		this.showSymbols()
+		if (transform == "true") {
+			document.getElementById("transform").style.visibility="visible";
+			document.getElementById("rotate").addEventListener("click", e => drawsim.rotate(back, e));
+			document.getElementById("fliph").addEventListener("click", e => drawsim.flipH(back, e));
+			document.getElementById("flipv").addEventListener("click", e => drawsim.flipV(back, e));
+		}
 		if (edit) {
 			this.mainstage.enableMouseOver()
-			let inst = document.getElementById("instruct")
+			//let inst = document.getElementById("instruct")
 			switch (tool) {
 			case "pressure":
 				let pressures = new Pressures(2,this)
 				this.toolbar = new Toolbar(pressures,this)
-				inst.innerHTML = pressures.getInst()
+				//inst.innerHTML = pressures.getInst()
 				back.addEventListener("mousedown", e => this.toolbar.show(e))
 				this.mainstage.addChild(this.toolbar)
 				break
 			case "airmass":
 				let airmasses = new Airmasses(2,this)
 				this.toolbar = new Toolbar(airmasses,this)
-				inst.innerHTML = airmasses.getInst()
+				//inst.innerHTML = airmasses.getInst()
 				back.addEventListener("mousedown", e => this.toolbar.show(e))
 				this.mainstage.addChild(this.toolbar)
 				break
 			case "isopleth":
 				this.isopleth = new IsoPleth(back,this)
-				inst.innerHTML = this.isopleth.getInst()
+				//inst.innerHTML = this.isopleth.getInst()
 				break
 			case "line":
 				this.line = new Line(back,this)
-				inst.innerHTML = this.line.getInst()
+				//inst.innerHTML = this.line.getInst()
 				break
 			case "ellipse":
 				this.ellipse = new Ellipse(back,this)
-				inst.innerHTML = this.ellipse.getInst()
+				//inst.innerHTML = this.ellipse.getInst()
 				break
 			case "field":
 				this.field = new Field(back,this)
-				inst.innerHTML = this.field.getInst()
+				//inst.innerHTML = this.field.getInst()
+				break
+			case "mindmap":
+				this.field = new Field(back,this)
+				//inst.innerHTML = this.field.getInst()
 				break
 			default: {
 					alert("Parameter tool should be pressure, airmass, isopleth, line, ellipse or field")
@@ -799,14 +858,29 @@ class DrawSim {
 		})
 	}
 	
-	resize(img) {
-		let bnd = img.getBounds()
+	resize(back) {
+		let bnd = back.getBounds()
 		this.mainstage.canvas.width = bnd.width + 40
 		this.mainstage.canvas.height = bnd.height + 40
-		img.x = 20
-		img.y = 25
+		back.x = bnd.width / 2 + 20
+		back.y = bnd.width / 2 + 20
+	    back.regX = bnd.width / 2;
+	    back.regY = bnd.height / 2;
 	}
 	
+	rotate(img, e) {
+		img.rotation += 90;
+		console.log(img.rotation);
+	}
+	
+	flipH(img, e) {
+		img.scaleX = img.scaleX == 1 ? -1 : 1;
+	}
+
+	flipV(img, e) {
+		img.scaleY = img.scaleY == 1 ? -1 : 1;
+	}
+
 	showSymbols() {
 		let symbols = getSymbols()
 		symbols.forEach(json => {

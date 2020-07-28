@@ -4,28 +4,20 @@
 	<target name="init" depends="clean">
 	</target>
 
-	<target name="compile" depends="init">
-		<copy todir="c:/Users/pboysen/git/projectx/projectx">
-		    <fileset dir="src/projectx">
-		        <include name="assets"/>
-		        <include name="**/*.css"/>
-		        <include name="**/*.js"/>
-		        <include name="**/*.html"/>
-		        <include name="**/*.pdf"/>
+	<target name="copy" depends="init">
+		<copy todir="c:/Users/pboysen/node/public">
+		    <fileset dir="src/drawsim">
+		        <include name="index.html"/>		    	
+		        <include name="main.js"/>
+		        <include name="assets/*"/>
 		    </fileset>
 		</copy>
 	</target>
 	
 	<target name="execute">
-		<copy todir="c:/Users/pboysen/node/public">
-		    <fileset dir="src/projectx">
-		        <include name="assets"/>
-		        <include name="**/*.css"/>
-		        <include name="**/*.js"/>
-		        <include name="**/*.html"/>
-		        <include name="Designer Help.pdf"/>
-		    </fileset>
-		</copy>			
+		<exec executable="C:\Program Files\nodejs\npm.cmd">
+		    <arg line="run drawsim"/>
+		</exec>
 	</target>
 
 	<target name="clean">

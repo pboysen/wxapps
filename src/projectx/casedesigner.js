@@ -581,15 +581,12 @@ function deleteWidget(widget) {
 }
 
 function placeWidget(widget,left,top) {
-	//+view.scrollTop-view.offsetTop
-	let view = phaseViews[currentPhase];
 	widget.style.left = left+"px";
     widget.style.top = top+"px";	
 }
 
 function setDraggable(widget) {  
   widget.onmousedown = function(e) {
-	  //widget.style.position = 'absolute';
 	  var left = widget.offsetLeft;
 	  var top = widget.offsetTop;
 	  var width = widget.offsetWidth;

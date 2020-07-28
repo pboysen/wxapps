@@ -36,6 +36,7 @@ body {
 }
 
 #roles select {
+	float: left;
 	border-radius: 5px;
 	width: 100px;
 }
@@ -99,6 +100,7 @@ body {
 	white-space: nowrap;
 	cursor: pointer;
 	overflow-x: scroll;
+	vertical-align: middle;
 }
 
 #phasePanel span {
@@ -168,15 +170,15 @@ body {
 }
 
 #widgetBar {
-	position: relative;
-	left: 300px;
-	top: 0px;
-	padding: 0 2px 4px 2px;
-	height: 22px;
-	z-index: 10;
-	border-radius: 0 0 5px 5px;
-	background-color: var(--main-bg-color);
-	box-shadow: 2px 2px gray;
+position: relative;
+left: 300px;
+top: 0px;
+padding: 0 2px 4px 2px;
+height: 22px;
+z-index: 10;
+border-radius: 0 0 5px 5px;
+background-color: var(--main-bg-color);
+box-shadow: 2px 2px gray;
 }
 
 .configure-title {
