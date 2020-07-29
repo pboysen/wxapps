@@ -730,7 +730,7 @@ class Field {
 		    	});
 		    }
 		})
-	}
+	} 
 	
 	getInst() {
 		return opt?"<p>Press and drag mouse to draw a line. Release when done. Click on line when red cursor appears to delete.":"<p>Join horizontal field lines on left and right by drawing over top of image. Lines should not cross. <br/>Click on line when red cursor appears to delete.</p>"

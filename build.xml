@@ -1,5 +1,5 @@
 <?xml version="1.0" ?> 
-<project name="Case Designer" default="execute">
+<project name="Case Designer" default="build">
 
 	<target name="init" depends="clean">
 	</target>
@@ -8,20 +8,19 @@
 		<copy todir="c:/Users/pboysen/node/public">
 		    <fileset dir="src/drawsim">
 		        <include name="index.html"/>		    	
-		        <include name="main.js"/>
 		        <include name="assets/*"/>
 		    </fileset>
 		</copy>
 	</target>
 	
-	<target name="execute">
+	<target name="build">
 		<exec executable="C:\Program Files\nodejs\npm.cmd">
-		    <arg line="run drawsim"/>
+		    <arg line="build drawsim"/>
 		</exec>
 	</target>
 
 	<target name="clean">
 		<delete dir="build" />
 	</target>
-	
+ 	
 </project>
