@@ -758,9 +758,7 @@ class Transform {
 
 	flipV(img, e) {
 		img.scaleY = img.scaleY == 1 ? -1 : 1;
-	}
-
-	
+	}	
 }
 
 class Toolbar extends createjs.Container {
