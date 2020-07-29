@@ -11,7 +11,8 @@
     "blint": "^0.4.0",
     "watchify": "^3.2.0",
     "xmldom": "^0.1.0",
-	"lodash": ">=4.17.19"
+	"lodash": ">=4.17.19",
+	"braces": ">=2.3.1"
   },
   "scripts": {
     "drawsim": "watchify src/drawsim/main.js -t babelify -d -v -o ../../node/public/main-built.js"
