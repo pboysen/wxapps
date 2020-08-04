@@ -1,14 +1,14 @@
-import {getStore} from "../utils"   
-import {Url} from "url" 
+var getStore = require('../utils')   
+var Url = require('url') 
  
 let store = getStore(), searchParams = new URLSearchParams(window.location.search.substring(1))
- 
+
 let image = searchParams.get('img')
 if (!image) image = prompt("Enter image url:","")
+let back = new createjs.Bitmap(image)
 let edit = searchParams.get('mode') == "edit"
 let scale = searchParams.get('scale') || 1.0
 let tool = searchParams.get('tool') || "pressure"
-let ex = searchParams.get('ex') || ""
 let width = searchParams.get('w') || 20
 let height = searchParams.get('h') || 20
 let opt = searchParams.get('opt') || "all"
@@ -46,104 +46,92 @@ function rgbToHex(r, g, b) {
   return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
-function getMid(start, end) {
-	let mid = Math.abs((end - start) / 2);
-	return (start < end) ? start + mid : end + mid;
+var saveparms = [];
+
+document.getElementById("save").addEventListener('click', e => {
+	e.stopPropagation()
+	let [symbol, cb] = saveparms
+	let desc_editor = document.getElementById("desc_editor")
+	removeSymbol(symbol)
+	symbol.desc = desc_editor.value
+	addSymbol(symbol)
+	editor.style.visibility = "hidden"
+	cb(true)
+});
+document.getElementById("delete").addEventListener('click', e => {
+	e.stopPropagation()
+	let [symbol, cb] = saveparms
+	removeSymbol(symbol)
+	editor.style.visibility = "hidden"
+	cb(false)
+});
+
+
+function getDesc(pt, symbol, cb) {
+	let editor = document.getElementById("editor")
+	let desc_editor = document.getElementById("desc_editor")
+	let canvas = document.getElementById("maincanvas")
+	desc_editor.value = symbol.desc
+	editor.style.left = (pt[0] + canvas.offsetLeft) + "px"
+	editor.style.top = (pt[1] + canvas.offsetTop) + "px"
+	editor.style.visibility = "visible"
+	editor.focus()
+	saveparms = [symbol, cb]
 }
 
-var descIsOpen = false;
+function getMid(pts) {
+	let [start, end] = [pts[0], pts[pts.length - 1]]
+	let [midx, midy] = [0, 0]
+	if (start.x < end.x) midx = start.x + (end.x - start.x) / 2 - 20;
+	else midx = end.x + (start.x - end.x) / 2 - 20; 
+	if (start.y < end.y) midy = start.y + (end.y - start.y) / 2;
+	else midy = end.y + (start.y - end.y) / 2;
+	return [midx, midy];
+}
 
-function getDesc(pt, json, cb) {
-	descIsOpen = true;
-	var editor = document.getElementById("editor");
-	editor.style.left = pt.x + "px";
-	editor.style.top = pt.y + "px";
-	editor.style.visibility = "visible";
-	document.getElementById("desc_editor").value = json.desc;
-	document.getElementById("save").addEventListener('click',function () {
-		descIsOpen = false;
-		json.desc = document.getElementById("desc_editor").value;
-		editor.style.visibility = "hidden";
-		cb();
-	});
+function addLabel(path, mid, symbol, cb) {
+	let desc = new createjs.Text(symbol.desc,"14px Arial","#000")
+	desc.x = mid[0] 
+	desc.y = mid[1]
+    var rect = new createjs.Shape();
+	rect.graphics.beginFill("white");
+    rect.graphics.drawRect(desc.x, desc.y, desc.getMeasuredWidth(), desc.getMeasuredHeight());
+    rect.graphics.endFill();
+    rect.cursor = "text"
+    path.addChild(rect);
+	path.addChild(desc);
+	rect.addEventListener("click", e => {
+		e.stopPropagation()
+		getDesc(mid, symbol, cb)
+	})
 }
 
 function getSymbols() {
-	let symbols = store.get(image+ex)
+	let symbols = store.get(image + "." + tool)
 	if (!symbols) {
-		symbols = []
-		store.set(image+ex,symbols)
+		symbols = {cnt: 1, data: {}}
+		store.set(image + "." + tool, symbols)
 	}
 	return symbols
 }
 
 function addSymbol(symbol) {
 	let symbols = getSymbols()
-	store.set(image+ex,symbols.concat(symbol))
+	symbol.id = symbols.cnt++;
+	symbols.data[symbol.id] = symbol
+	store.set(image + "." + tool, symbols)
 }
 
 function removeSymbol(symbol) {
 	let symbols = getSymbols()
-	for (let i = 0; i < symbols.length; i++) {
-		let json = symbols[i]
-		switch (json.type) {
-		case "vector":
-			if (Vector.isSame(symbol,symbols[i])) {
-				symbols.splice(i,1)
-				store.set(image+ex,symbols)
-				return
-			}
-			break
-		case "region":
-			if (PressureRegion.isSame(symbol,symbols[i])) {
-				symbols.splice(i,1)
-				store.set(image+ex,symbols)
-				return
-			}
-			break
-		case "airmass":
-			if (Airmass.isSame(symbol,symbols[i])) {
-				symbols.splice(i,1)
-				store.set(image+ex,symbols)
-				return
-			}
-			break
-		case "isopleth":
-			if (IsoPleth.isSame(symbol,symbols[i])) {
-				symbols.splice(i,1)
-				store.set(image+ex,symbols)
-				return
-			}
-			break
-		case "line":
-			if (Line.isSame(symbol,symbols[i])) {
-				symbols.splice(i,1)
-				store.set(image+ex,symbols)
-				return
-			}
-			break;
-		case "ellipse":
-			if (Ellipse.isSame(symbol,symbols[i])) {
-				symbols.splice(i,1)
-				store.set(image+ex,symbols)
-				return
-			}
-			break;
-		case "field":
-			if (Field.isSame(symbol,symbols[i])) {
-				symbols.splice(i,1)
-				store.set(image+ex,symbols)
-				return
-			}
-			break;
-		}
-	}
+	if (symbol.id) delete symbols.data[symbol.id]
+	store.set(image + "." + tool, symbols)
 }
 
-function deleteSymbols() {
-	store.set(image+ex,[])
+function removeSymbols() {
+	symbols = {cnt: 1, data: {}}
+	store.set(image + "." + tool,symbols)
 }
-
 
 class Vector extends createjs.Container {
 	static showSymbol(stage,json) {
@@ -160,15 +148,7 @@ class Vector extends createjs.Container {
 		})
 		stage.addChild(map)
 	}
-	
-	static isSame(json1,json2) {
-		if (json1.type != json2.type) return false
-		if (json1.img != json2.img) return false
-		if (json1.pt.x != json2.pt.x) return false
-		if (json1.pt.y != json2.pt.y) return false
-		return true
-	}
-	
+		
 	constructor(x,rot,img,drawsim) {
 		super()
 		this.x = x
@@ -216,14 +196,6 @@ class PressureRegion extends createjs.Container {
 		stage.addChild(region)
 	}
 	
-	static isSame(json1,json2) {
-		if (json1.type != json2.type) return false
-		if (json1.high != json2.high) return false
-		if (json1.pt.x != json2.pt.x) return false
-		if (json1.pt.y != json2.pt.y) return false
-		return true
-	}
-	
 	constructor(x,high,drawsim) {
 		super()
 		this.high = high
@@ -249,10 +221,6 @@ class PressureRegion extends createjs.Container {
 	}		
 
 	getLength() { return 2*30+2 }
-
-	getInst() {
-		return "<p>Click location and select an icon to add. Click icon in map to delete.</p>"
-	}
 }
 
 class Pressures extends createjs.Container {
@@ -278,10 +246,6 @@ class Pressures extends createjs.Container {
 		let n = opt == "all"?10:opt == "arrows"?8:2
 		return n*30+2 
 	}
-
-	getInst() {
-		return "<p>Click location and select an icon to add. Click icon in map to delete.</p>"
-	}
 }
 
 class Airmass extends createjs.Container {
@@ -302,14 +266,6 @@ class Airmass extends createjs.Container {
 			airmass.stage.removeChild(airmass)
 		})
     	stage.addChild(airmass)
-	}
-	
-	static isSame(json1,json2) {
-		if (json1.type != json2.type) return false
-		if (json1.name != json2.name) return false
-		if (json1.pt.x != json2.pt.x) return false
-		if (json1.pt.y != json2.pt.y) return false
-		return true
 	}
 	
 	constructor(x,name,drawsim) {
@@ -355,10 +311,6 @@ class Airmasses extends createjs.Container {
 	}
 	
 	getLength() { return 8*30+2 }
-
-	getInst() {
-		return "<p>Click location and select airmass to add. Click airmass to delete.</p>"
-	}
 }
 
 class IsoPleth {
@@ -413,17 +365,8 @@ class IsoPleth {
 		return label
 	}
 	
-	static isSame(json1,json2) {
-		if (json1.type != json2.type) return false
-		if (json1.value != json2.value) return false
-		if (json1.pts[0].x != json2.pts[0].x) return false
-		if (json1.pts[0].y != json2.pts[0].y) return false
-		return true
-	}
-	
-	constructor(back,drawsim) {
+	constructor(drawsim) {
 		createjs.Ticker.framerate = 10
-		this.back = back
 		this.mouseDown = false
 		drawsim.mainstage.addEventListener("stagemousedown", e => {
 			this.currentShape = new createjs.Shape()
@@ -457,10 +400,6 @@ class IsoPleth {
 				addSymbol(symbol)
 			}
 		})
-	}
-	
-	getInst() {
-		return "<p>Press and drag mouse to draw line. Release when done. Supply a value when prompted.  Click value to delete.</p>"
 	}
 }
 
@@ -527,17 +466,8 @@ class Line {
 	    stage.addChild(path)
 	}
 	
-	static isSame(json1,json2) {
-		if (json1.type != json2.type) return false
-		if (json1.ltype != json2.ltype) return false
-		if (json1.pts[0].x != json2.pts[0].x) return false
-		if (json1.pts[0].y != json2.pts[0].y) return false
-		return true
-	}
-	
-	constructor(back,drawsim) {
+	constructor(drawsim) {
 		createjs.Ticker.framerate = 10
-		this.back = back
 		this.mouseDown = false
 		let x = 5
 		for (let key in linetypes) {
@@ -575,13 +505,8 @@ class Line {
 			})
 			let symbol = {type:"line",ltype: linetype, pts: this.pts}
 			Line.showSymbol(drawsim.mainstage,symbol)
-			addSymbol(symbol)
-			
+			addSymbol(symbol)			
 		})
-	}
-	
-	getInst() {
-		return "<p>Select a line type, then press and drag mouse to draw. Release when done.<br/>Drawing another line of the same type will replace the previous line.</p>"
 	}
 }
 
@@ -597,18 +522,8 @@ class Ellipse extends createjs.Container {
 		})
     	stage.addChild(ellipse)
 	}
-	
-	static isSame(json1,json2) {
-		if (json1.type != json2.type) return false
-		if (json1.ex != json2.ex) return false
-		if (json1.w != json2.w) return false
-		if (json1.h != json2.h) return false
-		if (json1.pt.x != json2.pt.x) return false
-		if (json1.pt.y != json2.pt.y) return false
-		return true
-	}
-	
-	constructor(back,drawsim) {
+		
+	constructor(drawsim) {
 		super()
     	back.cursor = "pointer"
 		back.addEventListener("click", e => {
@@ -621,26 +536,22 @@ class Ellipse extends createjs.Container {
 	toJSON(x,y) {
 		return {type:"ellipse", ex: ex, w:width, h:height, pt:{x:x,y:y}}
 	}
-	
-	getInst() {
-		return "<p>Click to add an ellipse. Click ellipse to delete.</p>"
-	}
 }
 
 class Field {
-	static showSymbol(stage,json) {
+	static showSymbol(stage, json) {
 		let pts = json.pts
-		let shape = new createjs.Shape()
 	    if (pts.length == 0) return
-		let oldX = pts[0].x
+		let shape = new createjs.Shape()
+		let oldX = pts[0].x 
 		let oldY = pts[0].y
 		let oldMidX = oldX
 		let oldMidY = oldY
 		this.color = json.color;
 	    shape.graphics.beginStroke(this.color);
 	    json.pts.forEach(pt => {
-			let midPoint = new createjs.Point(oldX + pt.x >> 1, oldY+pt.y >> 1)
-	        shape.graphics.setStrokeStyle(4).moveTo(midPoint.x, midPoint.y)
+			let midPoint = new createjs.Point(oldX + pt.x >> 1, oldY + pt.y >> 1)
+	        shape.graphics.setStrokeStyle(2).moveTo(midPoint.x, midPoint.y)
 	        shape.graphics.curveTo(oldX, oldY, oldMidX, oldMidY)
 	        oldX = pt.x
 	        oldY = pt.y
@@ -650,48 +561,41 @@ class Field {
 		let path = new createjs.Container()
 		path.addChild(shape)
 	    if ((opt == 'head' || opt == "colorhead") && pts.length > 4) {
-	    	let lastpt = pts[pts.length-6]
-	    	let endpt = pts[pts.length-3]
-	    	let head = new createjs.Shape()
-		    head.graphics.f(this.color).setStrokeStyle(4).beginStroke(this.color).mt(4,0).lt(-4,-4).lt(-4,4).lt(4,0)
-		    head.x = endpt.x
-		    head.y = endpt.y
-		    head.rotation = angle(lastpt,endpt)
-		    path.addChild(head)
-			let desc = new createjs.Text(json.desc,"14px Arial","#000")
-	    	let mid = Math.trunc(pts.length/2)
-	    	desc.x = json.pts[mid].x
-	    	desc.y = json.pts[mid].y
-	        var rect = new createjs.Shape();
-	    	rect.graphics.beginFill("white");
-            rect.graphics.drawRect(desc.x, desc.y, desc.getMeasuredWidth(), desc.getMeasuredHeight());
-            rect.graphics.endFill();
-            rect.alpha = 0.9;
-            path.addChild(rect);
-	    	path.addChild(desc);
+		    path.addChild(Field.drawHead(pts, json.color))
+		    addLabel(path, getMid(pts), json, function(keep) {
+	    		drawsim.mainstage.removeChild(path)
+	    		if (keep) Field.showSymbol(drawsim.mainstage, json)		    	
+		    })
 	    }
-    	path.cursor = "not-allowed"
-		path.addEventListener("click", e => {
+    	shape.cursor = "not-allowed"
+    	stage.addChild(path)
+		shape.addEventListener("click", e => {
 			removeSymbol(json)
-			path.stage.removeChild(path)
+			stage.removeChild(path)
 		})
-		stage.addChild(path)
+		return path
 	}
 	
-	static isSame(json1,json2) {
-		if (json1.type != json2.type) return false
-		if (json1.pts[0].x != json2.pts[0].x) return false
-		if (json1.pts[0].y != json2.pts[0].y) return false
-		return true
+	static drawHead(pts, color) {
+    	let lastpt = pts[pts.length-6]
+    	let endpt = pts[pts.length-1]
+    	let head = new createjs.Shape()
+	    head.graphics.f(color).setStrokeStyle(4).beginStroke(color).mt(4,0).lt(-4,-4).lt(-4,4).lt(4,0)
+	    head.x = endpt.x
+	    head.y = endpt.y
+	    head.rotation = angle(lastpt,endpt)
+	    return head
 	}
 	
-	constructor(back,drawsim) {
+	constructor(drawsim) {
 		createjs.Ticker.framerate = 5
-		this.back = back
 		this.mouseDown = false
 		this.w = 1
+		document.getElementById("delete").style.visibility = "hidden"
 		drawsim.mainstage.addEventListener("stagemousedown", e => {
-			this.currentShape = new createjs.Shape()
+			if (document.getElementById("editor").style.visibility == "visible") return;
+			this.shape = new createjs.Shape()
+			drawsim.mainstage.addChild(this.shape)
 		    this.oldX = this.oldMidX = e.stageX
 		    this.oldY = this.oldMidY = e.stageY
 			this.mouseDown = true
@@ -702,16 +606,15 @@ class Field {
 			    var data = ctx.getImageData(this.oldX, this.oldY, 1, 1).data
 			    this.color = rgbToHex(data[0], data[1], data[2])
 			}
-		    this.currentShape.graphics.beginStroke(this.color)
-			drawsim.mainstage.addChild(this.currentShape)
+		    this.shape.graphics.beginStroke(this.color)
 		})
 		drawsim.mainstage.addEventListener("stagemousemove", e => {
 			if (this.mouseDown == false) return
 	        this.pt = new createjs.Point(e.stageX, e.stageY)
 			this.pts = this.pts.concat({x:e.stageX,y:e.stageY})
-			let midPoint = new createjs.Point(this.oldX + this.pt.x >> 1, this.oldY+this.pt.y >> 1)
-	        this.currentShape.graphics.setStrokeStyle(4).moveTo(midPoint.x, midPoint.y)
-	        this.currentShape.graphics.curveTo(this.oldX, this.oldY, this.oldMidX, this.oldMidY)
+			let midPoint = new createjs.Point(this.oldX + this.pt.x >> 1, this.oldY + this.pt.y >> 1)
+	        this.shape.graphics.setStrokeStyle(2).moveTo(midPoint.x, midPoint.y)
+	        this.shape.graphics.curveTo(this.oldX, this.oldY, this.oldMidX, this.oldMidY)
 	        this.oldX = this.pt.x
 	        this.oldY = this.pt.y
 	        this.oldMidX = midPoint.x
@@ -720,47 +623,82 @@ class Field {
 		drawsim.mainstage.addEventListener("stagemouseup", e => {
 			this.mouseDown = false
 			if (this.pts.length == 0) return
-			drawsim.mainstage.removeChild(this.currentShape)
 			let symbol = {type:"field", pts: this.pts, color: this.color, desc: ""}
-			Field.showSymbol(drawsim.mainstage, symbol)
 		    if ((opt == 'head' || opt == "colorhead") && this.pts.length > 4) {
-		    	symbol.desc = getDesc(this.pts[Math.trunc(this.pts.length/2)], symbol, function() {
-					Field.showSymbol(drawsim.mainstage, symbol)
-					addSymbol(symbol)		    		
+				let that = this;
+		    	let head = Field.drawHead(this.pts, this.color)
+		    	drawsim.mainstage.addChild(head)
+		    	getDesc(getMid(this.pts), symbol, function(keep) {
+		    		drawsim.mainstage.removeChild(that.shape)
+		    		drawsim.mainstage.removeChild(head)
+		    		if (keep) Field.showSymbol(drawsim.mainstage, symbol)
 		    	});
 		    }
 		})
 	} 
-	
-	getInst() {
-		return opt?"<p>Press and drag mouse to draw a line. Release when done. Click on line when red cursor appears to delete.":"<p>Join horizontal field lines on left and right by drawing over top of image. Lines should not cross. <br/>Click on line when red cursor appears to delete.</p>"
-	}
 }
 
 class Transform {
-	constructor(back,drawsim) {
-		createjs.Ticker.framerate = 5
-		this.back = back
-		if (edit) {
-			document.getElementById("transform").style.visibility="visible";
-			document.getElementById("rotate").addEventListener("click", e => this.rotate(back, e));
-			document.getElementById("fliph").addEventListener("click", e => this.flipH(back, e));
-			document.getElementById("flipv").addEventListener("click", e => this.flipV(back, e));
-		}
-	}
-	rotate(img, e) {
-		img.rotation += 90;
+	static showSymbol(stage, json) {
+		back.rotation = json.rotation;
+		back.scaleX = json.flipH;
+		back.scaleY = json.flipV;
 	}
 	
-	flipH(img, e) {
-		img.scaleX = img.scaleX == 1 ? -1 : 1;
+	static getSymbol() {
+		let symbols = getSymbols();
+		if (symbols.length == 0) return {type:"transform", rotation: 0, flipH: 1, flipY: 1};
+		else {
+			let symbol = symbols[0];
+			removeSymbol(symbol);
+			return symbol;
+		}		
 	}
-
-	flipV(img, e) {
-		img.scaleY = img.scaleY == 1 ? -1 : 1;
-	}	
+	
+	constructor(drawsim) {
+		createjs.Ticker.framerate = 5
+		if (edit) {
+			document.getElementById("transform").style.visibility="visible";
+			document.getElementById("rotate").addEventListener("click", function() {
+				back.rotation = back.rotation < 360 ? back.rotation + 90 : 0;
+				let symbol = Transform.getSymbol();
+				symbol.rotation = back.rotation;
+				addSymbol(symbol);
+			});
+			document.getElementById("fliph").addEventListener("click", function() {
+				back.scaleX = -back.scaleX;
+				let symbol = Transform.getSymbol();
+				symbol.flipH = back.scaleX;
+				addSymbol(symbol);				
+			});
+			document.getElementById("flipv").addEventListener("click", function() {
+				back.scaleY = -back.scaleY;
+				let symbol = Transform.getSymbol();
+				symbol.flipV = back.scaleY;
+				addSymbol(symbol);				
+			});
+		}
+	}
 }
 
+class Label {
+	static showSymbol(stage, json) {
+		let path = new createjs.Container()
+		stage.addChild(path);
+		addLabel(path, [json.x, json.y], json, function(show) {
+			stage.removeChild(path);
+    		if (show) Label.showSymbol(stage, json)
+		})
+	}
+	constructor(drawsim) {
+		drawsim.mainstage.addEventListener("click", e => {
+			let symbol = {"type": "label", x: e.stageX, y: e.stageY, desc: ""}
+			getDesc([symbol.x, symbol.y], symbol, function(show) {
+	    		if (show) Label.showSymbol(drawsim.mainstage, symbol)
+			})
+		})		
+	}		
+}
 class Toolbar extends createjs.Container {
 	constructor(tool,drawsim) {
 		super()
@@ -813,7 +751,6 @@ class DrawSim {
 	constructor() {
 		this.mainstage = new createjs.Stage("maincanvas")
 		createjs.Touch.enable(this.mainstage)
-		let back = new createjs.Bitmap(image)
 		back.image.onload = function() {
 			let bnd = back.getBounds()
 			drawsim.mainstage.canvas.width = bnd.width + 40
@@ -827,44 +764,39 @@ class DrawSim {
 		this.showSymbols()
 		if (edit) {
 			this.mainstage.enableMouseOver()
-			//let inst = document.getElementById("instruct")
 			switch (tool) {
 			case "pressure":
 				let pressures = new Pressures(2,this)
 				this.toolbar = new Toolbar(pressures,this)
-				//inst.innerHTML = pressures.getInst()
 				back.addEventListener("mousedown", e => this.toolbar.show(e))
 				this.mainstage.addChild(this.toolbar)
 				break
 			case "airmass":
 				let airmasses = new Airmasses(2,this)
 				this.toolbar = new Toolbar(airmasses,this)
-				//inst.innerHTML = airmasses.getInst()
 				back.addEventListener("mousedown", e => this.toolbar.show(e))
 				this.mainstage.addChild(this.toolbar)
 				break
 			case "isopleth":
-				this.isopleth = new IsoPleth(back,this)
-				//inst.innerHTML = this.isopleth.getInst()
+				this.isopleth = new IsoPleth(this)
 				break
 			case "line":
-				this.line = new Line(back,this)
-				//inst.innerHTML = this.line.getInst()
+				this.line = new Line(this)
 				break
 			case "ellipse":
-				this.ellipse = new Ellipse(back,this)
-				//inst.innerHTML = this.ellipse.getInst()
+				this.ellipse = new Ellipse(this)
 				break
 			case "field":
-				this.field = new Field(back,this)
-				//inst.innerHTML = this.field.getInst()
+				this.field = new Field(this)
 				break
 			case "transform":
-				this.field = new Transform(back,this)
+				this.transform = new Transform(this)
 				break
-			default: {
-					alert("Parameter tool should be pressure, airmass, isopleth, line, ellipse, field or transform")
-				}
+			case "label":
+				this.label = new Label(this)
+				break;
+			default:
+				alert("Parameter tool should be pressure, airmass, isopleth, line, ellipse, field, transform or label")
 			}
 		}
 		// handle download
@@ -881,7 +813,8 @@ class DrawSim {
 	
 	showSymbols() {
 		let symbols = getSymbols()
-		symbols.forEach(json => {
+		for (let key in symbols["data"]) {
+			let json = symbols["data"][key]
 			switch (json.type) {
 			case "vector":
 				Vector.showSymbol(this.mainstage,json)
@@ -904,8 +837,14 @@ class DrawSim {
 			case "field":
 				Field.showSymbol(this.mainstage,json)
 				break;
+			case "transform":
+				Transform.showSymbol(this.mainstage,json)
+				break;
+			case "label":
+				Label.showSymbol(this.mainstage,json)
+				break;
 			}
-		})
+		}
 	}
 	
 	run() {

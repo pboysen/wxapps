@@ -6,18 +6,25 @@
   "author": "Pete Boysen",
   "license": "ISC",
   "devDependencies": {
-    "babel": "^5.8.38",
-    "babelify": "^6.4.0",
+    "babelify": "^10.0.0",
     "blint": "^0.4.0",
-    "watchify": "^3.2.0",
-    "xmldom": "^0.1.0",
-	"lodash": ">=4.17.19",
-	"braces": ">=2.3.1"
+    "braces": ">=2.3.1",
+    "watchify": "^3.11.1",
+    "xmldom": "^0.1.0"
   },
   "scripts": {
     "drawsim": "watchify src/drawsim/main.js -t babelify -d -v -o ../../node/public/main-built.js"
   },
   "dependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "babel": "^6.23.0",
+    "minimatch": "^3.0.4",
     "object-assign": "^4.1.1"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
   }
 }
