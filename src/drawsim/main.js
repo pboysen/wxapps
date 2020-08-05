@@ -122,6 +122,12 @@ function addSymbol(symbol) {
 	store.set(image + "." + tool, symbols)
 }
 
+function updateSymbol(symbol) {
+	let symbols = getSymbols()
+	symbols.data[symbol.id] = symbol
+	store.set(image + "." + tool, symbols)	
+}
+
 function removeSymbol(symbol) {
 	let symbols = getSymbols()
 	if (symbol.id) delete symbols.data[symbol.id]
@@ -639,43 +645,41 @@ class Field {
 }
 
 class Transform {
-	static showSymbol(stage, json) {
-		back.rotation = json.rotation;
-		back.scaleX = json.flipH;
-		back.scaleY = json.flipV;
-	}
-	
-	static getSymbol() {
-		let symbols = getSymbols();
-		if (symbols.length == 0) return {type:"transform", rotation: 0, flipH: 1, flipY: 1};
-		else {
-			let symbol = symbols[0];
-			removeSymbol(symbol);
-			return symbol;
-		}		
+	static showSymbol(stage, symbol) {
+		back.rotation = symbol.rotation;
+		back.scaleX = symbol.flipH;
+		back.scaleY = symbol.flipV;
 	}
 	
 	constructor(drawsim) {
 		createjs.Ticker.framerate = 5
+		let symbols = getSymbols()
+		if (symbols.cnt == 1) {
+			let symbol = {type:"transform", rotation: 0, flipH: 1, flipV: 1}
+			addSymbol(symbol)
+		}
 		if (edit) {
 			document.getElementById("transform").style.visibility="visible";
 			document.getElementById("rotate").addEventListener("click", function() {
-				back.rotation = back.rotation < 360 ? back.rotation + 90 : 0;
-				let symbol = Transform.getSymbol();
-				symbol.rotation = back.rotation;
-				addSymbol(symbol);
+				back.rotation = back.rotation < 360 ? back.rotation + 90 : 0
+				let symbol = getSymbols().data[1]
+				symbol.rotation = back.rotation
+				updateSymbol(symbol)
+				Transform.showSymbol(drawsim.stage, symbol)
 			});
 			document.getElementById("fliph").addEventListener("click", function() {
-				back.scaleX = -back.scaleX;
-				let symbol = Transform.getSymbol();
-				symbol.flipH = back.scaleX;
-				addSymbol(symbol);				
+				back.scaleX = -back.scaleX
+				let symbol = getSymbols().data[1]
+				symbol.flipH = back.scaleX
+				updateSymbol(symbol)				
+				Transform.showSymbol(drawsim.stage, symbol)
 			});
 			document.getElementById("flipv").addEventListener("click", function() {
-				back.scaleY = -back.scaleY;
-				let symbol = Transform.getSymbol();
-				symbol.flipV = back.scaleY;
-				addSymbol(symbol);				
+				back.scaleY = -back.scaleY
+				let symbol = getSymbols().data[1]
+				symbol.flipV = back.scaleY
+				updateSymbol(symbol)		
+				Transform.showSymbol(drawsim.stage, symbol)
 			});
 		}
 	}
