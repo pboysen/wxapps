@@ -1,5 +1,5 @@
-var getStore = require('../utils')   
-var Url = require('url') 
+import {getStore} from "../utils"   
+import {Url} from "url" 
  
 let store = getStore(), searchParams = new URLSearchParams(window.location.search.substring(1))
 
