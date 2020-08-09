@@ -12,6 +12,7 @@ let tool = searchParams.get('tool') || "pressure"
 let width = searchParams.get('w') || 20
 let height = searchParams.get('h') || 20
 let opt = searchParams.get('opt') || "all"
+let colors = searchParams.get('colors') || "black"
 
 let linetypes = {
 	dry:{w:1,c:"#000"},
@@ -44,6 +45,15 @@ function componentToHex(c) {
 
 function rgbToHex(r, g, b) {
   return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function getColor() {
+    var radio = document.getElementsByName('color');       
+    for(let i = 0; i < radio.length; i++) {
+        if(radio[i].checked)
+        	return radio[i].value
+    }
+    return "black"
 }
 
 var saveparms = [];
@@ -147,7 +157,7 @@ class Vector extends createjs.Container {
 		map.regX = 12
 		map.regY = 12
     	map.rotation = json.rot
-    	map.cursor = "not-allowed"
+    	map.cursor = "url(assets/remove.png) 8 8, auto"
 		map.addEventListener("click", e => {
 			removeSymbol(json)
 			map.stage.removeChild(map)
@@ -198,7 +208,7 @@ class PressureRegion extends createjs.Container {
 			removeSymbol(json)
 			region.stage.removeChild(region)
 		})
-    	region.cursor = "not-allowed"
+    	region.cursor = "url(assets/remove.png) 8 8, auto"
 		stage.addChild(region)
 	}
 	
@@ -266,7 +276,7 @@ class Airmass extends createjs.Container {
 		txt.x = 6
 		txt.y = 10
 		airmass.addChild(txt)
-    	airmass.cursor = "not-allowed"
+    	airmass.cursor = "url(assets/remove.png) 8 8, auto"
 			airmass.addEventListener("click", e => {
 			removeSymbol(json)
 			airmass.stage.removeChild(airmass)
@@ -341,7 +351,7 @@ class IsoPleth {
 		path.addChild(shape)
 		let first = pts[0], last = pts[pts.length-1]
 		let label = IsoPleth.getLabel(json.value,first.x - 10,first.y + (first.y < last.y? -24: 0))
-    	label.cursor = "not-allowed"
+    	label.cursor = "url(assets/remove.png) 8 8, auto"
 		label.addEventListener("click", e => {
 			removeSymbol(json)
 			stage.removeChild(path)
@@ -349,7 +359,7 @@ class IsoPleth {
 		path.addChild(label)
 		if (dist(first,last) > 10) {
 			let label = IsoPleth.getLabel(json.value,last.x - 10,last.y + (first.y < last.y? 0 : -24))
-			label.cursor = "not-allowed"
+			label.cursor = "url(assets/remove.png) 8 8, auto"
 			label.addEventListener("click", e => {
 				removeSymbol(json)
 				stage.removeChild(path)
@@ -521,7 +531,7 @@ class Ellipse extends createjs.Container {
 		let ellipse = new createjs.Shape()
 		ellipse.graphics.setStrokeStyle(2).beginFill("#FFF").beginStroke("#F00").drawEllipse(Math.round(json.pt.x-json.w/2),Math.round(json.pt.y-json.h/2),Math.round(json.w),Math.round(json.h)).endStroke()
 		ellipse.alpha = 0.5
-    	ellipse.cursor = "not-allowed"
+    	ellipse.cursor = "url(assets/remove.png) 8 8, auto"
 		ellipse.addEventListener("click", e => {
 			removeSymbol(json)
 			stage.removeChild(ellipse)
@@ -573,7 +583,7 @@ class Field {
 	    		if (keep) Field.showSymbol(drawsim.mainstage, json)		    	
 		    })
 	    }
-    	shape.cursor = "not-allowed"
+    	shape.cursor = "url(assets/remove.png) 8 8, auto"
     	stage.addChild(path)
 		shape.addEventListener("click", e => {
 			removeSymbol(json)
@@ -703,6 +713,75 @@ class Label {
 		})		
 	}		
 }
+
+class Arrow {
+	static showSymbol(stage, json, showCursor) {
+		let shape = new createjs.Shape()
+		let w = Math.min(width, 5)
+		let d = Math.hypot(json.start.x - json.end.x, json.start.y - json.end.y)
+	    shape.graphics.ss(1).s(json.color).f(json.color).mt(0, 0).lt(0, w).lt(d, w).lt(d, 2 * w).lt(d + 2 * w, 0).lt(d, - 2 * w).lt(d, -w).lt(0, -w).lt(0, 0)
+	    shape.x = json.start.x
+	    shape.y = json.start.y
+	    shape.rotation = angle(json.start, json.end)
+		if (showCursor) shape.cursor = "url(assets/remove.png) 8 8, auto"
+		shape.addEventListener("click", e => {
+			e.stopPropagation()
+			removeSymbol(json)
+			stage.removeChild(shape)
+		})
+    	stage.addChild(shape)
+		return shape
+	}
+	
+	constructor(drawsim) {
+		createjs.Ticker.framerate = 30
+		let colorsdiv = document.getElementById("colors")
+		let checked = true
+		colors.split(",").forEach(color => {
+			var radio = document.createElement('input')
+			  radio.type = 'radio'
+			  radio.name = 'color'
+			  radio.checked = checked;
+			  radio.id = color
+			  radio.value = color
+			  colorsdiv.appendChild(radio)
+			var label = document.createElement('label')
+			  label.for = color
+			label.style.color = color;
+			colorsdiv.appendChild(label)
+			var text = document.createTextNode(color)
+			label.appendChild(text)
+			checked = false
+		})
+		let symbol = {type:"arrow", start:{}, end: {}, color: getColor()}
+		let mouseDown = false
+		let shape = null
+		drawsim.mainstage.addEventListener("stagemousedown", e => {
+			let thing = drawsim.mainstage.getObjectUnderPoint(e.stageX, e.stageY)
+			if (!thing || !thing.image) return
+			mouseDown = true
+			symbol.start = {x: e.stageX, y: e.stageY}
+			symbol.end = {x: e.stageX, y: e.stageY}
+			symbol.color = getColor()
+			shape = Arrow.showSymbol(drawsim.mainstage, symbol, false);
+		})
+		drawsim.mainstage.addEventListener("stagemousemove", e => {
+			if (mouseDown) {
+				drawsim.mainstage.removeChild(shape)
+				symbol.end = {x: e.stageX, y: e.stageY}
+				shape = Arrow.showSymbol(drawsim.mainstage, symbol, false);
+			}
+		})
+		drawsim.mainstage.addEventListener("stagemouseup", e => {
+			if (mouseDown) {
+				addSymbol(symbol)
+				if (shape) shape.cursor = "url(assets/remove.png) 8 8, auto"
+				mouseDown = false
+			}
+		})
+	} 
+}
+
 class Toolbar extends createjs.Container {
 	constructor(tool,drawsim) {
 		super()
@@ -754,6 +833,7 @@ class Toolbar extends createjs.Container {
 class DrawSim {
 	constructor() {
 		this.mainstage = new createjs.Stage("maincanvas")
+		this.mainstage.cursor = "default"
 		createjs.Touch.enable(this.mainstage)
 		back.image.onload = function() {
 			let bnd = back.getBounds()
@@ -798,6 +878,9 @@ class DrawSim {
 				break
 			case "label":
 				this.label = new Label(this)
+				break;
+			case "arrow":
+				this.arrow = new Arrow(this)
 				break;
 			default:
 				alert("Parameter tool should be pressure, airmass, isopleth, line, ellipse, field, transform or label")
@@ -846,6 +929,9 @@ class DrawSim {
 				break;
 			case "label":
 				Label.showSymbol(this.mainstage,json)
+				break;
+			case "arrow":
+				Arrow.showSymbol(this.mainstage,json, true)
 				break;
 			}
 		}
