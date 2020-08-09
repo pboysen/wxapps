@@ -736,6 +736,7 @@ class Arrow {
 	constructor(drawsim) {
 		createjs.Ticker.framerate = 30
 		let colorsdiv = document.getElementById("colors")
+		colorsdiv.style.visibility = "visible"
 		let checked = true
 		colors.split(",").forEach(color => {
 			var radio = document.createElement('input')
