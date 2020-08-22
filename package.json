@@ -1,0 +1,55 @@
+{
+  "name": "sims",
+  "version": "1.0.0",
+  "description": "build sims",
+  "main": "index.js",
+  "author": "Pete Boysen",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.11.1",
+    "@babel/preset-env": "^7.11.0",
+    "argparse": "~1.0.3",
+    "babel-cli": "^6.26.0",
+    "babelify": "^10.0.0",
+    "bluebird": "~3.4.0",
+    "braces": "^3.0.2",
+    "core-js": "^3.6.5",
+    "express": "^4.17.1",
+    "frameguard": "^3.1.0",
+    "jszip": "~2.5.0",
+    "lop": "~0.4.0",
+    "mammoth": "^1.4.9",
+    "md5": "^2.3.0",
+    "minimatch": "^3.0.4",
+    "object-assign": "^4.1.1",
+    "path-is-absolute": "^1.0.0",
+    "sax": "~1.1.1",
+    "underscore": "^1.10.2",
+    "watchify": "^3.11.1",
+	"lodash": ">=4.17.19",
+    "xmlbuilder": "^10.0.0",
+    "xmldom": "^0.1.0"
+  },
+  "devDependencies": {
+    "browserify": "~13.0.1",
+    "browserify-prepend-licenses": "~1.0.0",
+    "duck": "~0.1.11",
+    "eslint": "2.13.1",
+    "hamjest": "2.13.0",
+    "mocha": "~2.2.5",
+    "temp": "~0.7.0",
+	"lodash": ">=4.17.19",
+	"uglify-js": "~2.4.8"
+  },
+  "browser": {
+    "./lib/unzip.js": "./browser/unzip.js",
+    "./lib/docx/files.js": "./browser/docx/files.js"
+  },
+  "bin": {
+    "mammoth": "bin/mammoth"
+  },
+  "scripts": {
+    "drawsim": "watchify C:/Users/pboysen/git/wxapps/src/drawsim/main.js  -o public/main-built.js -t [babelify --presets [@babel/preset-env] ] -d -v",
+    "mammoth": "browserify C:/Users/pboysen/git/mammoth.js/lib/index.js  -o public/mammoth-built.js -t [babelify --presets [@babel/preset-env] ] -d -v"
+  }
+}
