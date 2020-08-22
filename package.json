@@ -12,7 +12,7 @@
     "babel-cli": "^6.26.0",
     "babelify": "^10.0.0",
     "bluebird": "~3.4.0",
-    "braces": "^3.0.2",
+    "braces": "^2.3.1",
     "core-js": "^3.6.5",
     "express": "^4.17.1",
     "frameguard": "^3.1.0",
