@@ -13,12 +13,27 @@
 		</copy>
 	</target>
 	
+	<target name="copymam" depends="init">
+		<copy todir="c:/Users/pboysen/node/public">
+		    <fileset dir="src/mammoth">
+		        <include name="mammoth_index.html"/>		    	
+		        <include name="mammoth.browser.min.js"/>		    	
+		    </fileset>
+		</copy>
+	</target>
+	
 	<target name="build">
 		<exec executable="C:\Program Files\nodejs\npm.cmd">
-			<arg line="run babs"/>
+			<arg line="run drawsim"/>
 		</exec>
 	</target>
 
+	<target name="buildmam">
+		<exec executable="C:\Program Files\nodejs\npm.cmd">
+			<arg line="run mammoth"/>
+		</exec>
+	</target>
+	
 	<target name="clean">
 		<delete dir="build" />
 	</target>
