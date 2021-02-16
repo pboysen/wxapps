@@ -550,7 +550,7 @@ class Ellipse extends createjs.Container {
 	}
 	
 	toJSON(x,y) {
-		return {type:"ellipse", ex: ex, w:width, h:height, pt:{x:x,y:y}}
+		return {type:"ellipse", w:width, h:height, pt:{x:x,y:y}}
 	}
 }
 
