@@ -838,12 +838,12 @@ class DrawSim {
 		createjs.Touch.enable(this.mainstage)
 		back.image.onload = function() {
 			let bnd = back.getBounds()
-			drawsim.mainstage.canvas.width = bnd.width + 40
-			drawsim.mainstage.canvas.height = bnd.height + 40
-			back.x = bnd.width / 2 + 20
-			back.y = bnd.width / 2 + 20
-		    back.regX = bnd.width / 2;
-		    back.regY = bnd.height / 2;
+			drawsim.mainstage.canvas.width = bnd.width
+			drawsim.mainstage.canvas.height = bnd.height
+			back.x = bnd.width / 2
+			back.y = bnd.height / 2
+		    back.regX = bnd.width / 2
+		    back.regY = bnd.height / 2
 		}
 		this.mainstage.addChild(back)
 		this.showSymbols()
