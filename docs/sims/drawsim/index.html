@@ -1,71 +1,204 @@
-<!doctype html>
+<!DOCTYPE html> 
+<head>
+<meta charset="utf-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<!-- Styles -->
+<link rel="stylesheet" href="docs/index.css">
+</head>
+<body>  
 
-<meta charset="utf-8"/>
-<title>DrawSim</title>
-<link rel=stylesheet href="index.css">
-<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
-
-<style>
-#editor {
-	position: absolute;
-	visibility: hidden;
-	left: 100px;
-	top: 100px;
-	z-index: 5;
-	background-color: white;
-	border: 1px solid lightgrey;
-	padding: 4px;
-	border-radius: 8px;
-}
-textarea {
-	height: 16px;
-	width: 100px;
-	border: 1px solid #888;
-	min-height: 16px;
-}
-.control {
-	border-radius: 4px;
-	border: 1px solid lightgrey;
-	font-size: 12px;
-	margin: 4px;
-	background-color: white;
-}
-.control:hover {
-	color: white;
-	background-color: lightblue;
-}
-#transform {
-	visibility: collapse;
-}
-#colors {
-	visibility: collapse;
-}
-</style>
-<div class="drawsim">
-	<div id ="transform">
-		<button id="rotate" class="control">Rotate</button>
-		<button id="fliph" class="control">Horizontal Flip</button>
-		<button id="flipv" class="control">Vertical Flip</button>
+<div class="main-page"> 
+  <div class="flex-item"><span>WXAPPS</span></div>
+  <div class="flex-item">Active Learning in Meteorology</div>
+</div>
+<div class="main-content">
+<div class="appbox">
+	<div class="app">
+		<div class="title">Overview</div>
+		<p>Engage your students in active learning about meteorology by using one or more of the WXAPPS listed below.
+		Each app is either a simulation or tool designed to let students explore conditions relating to such challenging concepts as solar and terrestrial radiation, 
+		humidity variables, temperature lags and adiabatic processes. Tools are also provided to sort clouds and draw weather maps.</p>
+		<div class="title">Usage</div>
+		<p>
+		Use the Embed code listed for each app to place in your webpage.  The apps are designed to run in both desktop browsers or on mobile. 
+		The source code is available on <a href="https://github.com/pboysen/wxapps">GitHub</a> if you want to make enhancements.  
+		The apps are freely available and released under the MIT License.</p>
 	</div>
-	<div id="colors">
-		<b>Arrow Colors: </b>
+	<div class="app">
+		<div class="title">Mtnsim</div>
+		<img src="docs/img/mtnsim.png" alt="Image of Mountain Simulation"/>
+		<p>Adjust the initial temperature and vapor pressure of a parcel, 
+denoted by a leaf, to observe how saturation occurs as the parcel travels over the mountain. 
+The challenge for the student is hypothesize how these parameters affect when (where) saturation occurs to identify the 
+variety of paths to saturation. 
+		</p>
+		<div class="links">
+		<p><a href="" onclick="window.open('docs/sims/mtnsim/index.html','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Try it.</a></p>
+		<p>
+		Embed: <input type="text" size="20" value='<iframe height="600" src="https://pboysen.github.io/wxapps/docs/sims/mtnsim/index.html" width="800"></iframe>
+' readonly="readonly"/>
+		</p>
+		</div>
 	</div>
-	<div class="display">
-		<canvas id="maincanvas" width="800" height="600"></canvas>
+	<div class="app">
+		<div class="title">Budgetsim</div>
+		<img src="docs/img/budgetsim.png" alt="Image of Budget Simulation"/>
+		<p>Hypothesize how input and output flows 
+affect the water level in the tank over time. The input flow can be changed during predetermined time periods. 
+The output flow is constant during the entire activity. 
+The goal for the student is to construct rules that govern tank water level and are generally applicable to parameters 
+other than water.
+		</p>
+		<div class="links">
+		<p><a href="" onclick="window.open('docs/sims/budgetsim/index.html','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Try it.</a></p>
+		<p>
+		Embed: <input type="text" size="20" value='<iframe height="400" src="https://pboysen.github.io/wxapps/docs/sims/budgetsim/index.html" width="800"></iframe>
+' readonly="readonly"/>
+		</p>
+		</div>
 	</div>
-	<br/>
-	<div id="panel">
-		<a id="download" download="image.png">
-			<input type="button" value="Download" title="Download" class="control">
-		</a>
+	<div class="app">
+		<div class="title">Radsim</div>
+		<img src="docs/img/radsim.png" alt="Image of Radiation Simulation"/>
+		<p>Collect temperature profile data for day and night in an environment 
+that differs only by surface conditions. This activity is intended to be a puzzle since students are not 
+expected to have yet been exposed to course materials that explain the profile differences. 
+The challenge for the student is to list both what makes sense and what doesn't.</p>
+		<div class="links">
+		<p><a href="" onclick="window.open('docs/sims/radsim/index.html','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Try it.</a></p>
+		<p>
+		Embed: <input type="text" size="20" value='<iframe height="600" src="https://pboysen.github.io/wxapps/docs/sims/radsim/index.html" style="border: 0;" width="800"></iframe>' readonly="readonly"/>
+		</p>
+		</div>
 	</div>
-	<div id="editor">
-		<textarea placeholder="Description" id="desc_editor"></textarea>
-		<div>
-			<button id="save" class="control">Save</button>
-			<button id="delete" class="control">Delete</button>
+	<div class="app">
+		<div class="title">Advectionsim</div>
+		<img src="docs/img/advectionsim.png" alt="Image of Advection Simulation"/>
+		<p>Modify the wind speed, direction, duration and isotherm spacing to observe the 
+		impact of these variables on temperature advection.</p>
+		<div class="links">
+		<p><a href="" onclick="window.open('docs/sims/advectionsim/index.html','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Try it.</a></p>
+		<p>
+		Embed: <input type="text" size="20" value='<iframe height="600" src="https://pboysen.github.io/wxapps/docs/sims/advectionsim/index.html" width="800"></iframe>
+' readonly="readonly"/>
+		</p>
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Vaporsim</div>
+		<img src="docs/img/vaporsim.png" alt="Image of Vapor Simulation"/>
+		<p>Observe the processes of condensation and evaporation in a beaker.  
+A student can intermittently apply heat for a few seconds and watch the system reach equilibrium.</p></p>
+		<div class="links">
+		<p><a href="" onclick="window.open('docs/sims/vaporsim/index.html','demo','height=500,width=450,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Try it.</a></p>
+		<p>
+		Embed: <input type="text" size="20" value='<iframe height="500" src="https://pboysen.github.io/wxapps/docs/sims/vaporsim/index.html" width="450"></iframe>
+' readonly="readonly"/>
+		</p>
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Bubblesim</div>
+		<img src="docs/img/bubblesim.png" alt="Image of Bubble Simulation"/>
+		<p>Observe molecules in a parcel of air as it rises and falls adiabatically in the atmosphere as the result of buoyancy differences.</p>
+		<div class="links">
+		<p><a href="" onclick="window.open('docs/sims/bubblesim/index.html','demo','height=400,width=400,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Try it.</a></p>
+		<p>
+		Embed: <input type="text" size="20" value='<iframe height="400" src="https://pboysen.github.io/wxapps/docs/sims/bubblesim/index.html" width="400"></iframe>
+' readonly="readonly"/>
+		</p>
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Drawsim</div>
+		<img src="docs/img/drawsim.png" alt="Image of Draw Tool"/>
+		<p>Draw a variety of symbols on images including wind vectors and pressure regions, air mass types, isopleths, lines, ellipses, field lines and arrows.</p>
+		<div class="links">
+		<p>
+		Try
+		<ul> 
+			<li><a href="" onclick="window.open('docs/sims/drawsim/index.html?img=assets/multisat.jpg&mode=edit&tool=pressure','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Wind Vectors and Pressure Regions</a></li>
+			<li><a href="" onclick="window.open('docs/sims/drawsim/index.html?img=assets/multisat.jpg&mode=edit&tool=airmass','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Air Masses</a></li>
+			<li><a href="" onclick="window.open('docs/sims/drawsim/index.html?img=assets/sfc_slp_map.gif&mode=edit&tool=isopleth','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Isopleths</a></li>
+			<li><a href="" onclick="window.open('docs/sims/drawsim/index.html?img=assets/SW_2.png&mode=edit&tool=line','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Lines</a></li>
+			<li><a href="" onclick="window.open('docs/sims/drawsim/index.html?img=assets/aspen.jpg&mode=edit&tool=ellipse&w=100&h=50','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Ellipses</a></li>
+			<li><a href="" onclick="window.open('docs/sims/drawsim/index.html?img=assets/tree.png&mode=edit&tool=field&opt=tree','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Field Lines around Tree</a></li>
+			<li><a href="" onclick="window.open('docs/sims/drawsim/index.html?img=assets/flagpole.png&mode=edit&tool=field&opt=flagpole','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Field Lines around Flagpole</a></li>
+			<li><a href="" onclick="window.open('docs/sims/drawsim/index.html?img=assets/vet.png&mode=edit&tool=field&opt=colorhead','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Curved Arrows</a></li>
+			<li><a href="" onclick="window.open('docs/sims/drawsim/index.html?img=assets/vet.png&mode=edit&tool=transform','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Rotate and Flip Image</a></li>
+			<li><a href="" onclick="window.open('docs/sims/drawsim/index.html?img=assets/vet.png&mode=edit&tool=arrow&w=2&colors=red,blue','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Straight Colored Arrows</a></li>
+		</ul>
+		</p>
+		Embeds:<br/>
+		Wind and Pressure: <input type="text" size="20" value='<iframe height="800" src="https://pboysen.github.io/wxapps/docs/sims/drawsim/index.html?img=&amp;mode=edit&amp;tool=pressure" width="900"></iframe>
+' readonly="readonly"/><br/>
+		Air Masses: <input type="text" size="20" value='<iframe height="800" src="https://pboysen.github.io/wxapps/docs/sims/drawsim/index.html?img=&amp;mode=edit&amp;tool=airmass" width="900"></iframe>
+' readonly="readonly"/><br/>  
+		Isopleth: <input type="text" size="20" value='<iframe height="800" src="https://pboysen.github.io/wxapps/docs/sims/drawsim/index.html?img=&amp;mode=edit&amp;tool=isopleth" width="900"></iframe>
+' readonly="readonly"/><br/>
+		Ellipse: <input type="text" size="20" value='<iframe height="800" src="https://pboysen.github.io/wxapps/docs/sims/drawsim/index.html?img=assets/aspen.jpg&amp;mode=edit&amp;tool=ellipse&amp;w=100@amp;h=50" width="800"></iframe>
+' readonly="readonly"/><br/>
+		Tree: <input type="text" size="20" value='<iframe height="800" src="https://pboysen.github.io/wxapps/docs/sims/drawsim/index.html?img=assets/tree.png&amp;mode=edit&amp;tool=field" width="900"></iframe>
+' readonly="readonly"/><br/>
+		Flagpole: <input type="text" size="20" value='<iframe height="800" src="https://pboysen.github.io/wxapps/docs/sims/drawsim/index.html?img=assets/flagpole.png&amp;mode=edit&amp;tool=field" width="900"></iframe>
+' readonly="readonly"/><br/>
+		Curved Arrows: <input type="text" size="20" value='<iframe height="800" src="https://pboysen.github.io/wxapps/docs/sims/drawsim/index.html?img=assets/700_12Z_4_18_17.gif&amp;mode=edit&amp;tool=field&amp;opt=colorhead" width="900"></iframe>
+' readonly="readonly"/><br/>
+		Transform: <input type="text" size="20" value='<iframe height="800" src="https://pboysen.github.io/wxapps/docs/sims/drawsim/index.html?img=assets/vet.png&amp;mode=edit&amp;tool=transform" width="900"></iframe>
+' readonly="readonly"/><br/>
+		Straight Colored Arrows: <input type="text" size="20" value='<iframe height="800" src="https://pboysen.github.io/wxapps/docs/sims/drawsim/index.html?img=assets/vet.png&amp;mode=edit&amp;tool=arrow&amp;w=2&amp;colors=red,blue" width="900"></iframe>
+' readonly="readonly"/><br/>
+		</p>
+		URL Parameters: mode = edit|view, img=URL, w=width, h=height, ex=example, tool=pressure|airmass|isopleth|ellipse|field, for (pressure) opt=all|head|hl|colorhead
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Cloudsim</div>
+		<img src="docs/img/cloudsim.png" alt="Image of Cloud Simulation"/>
+		<p>Move cloud images to the correct locations either by level (1,2,3) and form (streaks, sheets, heaps and rain), or by stability and altitude.</p>
+		<div class="links">
+		<p>Try: 
+		<a href="" onclick="window.open('docs/sims/cloudsim/index.html?tool=grid&mode=edit','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Levels and Forms</a>
+		<a href="" onclick="window.open('docs/sims/cloudsim/index.html?tool=stability&mode=edit','demo','height=600,width=800,toolbar=no,menubar=no,status=no,location=no,resizable=no,scrollbars=no',true)">Stability and Altitude.</a>
+		</p>
+		<p>
+		Embeds:<br/>
+		Levels and Forms: <input type="text" size="20" value='<iframe height="600" src="https://pboysen.github.io/wxapps/docs/sims/cloudsim/index.html?tool=grid" width="800"></iframe>
+' readonly="readonly"/><br/>
+		Stability: <input type="text" size="20" value='<iframe height="600" src="https://pboysen.github.io/wxapps/docs/sims/cloudsim/index.html?tool=stability" width="800"></iframe>' readonly="readonly"/>
+		</p>
+		<p>
+		URL Parameters: mode = edit|view, tool = grid|stability
+		</p>
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Stationsim</div>
+		<img src="docs/img/stationsim.png" alt="Image of Station Simulation"/>
+		<p>Observe station models, temperature and dew point depression at various altitudes.</p>
+		<div class="links">
+		<p><a href="" onclick="window.open('docs/sims/stationsim/index.html?mode=edit','demo','height=750,width=850,toolbar=no,menubar=no,status=no,location=no,resizable=yes,scrollbars=yes',true)">Try it.</a></p>
+		<p>
+		Embed: <input type="text" size="20" value='<iframe height="750" src="https://pboysen.github.io/wxapps/docs/sims/stationsim/index.html?mode=edit" width="850"></iframe>
+' readonly="readonly"/>
+		</p>
+		</div>
+	</div>
+	<div class="app">
+		<div class="title">Cookiesim</div>
+		<img src="docs/img/cookiesim.png" alt="Image of Cookie Simulation"/>
+		<p>Observe the effects of different ingredient levels on the size and height of cookies</p>
+		<div class="links">
+		<p><a href="" onclick="window.open('docs/sims/cookiesim/index.html?dir=case1&ingredient=butter','demo','height=750,width=1100,toolbar=no,menubar=no,status=no,location=no,resizable=yes,scrollbars=yes',true)">Try it.</a></p>
+		<p>
+		Embed: <input type="text" size="20" value='<iframe height="750" src="https://pboysen.github.io/wxapps/docs/sims/cookiesim/index.html?dir=case1&ingredient=butter" width="1100"></iframe>
+' readonly="readonly"/>
+		</p>
 		</div>
 	</div>
 </div>
+</div>
 
-<script src="main-built.js"></script>
+</body>
+</html>
