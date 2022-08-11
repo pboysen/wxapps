@@ -16,21 +16,15 @@
     "core-js": "^3.24.1",
     "express": "^4.17.1",
     "frameguard": "^3.1.0",
-<<<<<<< HEAD
-    "jszip": "^2.5.0",
-=======
     "jszip": "~3.7.0",
->>>>>>> 026427e4fdef5acbb66515049a8e6beeae37b101
-    "lodash": ">=4.17.19",
     "lop": "~0.4.0",
-    "mammoth": "^1.4.21",
     "md5": "^2.3.0",
     "minimatch": "^3.0.4",
     "object-assign": "^4.1.1",
     "path-is-absolute": "^1.0.0",
     "sax": "~1.1.1",
     "underscore": "^1.10.2",
-    "watchify": "^3.11.1",
+    "watchify": "^4.0.0",
     "xmlbuilder": "^10.0.0",
     "xmldom": "^0.6.0"
   },

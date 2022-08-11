@@ -1,0 +1,1 @@
+console.error("Error: Can't walk dependency graph: Cannot find module '/home/pboysen/projects/wxapps/mtnsim/main.js' from '/home/pboysen/projects/wxapps/mtnsim/_fake.js'\n    required by /home/pboysen/projects/wxapps/mtnsim/_fake.js");
