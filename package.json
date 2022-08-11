@@ -13,13 +13,13 @@
     "babelify": "^10.0.0",
     "bluebird": "~3.4.7",
     "braces": "^3.0.2",
-    "core-js": "^3.6.5",
+    "core-js": "^3.24.1",
     "express": "^4.17.1",
     "frameguard": "^3.1.0",
     "jszip": "~2.5.0",
     "lodash": ">=4.17.19",
     "lop": "~0.4.0",
-    "mammoth": "^1.4.11",
+    "mammoth": "^1.4.21",
     "md5": "^2.3.0",
     "minimatch": "^3.0.4",
     "object-assign": "^4.1.1",
@@ -36,9 +36,9 @@
     "duck": "~0.1.11",
     "eslint": "7.7.0",
     "hamjest": "2.13.0",
-    "mocha": "~2.2.5",
-    "temp": "~0.7.0",
     "lodash": ">=4.17.19",
+    "mocha": "^3.5.3",
+    "temp": "~0.7.0",
     "uglify-js": "~3.10.1"
   },
   "browser": {
@@ -49,7 +49,7 @@
     "mammoth": "bin/mammoth"
   },
   "scripts": {
-    "drawsim": "watchify C:/Users/pboysen/git/wxapps/src/drawsim/main.js  -o public/main-built.js -t [babelify --presets [@babel/preset-env] ] -d -v",
+    "mtnsim": "watchify ./mtnsim/main.js  -o public/main-built.js -t [babelify --presets [@babel/preset-env] ] -d -v",
     "mammoth": "browserify C:/Users/pboysen/git/wxapps/src/mammoth/mammoth.js  -o public/mammoth-built.js -t [babelify --presets [@babel/preset-env] ] -d -v"
   }
 }
