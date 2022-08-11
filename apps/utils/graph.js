@@ -1,4 +1,5 @@
-import {Axis} from "./axis"
+var Axis = require("./axis")
+
 export class Graph {
 	constructor(spec) {
 		this.stage = spec.stage
@@ -36,15 +37,15 @@ export class Graph {
 			spec.stage.addChild(b)
 		}
 	}
-	
+
 	setWidth(width) {
 		this.width = width
 	}
-	
+
 	setDotted(dotted) {
 		this.dotted = dotted
 	}
-	
+
 	setColor(color) {
 		this.color = color
 		this.endPlot()
@@ -81,9 +82,9 @@ export class Graph {
 		this.stage.addChild(line)
 		return line
 	}
-	
+
     plot(xv,yv) {
-        if (xv >= this.xaxis.min && xv <= this.xaxis.max && yv >= this.yaxis.min && yv <= this.yaxis.max) {                
+        if (xv >= this.xaxis.min && xv <= this.xaxis.max && yv >= this.yaxis.min && yv <= this.yaxis.max) {
             let x = this.xaxis.getLoc(xv)
             let y = this.yaxis.getLoc(yv)
             if (this.last)  {
@@ -94,7 +95,7 @@ export class Graph {
             this.moveMarker(x,y)
         }
     }
-    
+
     endPlot() { this.last = null }
-    
+
 }

@@ -1,5 +1,5 @@
-import {Graph} from "../utils"
-import {Url} from "url"
+var Graph = require("../utils/graph")
+var Url =  require("url")
 
 let mtnsim_results = "mtnsim_results", LAPSE_RATE = -9.8
 searchParams = new URLSearchParams(window.location.search.substring(1))

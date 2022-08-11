@@ -13,6 +13,7 @@
     "babelify": "^10.0.0",
     "bluebird": "~3.4.7",
     "braces": "^3.0.2",
+    "browserify-prepend-licenses": "~1.0.0",
     "core-js": "^3.24.1",
     "express": "^4.17.1",
     "frameguard": "^3.1.0",
@@ -29,8 +30,6 @@
     "xmldom": "^0.6.0"
   },
   "devDependencies": {
-    "browserify": "~13.0.1",
-    "browserify-prepend-licenses": "~1.0.0",
     "duck": "~0.1.11",
     "eslint": "7.7.0",
     "hamjest": "2.13.0",
@@ -47,7 +46,7 @@
     "mammoth": "bin/mammoth"
   },
   "scripts": {
-    "mtnsim": "watchify ./mtnsim/main.js  -o public/main-built.js -t [babelify --presets [@babel/preset-env] ] -d -v",
+    "mtnsim": "browserify /home/pboysen/projects/wxapps/apps/mtnsim/main.js  -o public/main-built.js -t [babelify --presets [@babel/preset-env] ] -d -v",
     "mammoth": "browserify C:/Users/pboysen/git/wxapps/src/mammoth/mammoth.js  -o public/mammoth-built.js -t [babelify --presets [@babel/preset-env] ] -d -v"
   }
 }
