@@ -1,6 +1,7 @@
 import Graph from "../utils/graph"
 import Url from "url"
-import { getAnswer, setAnswer, getSettings, setComplete } from "../utils/message"
+import { getAnswer, setAnswer, getSettings, setComplete, appReady } from "../utils/message"
+
 
 let mtnsim_results = "mtnsim_results", LAPSE_RATE = -9.8
 var searchParams = new URLSearchParams(window.location.search.substring(1))
@@ -129,7 +130,7 @@ class Settings {
 		let event = /msie|trident/g.test(window.navigator.userAgent.toLowerCase())?"change":"input"
 		this.temp.addEventListener(event, e => slidef(e,this.temp,this.tempout,this.listener))
 		this.vapor.addEventListener(event, e => slidef(e,this.vapor,this.vaporout,this.listener))
-		//this.dewpoint.addEventListener(event, e => slidef(e,this.dewpoint,this.dewpointout,this.listener))
+		this.dewpoint.addEventListener(event, e => slidef(e,this.dewpoint,this.dewpointout,this.listener))
 	}
 
 	getTemp() { return this.temp.valueAsNumber }
@@ -418,20 +419,20 @@ class Mtn {
 
 	showResults() {
 		for (let i = this.results.children.length-1; i > 1 ; i--) this.results.removeChild(this.results.children[i])
-		let trials = getAnswer() || []
+		let trials = getAnswer()
 		trials.forEach(json => this.results.appendChild(getRow(json)))
 		setAnswer(trials)
 	}
 
 	addTrial() {
-		let trials = getAnswer() || []
+		let trials = getAnswer()
 		let json = this.trial.toJSON()
 		setAnswer(trials.concat(json))
 		this.results.appendChild(getRow(json))
 	}
 
 	deleteTrial(row) {
-		let trials = getAnswer() || []
+		let trials = getAnswer()
 		trials.splice(row,1)
 		setAnswer(trials)
 		this.showResults()
@@ -611,5 +612,4 @@ class MtnSim {
 	}
 }
 
-let mtnsim = new MtnSim()
-mtnsim.render()
+appReady().then(() => (new MtnSim()).render())
