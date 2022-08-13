@@ -1,6 +1,6 @@
 const marginX = 40, marginY = 30, endMargin = 5
 
-export class Axis {
+export default class Axis {
 	constructor(spec) {
 		this.spec = spec
 		this.stage = spec.stage
@@ -43,7 +43,7 @@ export class Axis {
 		line.graphics.endStroke();
 		this.stage.addChild(line)
 	}
-	
+
 	drawText(text,x,y) {
 		text.x = x
 		text.y = y
@@ -62,7 +62,7 @@ export class Axis {
             let minXLabel = this.originX
             for (let val = this.min; val <= this.max; val += this.major) {
                 let v = this.getLoc(val)
-                this.drawLine(this.originX-4,v,this.originX+4,v)                
+                this.drawLine(this.originX-4,v,this.originX+4,v)
                 let text = this.getText(val.toFixed(this.precision))
                 let bnds = text.getBounds()
                 let x = this.originX-5-bnds.width
@@ -71,28 +71,28 @@ export class Axis {
             }
             for (let val = this.min; val <= this.max; val += this.minor) {
                 let v = this.getLoc(val)
-                this.drawLine(this.originX-2,v,this.originX+2,v)                
+                this.drawLine(this.originX-2,v,this.originX+2,v)
             }
             if (this.spec.label) {
 	            let y = this.originY - (this.originY - label_bnds.width)/2
 	            this.drawText(label, minXLabel - label_bnds.height, y)
             }
         } else {
-            this.drawLine(this.originX,this.originY, this.endX,this.originY)            
+            this.drawLine(this.originX,this.originY, this.endX,this.originY)
             if (this.spec.label) {
 	            let x = (this.w - endMargin - label_bnds.width)/2
 	            this.drawText(label, this.originX + x, this.originY + 15)
             }
             for (let val = this.min; val <= this.max; val += this.major)  {
                 let v = this.getLoc(val)
-                this.drawLine(v,this.originY-4,v,this.originY+4)              
+                this.drawLine(v,this.originY-4,v,this.originY+4)
                 let text = this.getText(val.toFixed(this.precision))
                 let bnds = text.getBounds()
                 this.drawText(text,v-bnds.width/2,this.originY+4)
             }
             for (let val = this.min; val <= this.max; val += this.minor) {
                 let v = this.getLoc(val)
-                this.drawLine(v,this.originY-2,v,this.originY+2)              
+                this.drawLine(v,this.originY-2,v,this.originY+2)
             }
         }
     }

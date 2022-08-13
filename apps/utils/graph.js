@@ -1,6 +1,6 @@
-var Axis = require("./axis")
+import Axis from "./axis"
 
-export class Graph {
+export default class Graph {
 	constructor(spec) {
 		this.stage = spec.stage
 		this.xaxis = new Axis({
@@ -97,5 +97,4 @@ export class Graph {
     }
 
     endPlot() { this.last = null }
-
 }

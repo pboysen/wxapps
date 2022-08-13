@@ -1,8 +1,9 @@
-var Graph = require("../utils/graph")
-var Url =  require("url")
+import Graph from "../utils/graph"
+import Url from "url"
+import { getAnswer, setAnswer, getSettings, setComplete } from "../utils/message"
 
 let mtnsim_results = "mtnsim_results", LAPSE_RATE = -9.8
-searchParams = new URLSearchParams(window.location.search.substring(1))
+var searchParams = new URLSearchParams(window.location.search.substring(1))
 let tool = searchParams.get('tool')
 
 if (tool == "readout") {
@@ -14,7 +15,7 @@ if (tool == "readout") {
 
 createjs.MotionGuidePlugin.install()
 createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.HTMLAudioPlugin, createjs.FlashAudioPlugin])
-createjs.Ticker.frameRate = 20
+createjs.Ticker.frameRate = 10
 function teten(T,a,b) { return 6.1078*Math.exp(a*T/(T+273.16-b)) }
 function saturation(temp) { return teten(temp,17.269,35.86) }
 function icesaturation(temp) { return teten(temp,21.874,7.66) }
@@ -38,7 +39,7 @@ function getDelete(row) {
 		if (confirm("Delete row?")) {
 			// <tr><td><img...
 			let node = event.target.parentNode.parentNode
-			//mtnsim.mtn.deleteTrial(Array.prototype.indexOf.call(node.parentNode.childNodes,node)-4)
+			mtnsim.mtn.deleteTrial(Array.prototype.indexOf.call(node.parentNode.childNodes,node)-4)
 		}
 	})
 	td.appendChild(img)
@@ -62,33 +63,33 @@ function getRow(json,row) {
 class Trial {
 	constructor() {
 		this.start = null
-	    this.cloudbase = 0
-	    this.temp = 0
-	    this.altitude = 0
-	    this.vapor = 0
-	    this.dewpoint = 0
-	    this.lapse = 0
+    this.cloudbase = 0
+    this.temp = 0
+    this.altitude = 0
+    this.vapor = 0
+    this.dewpoint = 0
+    this.lapse = 0
 	}
 
 	toJSON() {
 		return {
 			start: this.start,
-		    cloudbase: this.cloudbase,
-		    temp: this.temp,
-		    altitude: this.altitude,
-		    vapor: this.vapor,
-		    dewpoint: this.dewpoint
+	    cloudbase: this.cloudbase,
+	    temp: this.temp,
+	    altitude: this.altitude,
+	    vapor: this.vapor,
+	    dewpoint: this.dewpoint
 		}
 	}
 
 	init(start) {
 		this.start = start
-	    this.cloudbase = 0
-	    this.temp = start.temp
-	    this.altitude = 0
-	    this.vapor = start.vapor
-	    this.dewpoint = start.dewpoint
-	    this.lapse = LAPSE_RATE
+    this.cloudbase = 0
+    this.temp = start.temp
+    this.altitude = 0
+    this.vapor = start.vapor
+    this.dewpoint = start.dewpoint
+    this.lapse = LAPSE_RATE
 	}
 }
 
@@ -104,7 +105,7 @@ class Readout {
 		this.altitude.value = trial.altitude.toFixed(1)
 		this.temp.value = trial.temp.toFixed(1)
 		this.vapor.value = trial.vapor.toFixed(1)
-		//this.dewpoint.value = trial.dewpoint.toFixed(1)
+		this.dewpoint.value = trial.dewpoint.toFixed(1)
 	}
 }
 
@@ -151,7 +152,7 @@ class Settings {
 	}
 
 	setDewpoint(value) {
-		//this.dewpoint.value = value
+		this.dewpoint.value = value
 		this.dewpointout.value = value.toFixed(1)
 		this.readout.dewpoint.value = this.dewpointout.value
 	}
@@ -181,7 +182,7 @@ class Buttons {
 }
 
 class ETGraph extends Graph {
-	constructor(stage,settings) {
+	constructor(stage, settings) {
 		super({
 			stage: stage,
 			w: 200,
@@ -207,20 +208,20 @@ class ETGraph extends Graph {
 		stage.addChild(this.leaf)
 		stage.addChild(this.marker)
 		this.settings.addListener(slider => {
-            if (slider.id == "temp") {
-                this.temp = slider.valueAsNumber
-                this.settings.setTemp(slider.valueAsNumber)
-            } else if (slider.id == "vapor") {
-                this.vapor = slider.valueAsNumber
-                this.settings.setVapor(this.vapor)
-                this.settings.setDewpoint(dewpoint(this.vapor))
-            } else if (slider.id == "dewpoint") {
-                this.dewpoint = slider.valueAsNumber
-                this.settings.setDewpoint(this.dewpoint)
-                this.vapor = vapor(this.dewpoint)
-                this.settings.setVapor(this.vapor)
-            }
-            this.moveMarker(true)
+      if (slider.id == "temp") {
+          this.temp = slider.valueAsNumber
+          this.settings.setTemp(slider.valueAsNumber)
+      } else if (slider.id == "vapor") {
+          this.vapor = slider.valueAsNumber
+          this.settings.setVapor(this.vapor)
+          this.settings.setDewpoint(dewpoint(this.vapor))
+      } else if (slider.id == "dewpoint") {
+          this.dewpoint = slider.valueAsNumber
+          this.settings.setDewpoint(this.dewpoint)
+          this.vapor = vapor(this.dewpoint)
+          this.settings.setVapor(this.vapor)
+      }
+      this.moveMarker(true)
 		})
 		this.icegraph = new IceGraph(stage)
 	}
@@ -235,9 +236,9 @@ class ETGraph extends Graph {
 	}
 
 	plotSaturation() {
-        for (let t = this.xaxis.min; t < 0; t++) this.plot(t,icesaturation(t))
-        for (let t = 0; t <= this.xaxis.max; t++) this.plot(t,saturation(t))
-        this.endPlot()
+    for (let t = this.xaxis.min; t < 0; t++) this.plot(t,icesaturation(t))
+    for (let t = 0; t <= this.xaxis.max; t++) this.plot(t,saturation(t))
+    this.endPlot()
 	}
 
 	clear() {
@@ -251,26 +252,26 @@ class ETGraph extends Graph {
 	}
 
 	showLeaf() {
-       let x = this.xaxis.getLoc(this.temp)
-       let y = this.yaxis.getLoc(this.vapor)
-       this.moveLeaf(x,y)
+   let x = this.xaxis.getLoc(this.temp)
+   let y = this.yaxis.getLoc(this.vapor)
+   this.moveLeaf(x,y)
 	}
 
     moveMarker(updateSettings) {
-        let sat = saturation(this.temp)
-        if (this.vapor > sat) {
-        	this.vapor = sat
-        	if (updateSettings === true) {
-        		this.settings.setTemp(this.temp)
-        		this.settings.setVapor(sat)
-        		this.settings.setDewpoint(dewpoint(sat))
-        	}
-        }
-        let x = this.xaxis.getLoc(this.temp)
-        let y = this.yaxis.getLoc(this.vapor)
-        this.marker.x = x - 2
-        this.marker.y = y - 2
-        if (updateSettings === true) this.moveLeaf(x,y)
+      let sat = saturation(this.temp)
+      if (this.vapor > sat) {
+      	this.vapor = sat
+      	if (updateSettings === true) {
+      		this.settings.setTemp(this.temp)
+      		this.settings.setVapor(sat)
+      		this.settings.setDewpoint(dewpoint(sat))
+      	}
+      }
+      let x = this.xaxis.getLoc(this.temp)
+      let y = this.yaxis.getLoc(this.vapor)
+      this.marker.x = x - 2
+      this.marker.y = y - 2
+      if (updateSettings === true) this.moveLeaf(x,y)
     }
 
 	update(trial) {
@@ -342,10 +343,10 @@ class IceGraph extends Graph {
 
 	render() {
 		super.render()
-        for (let t = this.xaxis.min; t <= this.xaxis.max; t++) this.plot(t,saturation(t))
-        this.endPlot()
-        for (let t = this.xaxis.min; t <= this.xaxis.max; t++) this.plot(t,icesaturation(t))
-        this.endPlot()
+    for (let t = this.xaxis.min; t <= this.xaxis.max; t++) this.plot(t,saturation(t))
+    this.endPlot()
+    for (let t = this.xaxis.min; t <= this.xaxis.max; t++) this.plot(t,icesaturation(t))
+    this.endPlot()
 	}
 
 }
@@ -374,14 +375,13 @@ class Mtn {
 		this.running = false
 		this.lightning = false
 		this.lighttick = 0
-		//this.path = [50,165, 60,155, 74,152, 80,140, 90,131, 100,125, 112,122, 120,110, 137,92, 140,75, 151,64, 150,60, 173,56, 185,60, 204,70, 210,80, 221,92, 221,95, 224,105, 230,110, 246,121, 250,130, 268,141, 280,165, 290,165]
 		this.path = [50,165, 60,155, 74,152, 80,140, 90,131, 100,125, 112,122, 120,110, 137,92, 140,75, 151,66, 150,66, 173,66, 185,66, 204,70, 210,80, 221,92, 221,95, 224,105, 230,110, 246,121, 250,130, 268,141, 280,165, 290,165]
 		this.results = document.getElementById("results_table")
 		document.getElementById("delete_all").addEventListener("click",event => {
-			//if (confirm("Delete all data?")) this.deleteResults()
+			if (confirm("Delete all data?")) this.deleteResults()
 		})
 		this.reset()
-		//this.showResults()
+		this.showResults()
 	}
 
 	render() {
@@ -408,7 +408,7 @@ class Mtn {
 		this.leaftween.call(() => {
 			if (this.wind) this.wind.stop()
 			this.running = false
-			//this.addTrial()
+			this.addTrial()
 			if (this.finish) this.finish()
 		})
 		this.running = true
@@ -416,33 +416,31 @@ class Mtn {
 		this.playSound("wind")
 	}
 
-	// showResults() {
-	// 	for (let i = this.results.children.length-1; i > 1 ; i--) this.results.removeChild(this.results.children[i])
-	// 	let trials = store.get(mtnsim_results)
-	// 	if (trials) {
-	// 		trials.forEach(json => this.results.appendChild(getRow(json)))
-	// 	} else
-	// 		store.set(mtnsim_results,[])
-	// }
+	showResults() {
+		for (let i = this.results.children.length-1; i > 1 ; i--) this.results.removeChild(this.results.children[i])
+		let trials = getAnswer() || []
+		trials.forEach(json => this.results.appendChild(getRow(json)))
+		setAnswer(trials)
+	}
 
-	// addTrial() {
-	// 	let trials = store.get(mtnsim_results)
-	// 	let json = this.trial.toJSON()
-	// 	store.set(mtnsim_results,trials.concat(json))
-	// 	this.results.appendChild(getRow(json))
-	// }
+	addTrial() {
+		let trials = getAnswer() || []
+		let json = this.trial.toJSON()
+		setAnswer(trials.concat(json))
+		this.results.appendChild(getRow(json))
+	}
 
-	// deleteTrial(row) {
-	// 	let trials = store.get(mtnsim_results)
-	// 	trials.splice(row,1)
-	// 	store.set(mtnsim_results,trials)
-	// 	this.showResults()
-	// }
+	deleteTrial(row) {
+		let trials = getAnswer() || []
+		trials.splice(row,1)
+		setAnswer(trials)
+		this.showResults()
+	}
 
-	// deleteResults() {
-	// 	store.set(mtnsim_results,[])
-	// 	this.showResults()
-	// }
+	deleteResults() {
+		setAnswer([])
+		this.showResults()
+	}
 
 	pause(pause) {
 		this.leaftween.setPaused(pause)
@@ -552,7 +550,7 @@ class MtnSim {
 		this.atstage = new createjs.Stage("atgraph")
 		this.buttons = new Buttons()
 		this.settings = new Settings()
-		this.etgraph = new ETGraph(this.etstage,this.settings)
+		this.etgraph = new ETGraph(this.etstage, this.settings)
 		this.atgraph = new ATGraph(this.atstage)
 		this.mtn = new Mtn(this.mainstage, this.settings, () => {
 			this.buttons.restart.disabled = false
