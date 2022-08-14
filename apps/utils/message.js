@@ -1,36 +1,31 @@
-var info = null
+var answer = null
+var origin = null
 
-window.onmessage = e => {
-  if (e.source != window.parent ) return
-  var msg = e.data
-  if (msg.cmd == "setInfo")
-    info = msg
-}
-
-export function appReady() {
-  new Promise(resolve => {
-    const timer = setInterval(() => {
-      if (info != null) {
-        clearInterval(timer)
-        resolve(true)
+export function getSettings() {
+  return new Promise(resolve => {
+    window.addEventListener("message", e => {
+      if (e.source != window.parent ) return
+      var msg = e.data
+      if (msg.cmd == "setInfo") {
+        answer = msg.answer
+        console.log(msg)
+        origin = msg.origin
+        resolve(msg.settings)
       }
-    }, 1000)
+    }, { once: true })
   })
 }
 
 export function getAnswer() {
-  return info.answer
+  return answer
 }
 
-export function setAnswer(answer) {
-  info.answer = answer
-  window.parent.postMessage({ cmd: "setAnswer", answer: answer }, info.origin)
-}
-
-export function getSettings() {
-  return info.settings
+export function setAnswer(value) {
+  answer = value
+  console.log(answer)
+  window.parent.postMessage({ cmd: "setAnswer", answer: answer }, origin)
 }
 
 export function setComplete(valid, target) {
-  target.postMessage({ cmd: "setValidity", validity: valid }, info.origin)
+  target.postMessage({ cmd: "setValidity", validity: valid }, origin)
 }

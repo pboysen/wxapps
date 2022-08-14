@@ -1,22 +1,13 @@
 import Graph from "../utils/graph"
 import Url from "url"
-import { getAnswer, setAnswer, getSettings, setComplete, appReady } from "../utils/message"
+import { getSettings, getAnswer, setAnswer, setComplete } from "../utils/message"
 
-
-let mtnsim_results = "mtnsim_results", LAPSE_RATE = -9.8
-var searchParams = new URLSearchParams(window.location.search.substring(1))
-let tool = searchParams.get('tool')
-
-if (tool == "readout") {
-	let dp = document.getElementById("dp")
-	dp.style.display = "inline-block"
-	let readout = document.getElementById("readout")
-	readout.style.display = "block"
-}
+const LAPSE_RATE = -9.8
 
 createjs.MotionGuidePlugin.install()
 createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.HTMLAudioPlugin, createjs.FlashAudioPlugin])
 createjs.Ticker.frameRate = 10
+function getEl(id) { return document.getElementById(id) }
 function teten(T,a,b) { return 6.1078*Math.exp(a*T/(T+273.16-b)) }
 function saturation(temp) { return teten(temp,17.269,35.86) }
 function icesaturation(temp) { return teten(temp,21.874,7.66) }
@@ -60,7 +51,6 @@ function getRow(json,row) {
 	return tr
 }
 
-
 class Trial {
 	constructor() {
 		this.start = null
@@ -96,30 +86,30 @@ class Trial {
 
 class Readout {
 	constructor() {
-		this.altitude = document.getElementById("altitudereadout")
-		this.temp = document.getElementById("tempreadout")
-		this.vapor = document.getElementById("vaporreadout")
-		this.dewpoint = document.getElementById("dewpointreadout")
+		this.altitude = getEl("altitudereadout")
+		this.temp = getEl("tempreadout")
+		this.vapor = getEl("vaporreadout")
+		this.dewpoint = getEl("dewpointreadout")
 	}
 
 	update(trial) {
 		this.altitude.value = trial.altitude.toFixed(1)
 		this.temp.value = trial.temp.toFixed(1)
 		this.vapor.value = trial.vapor.toFixed(1)
-		this.dewpoint.value = trial.dewpoint.toFixed(1)
+		//this.dewpoint.value = trial.dewpoint.toFixed(1)
 	}
 }
 
 class Settings {
 	constructor() {
 		this.readout = new Readout()
-		this.temp = document.getElementById("temp")
-		this.vapor = document.getElementById("vapor")
-		this.dewpoint = document.getElementById("dewpoint")
-		this.tempout = document.getElementById("tempout")
-		this.vaporout = document.getElementById("vaporout")
-		this.dewpointout = document.getElementById("dewpointout")
-		this.mute = document.getElementById("mute")
+		this.temp = getEl("temp")
+		this.vapor = getEl("vapor")
+		this.dewpoint = getEl("dewpoint")
+		this.tempout = getEl("tempout")
+		this.vaporout = getEl("vaporout")
+		this.dewpointout = getEl("dewpointout")
+		this.mute = getEl("mute")
 		this.listener = null
 		function slidef(e,input, out, f) {
 	    	e.stopPropagation()
@@ -130,7 +120,7 @@ class Settings {
 		let event = /msie|trident/g.test(window.navigator.userAgent.toLowerCase())?"change":"input"
 		this.temp.addEventListener(event, e => slidef(e,this.temp,this.tempout,this.listener))
 		this.vapor.addEventListener(event, e => slidef(e,this.vapor,this.vaporout,this.listener))
-		this.dewpoint.addEventListener(event, e => slidef(e,this.dewpoint,this.dewpointout,this.listener))
+		//this.dewpoint.addEventListener(event, e => slidef(e,this.dewpoint,this.dewpointout,this.listener))
 	}
 
 	getTemp() { return this.temp.valueAsNumber }
@@ -167,10 +157,10 @@ class Settings {
 
 class Buttons {
 	constructor() {
-		this.run = document.getElementById("run")
-		this.pause = document.getElementById("pause")
-		this.restart = document.getElementById("restart")
-		this.mute = document.getElementById("mute")
+		this.run = getEl("run")
+		this.pause = getEl("pause")
+		this.restart = getEl("restart")
+		this.mute = getEl("mute")
 	}
 
 	addListener(listener) {
@@ -258,22 +248,22 @@ class ETGraph extends Graph {
    this.moveLeaf(x,y)
 	}
 
-    moveMarker(updateSettings) {
-      let sat = saturation(this.temp)
-      if (this.vapor > sat) {
-      	this.vapor = sat
-      	if (updateSettings === true) {
-      		this.settings.setTemp(this.temp)
-      		this.settings.setVapor(sat)
-      		this.settings.setDewpoint(dewpoint(sat))
-      	}
-      }
-      let x = this.xaxis.getLoc(this.temp)
-      let y = this.yaxis.getLoc(this.vapor)
-      this.marker.x = x - 2
-      this.marker.y = y - 2
-      if (updateSettings === true) this.moveLeaf(x,y)
+  moveMarker(updateSettings) {
+    let sat = saturation(this.temp)
+    if (this.vapor > sat) {
+    	this.vapor = sat
+    	if (updateSettings === true) {
+    		this.settings.setTemp(this.temp)
+    		this.settings.setVapor(sat)
+    		this.settings.setDewpoint(dewpoint(sat))
+    	}
     }
+    let x = this.xaxis.getLoc(this.temp)
+    let y = this.yaxis.getLoc(this.vapor)
+    this.marker.x = x - 2
+    this.marker.y = y - 2
+    if (updateSettings === true) this.moveLeaf(x,y)
+  }
 
 	update(trial) {
 		this.temp = trial.temp
@@ -349,7 +339,6 @@ class IceGraph extends Graph {
     for (let t = this.xaxis.min; t <= this.xaxis.max; t++) this.plot(t,icesaturation(t))
     this.endPlot()
 	}
-
 }
 
 class Mtn {
@@ -377,8 +366,8 @@ class Mtn {
 		this.lightning = false
 		this.lighttick = 0
 		this.path = [50,165, 60,155, 74,152, 80,140, 90,131, 100,125, 112,122, 120,110, 137,92, 140,75, 151,66, 150,66, 173,66, 185,66, 204,70, 210,80, 221,92, 221,95, 224,105, 230,110, 246,121, 250,130, 268,141, 280,165, 290,165]
-		this.results = document.getElementById("results_table")
-		document.getElementById("delete_all").addEventListener("click",event => {
+		this.results = getEl("results_table")
+		getEl("delete_all").addEventListener("click",event => {
 			if (confirm("Delete all data?")) this.deleteResults()
 		})
 		this.reset()
@@ -403,6 +392,7 @@ class Mtn {
 		this.stage.removeAllChildren()
 		this.render()
 	}
+
 	play() {
 		this.reset()
 		this.leaftween = createjs.Tween.get(this.leaf).to({guide:{path:this.path}},10000)
@@ -545,7 +535,8 @@ class Mtn {
 }
 
 class MtnSim {
-	constructor() {
+	constructor(settings) {
+		//setAnswer([]) // beginning default
 		this.mainstage = new createjs.Stage("maincanvas")
 		this.etstage = new createjs.Stage("etgraph")
 		this.atstage = new createjs.Stage("atgraph")
@@ -612,4 +603,4 @@ class MtnSim {
 	}
 }
 
-appReady().then(() => (new MtnSim()).render())
+getSettings().then(settings => (new MtnSim(settings)).render())
