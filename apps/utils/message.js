@@ -1,14 +1,15 @@
+var init = null
 var answer = null
+var valid = false
 var origin = null
 
 export function getSettings() {
   return new Promise(resolve => {
     window.addEventListener("message", e => {
-      if (e.source != window.parent ) return
       var msg = e.data
+      if (e.source != window.parent ) return
       if (msg.cmd == "setInfo") {
-        answer = msg.answer
-        console.log(msg)
+        answer = msg.answer || init
         origin = msg.origin
         resolve(msg.settings)
       }
@@ -16,16 +17,22 @@ export function getSettings() {
   })
 }
 
+export function initAnswer(value) {
+  init = value
+  saveAnswer(value)
+}
+
 export function getAnswer() {
   return answer
 }
 
-export function setAnswer(value) {
-  answer = value
-  console.log(answer)
-  window.parent.postMessage({ cmd: "setAnswer", answer: answer }, origin)
+export function setValid(value) {
+  valid = value
+  saveAnswer(answer)
 }
 
-export function setComplete(valid, target) {
-  target.postMessage({ cmd: "setValidity", validity: valid }, origin)
+export function saveAnswer(value) {
+  answer = value
+  var ans = { answer: value, valid: valid }
+  window.parent.postMessage({ cmd: "setAnswer", answer: ans }, origin)
 }

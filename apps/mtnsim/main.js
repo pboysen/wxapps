@@ -1,8 +1,9 @@
 import Graph from "../utils/graph"
 import Url from "url"
-import { getSettings, getAnswer, setAnswer, setComplete } from "../utils/message"
+import { getSettings, initAnswer, getAnswer, saveAnswer, setValid } from "../utils/message"
 
 const LAPSE_RATE = -9.8
+var mtnsim = null
 
 createjs.MotionGuidePlugin.install()
 createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.HTMLAudioPlugin, createjs.FlashAudioPlugin])
@@ -28,11 +29,8 @@ function getDelete(row) {
 	img.setAttribute("alt","Delete row")
 	img.setAttribute("title","Delete row")
 	img.addEventListener("click", event => {
-		if (confirm("Delete row?")) {
-			// <tr><td><img...
-			let node = event.target.parentNode.parentNode
-			mtnsim.mtn.deleteTrial(Array.prototype.indexOf.call(node.parentNode.childNodes,node)-4)
-		}
+		let node = event.target.parentNode.parentNode
+		mtnsim.mtn.deleteTrial(Array.prototype.indexOf.call(node.parentNode.childNodes,node)-4)
 	})
 	td.appendChild(img)
 	return td
@@ -367,8 +365,9 @@ class Mtn {
 		this.lighttick = 0
 		this.path = [50,165, 60,155, 74,152, 80,140, 90,131, 100,125, 112,122, 120,110, 137,92, 140,75, 151,66, 150,66, 173,66, 185,66, 204,70, 210,80, 221,92, 221,95, 224,105, 230,110, 246,121, 250,130, 268,141, 280,165, 290,165]
 		this.results = getEl("results_table")
-		getEl("delete_all").addEventListener("click",event => {
-			if (confirm("Delete all data?")) this.deleteResults()
+		getEl("delete_all").addEventListener("click",e => {
+			console.log(e)
+			this.deleteResults()
 		})
 		this.reset()
 		this.showResults()
@@ -411,25 +410,26 @@ class Mtn {
 		for (let i = this.results.children.length-1; i > 1 ; i--) this.results.removeChild(this.results.children[i])
 		let trials = getAnswer()
 		trials.forEach(json => this.results.appendChild(getRow(json)))
-		setAnswer(trials)
+		saveAnswer(trials)
 	}
 
 	addTrial() {
 		let trials = getAnswer()
 		let json = this.trial.toJSON()
-		setAnswer(trials.concat(json))
+		saveAnswer(trials.concat(json))
 		this.results.appendChild(getRow(json))
 	}
 
 	deleteTrial(row) {
 		let trials = getAnswer()
 		trials.splice(row,1)
-		setAnswer(trials)
+		saveAnswer(trials)
 		this.showResults()
 	}
 
 	deleteResults() {
-		setAnswer([])
+		setValid(false)
+		saveAnswer([])
 		this.showResults()
 	}
 
@@ -536,7 +536,7 @@ class Mtn {
 
 class MtnSim {
 	constructor(settings) {
-		//setAnswer([]) // beginning default
+		initAnswer([])
 		this.mainstage = new createjs.Stage("maincanvas")
 		this.etstage = new createjs.Stage("etgraph")
 		this.atstage = new createjs.Stage("atgraph")
@@ -603,4 +603,7 @@ class MtnSim {
 	}
 }
 
-getSettings().then(settings => (new MtnSim(settings)).render())
+getSettings().then(settings => {
+	mtnsim = new MtnSim(settings)
+	mtnsim.render()
+})
